@@ -1,0 +1,48 @@
+{% extends 'djedi/plugins/txt/editor.html' %}
+
+{% block editor %}
+    <textarea name="data" class="form-control md-source"></textarea>
+{% endblock editor %}
+
+{% block plugin_script %}
+    <script>
+        new window.Editor({
+            uri: '{{ uri }}',
+            initialize: function () {
+                editor = this
+                editor.$textarea = $('textarea');
+
+                editor.$textarea.keydown(function(e) {
+                    if(e.keyCode === 9) { // tab was pressed
+                        // ### Get caret position/selection
+                        var start = this.selectionStart;
+                            end = this.selectionEnd;
+
+                        var $this = $(this);
+
+                        // ### Set textarea value to: text before caret + tab + text after caret
+                        $this.val($this.val().substring(0, start)
+                                    + "\t"
+                                    + $this.val().substring(end));
+
+                        // ### Put caret at right position again
+                        this.selectionStart = this.selectionEnd = start + 1;
+
+                        // ### Prevent the focus lose
+                        return false;
+                    }
+                });
+
+                editor.$textarea.on('keypress', function () {
+                    editor.setState('dirty');
+                });
+            },
+            render: function (node) {
+                this.$textarea.val(node.data);
+            },
+            onFormChange: function() {
+                editor.renderContent(editor.$textarea.val());
+            }
+        });
+    </script>
+{% endblock plugin_script %}

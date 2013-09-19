@@ -1,0 +1,9 @@
+*.pyc
+*.egg
+*.egg-info
+.idea
+.DS_Store
+.tox
+build
+dist
+tests/media

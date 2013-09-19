@@ -1,0 +1,66 @@
+{% load static %}
+{% load url from future %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>djedi editor</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        {% block style %}
+            <link href="{{ THEME }}" rel="stylesheet" media="screen">
+            {% block plugin_style %}{% endblock plugin_style %}
+        {% endblock style %}
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="{{ STATIC_URL }}djedi/vendor/html5/html5shiv.js"></script>
+          <script src="{{ STATIC_URL }}djedi/vendor/html5/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body class="editor">
+        {% block form %}
+        <form id="form" role="form" enctype="multipart/form-data" method="post" action="{% url 'admin:djedi_cms.editor' uri|urlencode:'' %}">
+            <header class="navbar-fixed-top">
+                <nav role="header" class="navbar navbar-default node-title">
+                    <div class="plugin"></div>
+                    <div class="flag"></div>
+                    <span class="uri"></span>
+                    <!--<div class="djedi-badge djedi-version"></div>-->
+                    <a href="#" id="version" data-toggle="dropdown" class="label label-default pull-right version"><var></var> <i class="icon-caret-down"></i></a>
+                    <ul id="revisions" class="dropdown-menu pull-right" role="menu" aria-labelledby="version"></ul>
+                </nav>
+                <div id="progressbar" class="progress progress-striped">
+                  <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <span class="sr-only">20% Complete</span>
+                  </div>
+                </div>
+            </header>
+            <section id="tabs">{% block tabs %}{% endblock tabs %}</section>
+            <section id="editor">{% block editor %}{% endblock editor %}</section>
+            <footer>
+                <nav class="navbar navbar-default navbar-fixed-bottom">
+                    <i id="spinner" class="icon-spinner icon-spin icon-2x pull-left"></i>
+                    <div class="pull-right navbar-right btn-group">
+                        <button type="button" id="button-discard" class="btn btn-default navbar-btn" disabled="disabled"><i class="icon-remove"></i> Discard</button>
+                        <button type="submit" id="button-save" class="btn btn-default navbar-btn" disabled="disabled"><i class="icon-ok"></i> Save</button>
+                        <button type="button" id="button-publish" class="btn btn-default navbar-btn" disabled="disabled"><i class="icon-cloud"></i> Publish</button>
+                    </div>
+                </nav>
+            </footer>
+        </form>
+        {% endblock form %}
+
+        {% block script %}
+            <script>
+                window.DJEDI_ENDPOINT = '{% url 'admin:djedi_cms' %}';
+            </script>
+            <script src="{{ STATIC_URL }}djedi/vendor/jquery/jquery.min.js"></script>
+            <script src="{{ STATIC_URL }}djedi/vendor/jquery.form/jquery.form.min.js"></script>
+            <script src="{{ STATIC_URL }}djedi/vendor/bootstrap/js/bootstrap.min.js"></script>
+            <script src="{{ STATIC_URL }}djedi/cms/js/uri.js"></script>
+            <script src="{{ STATIC_URL }}djedi/plugins/base/js/editor.js"></script>
+            {% block plugin_script %}{% endblock plugin_script %}
+        {% endblock script %}
+    </body>
+</html>

@@ -1,0 +1,93 @@
+{% extends 'djedi/plugins/base/editor.html' %}
+{% load static %}
+
+{% block plugin_style %}
+    <link href="{{ STATIC_URL }}djedi/plugins/img/css/jquery.jcrop.min.css" rel="stylesheet" media="screen">
+    <link href="{{ STATIC_URL }}djedi/plugins/img/css/img.css" rel="stylesheet" media="screen">
+{% endblock %}
+
+{% block tabs %}
+    <ul class="nav navbar-default nav-tabs">
+      <li class="active"><a href="#image-pane" data-toggle="tab"><i class="icon-camera"></i> Image</a></li>
+      <li><a href="#resize-pane" data-toggle="tab"><i class="icon-resize-full"></i> Resize</a></li>
+      <li><a href="#html-pane" data-toggle="tab"><i class="icon-code"></i> Html</a></li>
+    </ul>
+{% endblock tabs %}
+
+{% block editor %}
+    <div class="tab-content">
+        <div id="image-pane" class="tab-pane active">
+            <input type="hidden" name="data[filename]">
+            <input type="file" id="image" name="data[file]">
+            <div id="preview" data-url="{{ data.url }}"></div>
+            <div id="dropzone"><section></section></div>
+        </div>
+        <div id="resize-pane" class="tab-pane">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">Width</label>
+                    <div class="col-xs-3">
+                        <input type="text" name="data[width]" id="field-width" class="form-control dimension">
+                    </div>
+                    <div class="col-xs-2">
+                        <button type="button" id="ar-lock" class="btn btn-default" data-toggle="button" title="Maintain aspect ratio" data-placement="bottom"><i class="icon-link"></i></button>
+                    </div>
+                    <label class="col-xs-2 control-label">Height</label>
+                    <div class="col-xs-3">
+                        <input type="text" name="data[height]" id="field-height" class="form-control dimension">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label"><i class="icon-crop"></i> Crop</label>
+                    <div class="col-xs-10">
+                        <input type="text" name="data[crop]" id="field-crop" class="form-control">
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div id="html-pane" class="tab-pane">
+            <fieldset class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">ID:</label>
+                    <div class="col-xs-10">
+                        <input type="text" class="form-control" name="data[id]">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">Class:</label>
+                    <div class="col-xs-10">
+                        <input type="text" class="form-control" name="data[class]">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">Alt:</label>
+                    <div class="col-xs-10">
+                        <input type="text" class="form-control" name="data[alt]">
+                    </div>
+                </div>
+            </fieldset>
+            <!--
+            <fieldset>
+                <div class="form-group">
+                    <label>Filename:</label>
+                    <p class="form-control-static" id="filename">{{ data.filename|default:'' }}</p>
+                </div>
+            </fieldset>
+            -->
+    </div>
+{% endblock editor %}
+
+{% block plugin_script %}
+    <script src="{{ STATIC_URL }}djedi/plugins/img/js/jquery.ui.widget.js"></script>
+    <script src="{{ STATIC_URL }}djedi/plugins/img/js/jquery.fileupload.js"></script>
+    <script src="{{ STATIC_URL }}djedi/plugins/img/js/jquery.jcrop.min.js"></script>
+    <script src="{{ STATIC_URL }}djedi/plugins/img/js/img.js"></script>
+    <script>
+        image = new window.ImageEditor({
+            uri: '{{ uri }}',
+            field: '#image',
+            preview: '#preview',
+            dropzone: '#dropzone'
+        });
+    </script>
+{% endblock %}

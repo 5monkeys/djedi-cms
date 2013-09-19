@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>djedi cms</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link href="{{ THEME }}" rel="stylesheet" media="screen">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="{{ STATIC_URL }}djedi/vendor/html5/html5shiv.js"></script>
+          <script src="{{ STATIC_URL }}djedi/vendor/html5/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-default" role="navigation">
+                <span class="navbar-brand"><a href="#" id="brand">djedi cms</a></span>
+                <ul class="nav nav-tabs pull-right">
+                    <li><a href="#" id="fullscreen" class="hide"><i class="icon-resize-full"></i></a></li>
+                    <li><a href="#search-panel" data-toggle="tab"><i class="icon-search"></i></a></li>
+                    <li class="active"><a href="#editor-panel" data-toggle="tab"><i class="icon-edit-sign"></i></a></li>
+                    <li class="hide"><a href="#settings-panel" data-toggle="tab"><i class="icon-cog"></i></a></li>
+                    <li><a href="#" id="tab-close" class="hide"><i class="icon-off"></i></a></li>
+                </ul>
+            </nav>
+        </header>
+        <div class="tab-content">
+            <section id="search-panel" class="tab-pane">
+                <div class="search-bar hide">
+                    <input type="text" class="form-control" placeholder='Search node...' />
+                </div>
+                <div class="panel-group" id="search-result"></div>
+            </section>
+            <section id="editor-panel" class="tab-pane active"></section>
+            <section id="settings-panel" class="tab-pane hide"></section>
+        </div>
+        <script src="{{ STATIC_URL }}djedi/vendor/jquery/jquery.min.js"></script>
+        <script src="{{ STATIC_URL }}djedi/vendor/bootstrap/js/bootstrap.min.js"></script>
+        <script src="{{ STATIC_URL }}djedi/cms/js/uri.js"></script>
+        <script src="{{ STATIC_URL }}djedi/cms/js/cms.js"></script>
+    </body>
+</html>

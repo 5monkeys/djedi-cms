@@ -1,0 +1,27 @@
+{% extends 'djedi/plugins/base/editor.html' %}
+
+{% block editor %}
+    <textarea name="data" class="form-control"></textarea>
+{% endblock editor %}
+
+{% block plugin_script %}
+    <script>
+        new window.Editor({
+            uri: '{{ uri }}',
+            initialize: function () {
+                console.log('TextEditor.initialize()');
+                var editor = this;
+                editor.$textarea = $('textarea');
+                editor.$textarea.on('keyup', function () {
+                    console.log('TextEditor:keyup');
+                    editor.triggerRender(editor.$textarea.val());
+                    editor.$textarea.change()
+                });
+            },
+            render: function (node) {
+                console.log('TextEditor.render()');
+                this.$textarea.val(node.data);
+            }
+        });
+    </script>
+{% endblock plugin_script %}

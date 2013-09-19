@@ -1,0 +1,2 @@
+class InvalidNodeData(Exception):
+    pass
