@@ -22,7 +22,7 @@ version = __import__('djedi').__version__
 setup(
     name='djedi-cms',
     version=version,
-    description='Django content management as i should be',
+    description='Django content management as it should be',
     long_description=(
         'Djedi CMS\n'
         '=========\n'
