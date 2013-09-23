@@ -60,7 +60,8 @@ class DjangoModelStorageBackend(DatabaseBackend):
 
     def get_revisions(self, uri):
         key = self._build_key(uri)
-        revisions = Node.objects.filter(key=key).values_list('plugin', 'version', 'is_published')
+        nodes = Node.objects.filter(key=key).order_by('date_created')
+        revisions = nodes.values_list('plugin', 'version', 'is_published')
         return [(key.clone(ext=plugin, version=version), is_published) for plugin, version, is_published in revisions]
 
     def _get(self, uri):
