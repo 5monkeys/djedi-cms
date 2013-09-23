@@ -9,6 +9,7 @@ class Node(models.Model):
     version = models.CharField(max_length=255)
     is_published = models.BooleanField(default=False, blank=True)
     meta = models.TextField(blank=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         app_label = u'djedi'
