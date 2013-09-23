@@ -1,12 +1,21 @@
 language: python
 
 python:
-  - 2.7
+  - "2.6"
+  - "2.7"
+env:
+  - DJANGO=Django==1.4.8
+  - DJANGO=Django==1.5.4
 
 install:
-  - pip install tox flake8
-  - make install
+  - pip install $DJANGO flake8 python-coveralls
+  - pip install -e .
+  - pip install "file://`pwd`#egg=djedi-cms[tests]"
 
 script:
   - make flake8
-  - tox
+  - coverage run --source djedi runtests.py
+  - coverage report
+
+after_success:
+  - coveralls
