@@ -1,21 +1,19 @@
 #!/usr/bin/env python
-import sys
 from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
 
 
-class PyTest(TestCommand):
+install_requires = [
+    'Django >= 1.4',
+    'content-io >= 1.0b5',
+    'simplejson >= 3.2.0'
+]
 
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
-
+tests_require = [
+    'unittest2',
+    'coverage',
+    'Markdown',
+    'Pillow'
+]
 
 version = __import__('djedi').__version__
 
@@ -35,7 +33,7 @@ setup(
     download_url='https://github.com/5monkeys/djedi-cms/tarball/%s' % version,
     keywords=['cms', 'django', 'edit', 'gettext', 'content', 'management', 'template', 'plugins', 'markdown'],
     license='BSD',
-    packages=find_packages(exclude='tests'),
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     classifiers=[
@@ -51,12 +49,10 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    install_requires=[
-        'Django >= 1.4',
-        'content-io >= 1.0b3',
-        'simplejson >= 3.2.0'
-    ],
-    tests_require=['pytest', 'pytest-django', 'markdown', 'Pillow'],
-    test_suite='tests',
-    cmdclass={'test': PyTest},
+    install_requires=install_requires,
+    extras_require={
+        'tests': tests_require,
+    },
+    tests_require=tests_require,
+    test_suite='runtests.main'
 )
