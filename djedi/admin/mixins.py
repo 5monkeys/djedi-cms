@@ -2,6 +2,7 @@ import simplejson as json
 from django.conf import settings as django_settings
 from django.http import HttpResponse
 from cio.conf import settings
+import djedi
 
 # TODO: Switch simplejson to ujson or other?
 
@@ -36,5 +37,6 @@ class DjediContextMixin(object):
             theme = '{static}djedi/themes/{theme}/theme.css'.format(static=django_settings.STATIC_URL, theme=theme)
 
         context['THEME'] = theme
+        context['VERSION'] = djedi.__version__
 
         return context

@@ -6,12 +6,12 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link href="{{ THEME }}" rel="stylesheet" media="screen">
+        <link href="{{ THEME }}?v={{ VERSION }}" rel="stylesheet" media="screen">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
-          <script src="{{ STATIC_URL }}djedi/vendor/html5/html5shiv.js"></script>
-          <script src="{{ STATIC_URL }}djedi/vendor/html5/respond.min.js"></script>
+          <script src="{{ STATIC_URL }}djedi/vendor/html5/html5shiv.js?v={{ VERSION }}"></script>
+          <script src="{{ STATIC_URL }}djedi/vendor/html5/respond.min.js?v={{ VERSION }}"></script>
         <![endif]-->
     </head>
     <body>
@@ -37,9 +37,9 @@
             <section id="editor-panel" class="tab-pane active"></section>
             <section id="settings-panel" class="tab-pane hide"></section>
         </div>
-        <script src="{{ STATIC_URL }}djedi/vendor/jquery/jquery.min.js"></script>
-        <script src="{{ STATIC_URL }}djedi/vendor/bootstrap/js/bootstrap.min.js"></script>
-        <script src="{{ STATIC_URL }}djedi/cms/js/uri.js"></script>
-        <script src="{{ STATIC_URL }}djedi/cms/js/cms.js"></script>
+        <script src="{{ STATIC_URL }}djedi/vendor/jquery/jquery.min.js?v={{ VERSION }}"></script>
+        <script src="{{ STATIC_URL }}djedi/vendor/bootstrap/js/bootstrap.min.js?v={{ VERSION }}"></script>
+        <script src="{{ STATIC_URL }}djedi/cms/js/uri.js?v={{ VERSION }}"></script>
+        <script src="{{ STATIC_URL }}djedi/cms/js/cms.js?v={{ VERSION }}"></script>
     </body>
 </html>

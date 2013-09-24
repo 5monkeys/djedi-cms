@@ -8,14 +8,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         {% block style %}
-            <link href="{{ THEME }}" rel="stylesheet" media="screen">
+            <link href="{{ THEME }}?v={{ VERSION }}" rel="stylesheet" media="screen">
             {% block plugin_style %}{% endblock plugin_style %}
         {% endblock style %}
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
-          <script src="{{ STATIC_URL }}djedi/vendor/html5/html5shiv.js"></script>
-          <script src="{{ STATIC_URL }}djedi/vendor/html5/respond.min.js"></script>
+          <script src="{{ STATIC_URL }}djedi/vendor/html5/html5shiv.js?v={{ VERSION }}"></script>
+          <script src="{{ STATIC_URL }}djedi/vendor/html5/respond.min.js?v={{ VERSION }}"></script>
         <![endif]-->
     </head>
     <body class="editor">
@@ -55,11 +55,11 @@
             <script>
                 window.DJEDI_ENDPOINT = '{% url 'admin:djedi_cms' %}';
             </script>
-            <script src="{{ STATIC_URL }}djedi/vendor/jquery/jquery.min.js"></script>
-            <script src="{{ STATIC_URL }}djedi/vendor/jquery.form/jquery.form.min.js"></script>
-            <script src="{{ STATIC_URL }}djedi/vendor/bootstrap/js/bootstrap.min.js"></script>
-            <script src="{{ STATIC_URL }}djedi/cms/js/uri.js"></script>
-            <script src="{{ STATIC_URL }}djedi/plugins/base/js/editor.js"></script>
+            <script src="{{ STATIC_URL }}djedi/vendor/jquery/jquery.min.js?v={{ VERSION }}"></script>
+            <script src="{{ STATIC_URL }}djedi/vendor/jquery.form/jquery.form.min.js?v={{ VERSION }}"></script>
+            <script src="{{ STATIC_URL }}djedi/vendor/bootstrap/js/bootstrap.min.js?v={{ VERSION }}"></script>
+            <script src="{{ STATIC_URL }}djedi/cms/js/uri.js?v={{ VERSION }}"></script>
+            <script src="{{ STATIC_URL }}djedi/plugins/base/js/editor.js?v={{ VERSION }}"></script>
             {% block plugin_script %}{% endblock plugin_script %}
         {% endblock script %}
     </body>

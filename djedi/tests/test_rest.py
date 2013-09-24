@@ -209,7 +209,7 @@ class RestTest(DjediTest, UserMixin, AssertionMixin):
             url = reverse('admin:djedi_cms.editor', args=['sv-se@page/title.' + ext])
             response = self.client.get(url)
             assert response.status_code == 200
-            assert set(response.context_data.keys()) == set(('THEME', 'uri',))
+            assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
 
         url = reverse('admin:djedi_cms.editor', args=['sv-se@page/title'])
         response = self.client.post(url, {'data': u'Djedi'})
