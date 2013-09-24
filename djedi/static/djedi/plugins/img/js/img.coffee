@@ -68,6 +68,11 @@ class CropTool
 
     @$img.trigger 'crop:preview', @previewContainer
 
+  setPreviewAttributes: (attrs) ->
+    if not @preview?
+      @createPreview()
+    @previewContainer.attr attr, value for attr, value of attrs
+
   resizePreview: =>
     if not @preview?
       @createPreview()
@@ -247,6 +252,7 @@ class window.ImageEditor extends window.Editor
 
     # Field events
     $('.dimension').on 'keyup', @resizeImage
+    $('#html-pane input').on 'keyup', => @updateImageAttributes()
     @ratioButton.on 'click', @toggleAspectRatio
     @ratioButton.tooltip()
 
@@ -256,12 +262,13 @@ class window.ImageEditor extends window.Editor
 
     if node and node.data
       @dropzone.dragDrop()
-      data = node.data
+      @updateForm node.data
       @renderThumbnail node.data.url
     else
+      @updateForm filename: '', width: '', height: '', id: '', 'class': '', alt: ''
       @removeThumbnail()
-      data = filename: '', width: '', height: '', id: '', 'class': '', alt: ''
 
+  updateForm: (data) ->
 #    $('#filename').html node.data.filename
     $("input[name='data[filename]']").val data.filename
     $("input[name='data[width]']").val data.width
@@ -289,6 +296,7 @@ class window.ImageEditor extends window.Editor
         # Initialize crop tool
         $image.on 'crop:preview', (event, html) => @triggerRender html
         @crop = new CropTool $image
+        @updateImageAttributes()
         @crop.resizePreview()
 
   removeThumbnail: ->
@@ -332,6 +340,17 @@ class window.ImageEditor extends window.Editor
 
     @crop.resizePreview()
     @crop.cropPreview()
+    @trigger 'node:resize'
+
+  getHtmlFields: ->
+    attrs = {}
+    for attr in ['id', 'class', 'alt']
+      attrs[attr] = $("input[name='data[#{attr}]']").val()
+    attrs
+
+  updateImageAttributes: ->
+    @crop.setPreviewAttributes @getHtmlFields()
+    @trigger 'node:resize'
 
   toggleAspectRatio: =>
     ratioInactive = @ratioButton.hasClass 'active'

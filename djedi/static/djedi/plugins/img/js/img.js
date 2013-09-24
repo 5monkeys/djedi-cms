@@ -91,6 +91,19 @@
       return this.$img.trigger('crop:preview', this.previewContainer);
     };
 
+    CropTool.prototype.setPreviewAttributes = function(attrs) {
+      var attr, value, _results;
+      if (this.preview == null) {
+        this.createPreview();
+      }
+      _results = [];
+      for (attr in attrs) {
+        value = attrs[attr];
+        _results.push(this.previewContainer.attr(attr, value));
+      }
+      return _results;
+    };
+
     CropTool.prototype.resizePreview = function() {
       if (this.preview == null) {
         this.createPreview();
@@ -314,29 +327,34 @@
       this.heightField = $('#field-height');
       this.ratioButton = $('#ar-lock');
       $('.dimension').on('keyup', this.resizeImage);
+      $('#html-pane input').on('keyup', function() {
+        return _this.updateImageAttributes();
+      });
       this.ratioButton.on('click', this.toggleAspectRatio);
       return this.ratioButton.tooltip();
     };
 
     ImageEditor.prototype.render = function(node) {
-      var data;
       console.log('ImageEditor.render()');
       ImageEditor.__super__.render.call(this, node);
       if (node && node.data) {
         this.dropzone.dragDrop();
-        data = node.data;
-        this.renderThumbnail(node.data.url);
+        this.updateForm(node.data);
+        return this.renderThumbnail(node.data.url);
       } else {
-        this.removeThumbnail();
-        data = {
+        this.updateForm({
           filename: '',
           width: '',
           height: '',
           id: '',
           'class': '',
           alt: ''
-        };
+        });
+        return this.removeThumbnail();
       }
+    };
+
+    ImageEditor.prototype.updateForm = function(data) {
       $("input[name='data[filename]']").val(data.filename);
       $("input[name='data[width]']").val(data.width);
       $("input[name='data[height]']").val(data.height);
@@ -363,6 +381,7 @@
             return _this.triggerRender(html);
           });
           _this.crop = new CropTool($image);
+          _this.updateImageAttributes();
           return _this.crop.resizePreview();
         });
       });
@@ -408,7 +427,24 @@
         }
       }
       this.crop.resizePreview();
-      return this.crop.cropPreview();
+      this.crop.cropPreview();
+      return this.trigger('node:resize');
+    };
+
+    ImageEditor.prototype.getHtmlFields = function() {
+      var attr, attrs, _i, _len, _ref1;
+      attrs = {};
+      _ref1 = ['id', 'class', 'alt'];
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        attr = _ref1[_i];
+        attrs[attr] = $("input[name='data[" + attr + "]']").val();
+      }
+      return attrs;
+    };
+
+    ImageEditor.prototype.updateImageAttributes = function() {
+      this.crop.setPreviewAttributes(this.getHtmlFields());
+      return this.trigger('node:resize');
     };
 
     ImageEditor.prototype.toggleAspectRatio = function() {
