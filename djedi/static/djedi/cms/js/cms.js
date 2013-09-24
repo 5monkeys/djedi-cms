@@ -231,10 +231,12 @@
     function Page(window) {
       var data, uri, _ref;
       this.window = window;
+      this.renderNodes = __bind(this.renderNodes, this);
       this.updateNode = __bind(this.updateNode, this);
       this.win = window;
       this.doc = this.win.document;
       this.$doc = $(this.doc);
+      this.$el = $('html', this.doc);
       this.$cms = $('#djedi-cms', this.doc);
       this.nodes = {};
       _ref = this.win.DJEDI_NODES;
@@ -243,14 +245,19 @@
         this.nodes[uri] = new Node(uri, data, this.doc);
       }
       Events.on('node:render', this.updateNode);
+      Events.on('node:resize', this.renderNodes);
     }
 
     Page.prototype.updateNode = function(event, uri, content) {
-      var node, _ref, _results;
       uri = uri.to_uri();
       uri.version = null;
       uri = uri.valueOf();
       this.nodes[uri].setContent(content);
+      return this.renderNodes();
+    };
+
+    Page.prototype.renderNodes = function() {
+      var node, uri, _ref, _results;
       _ref = this.nodes;
       _results = [];
       for (uri in _ref) {
@@ -266,6 +273,39 @@
 
     Page.prototype.hideNodes = function() {
       return $('.djedi-node-outline', this.doc).hide();
+    };
+
+    Page.prototype.shrink = function(width, animated) {
+      var style,
+        _this = this;
+      this.pageWidth = this.$el.width();
+      style = {
+        width: "" + (this.pageWidth - width) + "px"
+      };
+      if (animated) {
+        return this.$el.animate(style, 100, function() {
+          return _this.renderNodes();
+        });
+      } else {
+        this.$el.css(style);
+        return this.renderNodes();
+      }
+    };
+
+    Page.prototype.unshrink = function(animated) {
+      var style,
+        _this = this;
+      style = {
+        width: "" + this.pageWidth + "px"
+      };
+      if (animated) {
+        return this.$el.animate(style, 100, function() {
+          return _this.renderNodes();
+        });
+      } else {
+        this.$el.css(style);
+        return this.renderNodes();
+      }
     };
 
     return Page;
@@ -298,6 +338,7 @@
         console.log('Plugin.connect().loaded');
         _this.$doc = _this.window.$(_this.window.document);
         _this.$doc.on('node:render', Events.handler);
+        _this.$doc.on('node:resize', Events.handler);
         _this.$doc.on('page:node:fetch', function(event, uri, callback) {
           return callback({
             data: _this.node.data,
@@ -412,6 +453,7 @@
     };
 
     CMS.prototype.open = function(animate) {
+      this.page.shrink(this.width, animate);
       this.css({
         height: '100%'
       });
@@ -426,6 +468,7 @@
 
     CMS.prototype.close = function(animate) {
       var $brand, brandHeight, brandWidth;
+      this.page.unshrink(animate);
       $brand = $('header .navbar-brand');
       brandWidth = $brand.outerWidth(true);
       brandHeight = $brand.outerHeight(true);

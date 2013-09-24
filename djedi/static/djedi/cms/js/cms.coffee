@@ -194,6 +194,7 @@ class Page
     @win = window
     @doc = @win.document
     @$doc = $ @doc
+    @$el = $ 'html', @doc
     @$cms = $ '#djedi-cms', @doc
 
     # Initialize nodes/outlines
@@ -202,20 +203,40 @@ class Page
       @nodes[uri] = new Node uri, data, @doc
 
     Events.on 'node:render', @updateNode
+    Events.on 'node:resize', @renderNodes
 
   updateNode: (event, uri, content) =>
     uri = uri.to_uri()
     uri.version = null
     uri = uri.valueOf()
     @nodes[uri].setContent content
-    node.render() for uri, node of @nodes
+    @renderNodes()
 
+  renderNodes: =>
+    node.render() for uri, node of @nodes
 
   showNodes: ->
     $('.djedi-node-outline', @doc).show()
 
   hideNodes: ->
     $('.djedi-node-outline', @doc).hide()
+
+  shrink: (width, animated) ->
+    @pageWidth = @$el.width()
+    style = width: "#{@pageWidth-width}px"
+    if animated
+      @$el.animate style, 100, => @renderNodes()
+    else
+      @$el.css style
+      @renderNodes()
+
+  unshrink: (animated) ->
+    style = width: "#{@pageWidth}px"
+    if animated
+      @$el.animate style, 100, => @renderNodes()
+    else
+      @$el.css style
+      @renderNodes()
 
 
 ################################################[  PLUGIN  ]############################################################
@@ -246,6 +267,7 @@ class Plugin
 
       # Bind and catch/forward events from plugin
       @$doc.on 'node:render', Events.handler
+      @$doc.on 'node:resize', Events.handler
       @$doc.on 'page:node:fetch', (event, uri, callback) => callback data: @node.data, content: @node.getContent()
 
       @render()
@@ -336,6 +358,7 @@ class CMS
         if @isClosed() then @open(yes) else @close(yes)
 
   open: (animate) ->
+    @page.shrink @width, animate
     @css {height: '100%'}
     @css {right: 0}, animate
     @page.$cms.removeClass 'closed'
@@ -344,6 +367,7 @@ class CMS
     @settings.set 'panelIsOpen', yes
 
   close: (animate) ->
+    @page.unshrink animate
     $brand = $ 'header .navbar-brand'
     brandWidth = $brand.outerWidth yes
     brandHeight = $brand.outerHeight yes
