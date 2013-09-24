@@ -122,9 +122,11 @@ class ImagePluginBase(BasePlugin):
         }
         if data:
             url = data.get('url')
-            alt = data.get('alt')
             width = data.get('width') or 0
             height = data.get('height') or 0
+            alt = data.get('alt')
+            tag_id = data.get('id')
+            tag_class = data.get('class')
             if url:
                 attrs['src'] = url
             if alt:
@@ -132,6 +134,10 @@ class ImagePluginBase(BasePlugin):
             if width and height:
                 attrs['width'] = width
                 attrs['height'] = height
+            if tag_id:
+                attrs['id'] = tag_id
+            if tag_class:
+                attrs['class'] = tag_class
 
         return u'<img {0} />'.format(u' '.join(u'{0}="{1}"'.format(attr, value) for attr, value in attrs.iteritems()))
 
