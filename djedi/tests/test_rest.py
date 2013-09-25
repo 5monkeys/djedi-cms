@@ -221,13 +221,44 @@ class RestTest(DjediTest, UserMixin, AssertionMixin):
         tests_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(tests_dir, 'assets', 'image.png')
 
+        form = {
+            'data[width]': u'64',
+            'data[height]': u'64',
+            'data[crop]': u'64,64,128,128',
+            'data[id]': u'vw',
+            'data[class]': u'year-53',
+            'data[alt]': u'Zwitter',
+            'meta[comment]': u'VW'
+        }
+        response = self.client.post(url, form)
+        self.assertEqual(response.status_code, 200)
+
         with open(image_path) as image:
             file = File(image, name=image_path)
-            response = self.client.post(url, {'data[file]': file, 'data[alt]': u'Zwitter', 'meta[comment]': u'VW'})
-            assert response.status_code == 200
+            form['data[file]'] = file
+            response = self.client.post(url, form)
+            self.assertEqual(response.status_code, 200)
+
             node = json_node(response, simple=False)
             meta = node.pop('meta')
             uri, content = node['uri'], node['content']
-            assert uri == 'i18n://sv-se@header/logo.img#draft'
-            assert content.startswith(u'<img src="/media/content-io/img/30/3045c6b466a1a816b180f679c024b7959e1d373c.')
-            assert meta['comment'] == u'VW'
+            self.assertEqual(uri, 'i18n://sv-se@header/logo.img#draft')
+            self.assertEqual(meta['comment'], u'VW')
+            html = u'<img ' \
+                   u'alt="Zwitter" ' \
+                   u'class="year-53" ' \
+                   u'height="64" ' \
+                   u'id="vw" ' \
+                   u'src="/media/djedi/img/03/5e/5eba6fc2149822a8dbf76cd6978798f2ddc4ac34.png" ' \
+                   u'width="64" />'
+            self.assertEqual(content, html)
+
+            # Post new resized version
+            node = cio.load(uri)
+            del form['data[file]']
+            del form['data[crop]']
+            form['data[width]'] = form['data[height]'] = u'32'
+            form['data[filename]'] = node['data']['filename']
+
+            response = self.client.post(url, form)
+            self.assertEqual(response.status_code, 200)

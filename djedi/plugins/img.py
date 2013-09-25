@@ -1,4 +1,6 @@
 import json
+from django.utils.html import escape
+
 try:
     import cStringIO as StringIO
 except ImportError:
@@ -53,14 +55,13 @@ class ImagePluginBase(BasePlugin):
 
         if upload:
             image = Image.open(upload)
-            filename = path.sep.join(('content-io', 'img', upload.name))
-            width, height = image.size
+            filename = path.sep.join(('djedi', 'img', upload.name))
             filename = self._create_filename(filename, w=width, h=height)
         elif filename:
             file = self._open(filename)
             image = Image.open(file)
         else:
-            raise KeyError('ImagePlugin requires file or filename data')
+            image = None
 
         if image:
             # Remember original image format before processing
@@ -138,7 +139,8 @@ class ImagePluginBase(BasePlugin):
             if tag_class:
                 attrs['class'] = tag_class
 
-        return u'<img {0} />'.format(u' '.join(u'{0}="{1}"'.format(attr, value) for attr, value in attrs.iteritems()))
+        html_attrs = (u'{0}="{1}"'.format(attr, escape(attrs[attr])) for attr in sorted(attrs.keys()))
+        return u'<img {0} />'.format(u' '.join(html_attrs))
 
 
 class ImagePlugin(ImagePluginBase):
