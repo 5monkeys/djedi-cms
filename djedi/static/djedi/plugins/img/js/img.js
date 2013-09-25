@@ -338,9 +338,13 @@
       console.log('ImageEditor.render()');
       ImageEditor.__super__.render.call(this, node);
       if (node && node.data) {
-        this.dropzone.dragDrop();
         this.updateForm(node.data);
-        return this.renderThumbnail(node.data.url);
+        if (node.data.url) {
+          this.dropzone.dragDrop();
+          return this.renderThumbnail(node.data.url);
+        } else {
+          return this.dropzone.dragStart();
+        }
       } else {
         this.updateForm({
           filename: '',

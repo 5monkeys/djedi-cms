@@ -261,9 +261,12 @@ class window.ImageEditor extends window.Editor
     super node
 
     if node and node.data
-      @dropzone.dragDrop()
       @updateForm node.data
-      @renderThumbnail node.data.url
+      if node.data.url
+        @dropzone.dragDrop()
+        @renderThumbnail node.data.url
+      else
+        @dropzone.dragStart()
     else
       @updateForm filename: '', width: '', height: '', id: '', 'class': '', alt: ''
       @removeThumbnail()
