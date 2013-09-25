@@ -4,7 +4,6 @@ try:
 except ImportError:
     import StringIO
 from cio.plugins.base import BasePlugin
-from django.core.files.storage import default_storage as file_storage
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from hashlib import sha1
 from os import path
@@ -146,12 +145,23 @@ class ImagePlugin(ImagePluginBase):
     """
     Image plugin extending abstract content-io image plugin to use django file storage.
     """
+    @property
+    def _file_storage(self):
+        # Get configured file storage from settings
+        file_storage = self.settings.get('FILE_STORAGE')
+
+        # Fallback on default file storage
+        if not file_storage:
+            from django.core.files.storage import default_storage as file_storage
+
+        return file_storage
+
     def _open(self, filename):
-        return file_storage.open(filename)
+        return self._file_storage.open(filename)
 
     def _save(self, filename, bytes):
         content = InMemoryUploadedFile(bytes, None, filename, None, None, None)
-        return file_storage.save(filename, content)
+        return self._file_storage.save(filename, content)
 
     def _url(self, filename):
-        return file_storage.url(filename)
+        return self._file_storage.url(filename)
