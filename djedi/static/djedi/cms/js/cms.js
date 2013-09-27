@@ -6,8 +6,6 @@
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  console.log = function() {};
-
   Events = $({});
 
   Events.handler = function() {
@@ -62,7 +60,8 @@
       this.uri = uri.to_uri();
       this.data = data;
       this.$el = $("span[data-i18n='" + (this.id()) + "']", container);
-      if (this.$el) {
+      this.preview = this.$el.length > 0;
+      if (this.preview) {
         this.$outline = $('<div class="djedi-node-outline">');
         this.$outline.on('click', this.select);
         $('body', container).append(this.render());
@@ -74,22 +73,23 @@
     };
 
     Node.prototype.getContent = function() {
-      var t;
-      if (t = this.$el) {
-        return (t.html() || '').trim();
+      if (this.preview) {
+        return (this.$el.html() || '').trim();
       } else {
         return '';
       }
     };
 
     Node.prototype.setContent = function(content, silent) {
-      this.$el.html(content);
-      return this.render();
+      if (this.preview) {
+        this.$el.html(content);
+        return this.render();
+      }
     };
 
     Node.prototype.render = function() {
       var bottom, c, child, children, firstChild, left, offset, padding, right, top, _i, _len, _ref, _ref1;
-      if (!this.$el) {
+      if (!this.preview) {
         return;
       }
       console.log('Node.render');
@@ -150,16 +150,21 @@
     };
 
     Node.prototype.select = function() {
-      this.selected = true;
-      this.$outline.addClass('selected');
-      console.log('select node');
-      Events.trigger('node:edit', this);
+      if (this.preview) {
+        this.selected = true;
+        this.$outline.addClass('selected');
+        console.log('select node');
+        Events.trigger('node:edit', this);
+      }
       return this;
     };
 
     Node.prototype.deselect = function() {
-      this.selected = false;
-      return this.$outline.removeClass('selected');
+      if (this.preview) {
+        this.selected = false;
+        this.$outline.removeClass('selected');
+      }
+      return this;
     };
 
     return Node;

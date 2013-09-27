@@ -1,4 +1,4 @@
-console.log = () ->
+#console.log = () ->
 
 ################################################[  EVENTS  ]############################################################
 Events = $ {}
@@ -43,9 +43,10 @@ class Node
     @uri = uri.to_uri()
     @data = data
     @$el = $ "span[data-i18n='#{@id()}']", container
+    @preview = @$el.length > 0
 
     # Create node outline
-    if @$el
+    if @preview
       @$outline = $ '<div class="djedi-node-outline">'
       @$outline.on 'click', @select
       $('body', container).append @render()
@@ -54,14 +55,15 @@ class Node
     @uri.namespace + '@' + @uri.path
 
   getContent: ->
-    if t = @$el then (t.html() or '').trim() else ''
+    if @preview then (@$el.html() or '').trim() else ''
 
   setContent: (content, silent) ->
-    @$el.html content
-    @render()
+    if @preview
+      @$el.html content
+      @render()
 
   render: ->
-    return unless @$el
+    return unless @preview
     console.log 'Node.render'
 
     children = @$el.children()
@@ -117,17 +119,20 @@ class Node
     @$outline
 
   select: =>
-    @selected = yes
-    @$outline.addClass 'selected'
-    console.log 'select node'
-    Events.trigger 'node:edit', @
-#    $('.djedi-overlay').show()
+    if @preview
+      @selected = yes
+      @$outline.addClass 'selected'
+      console.log 'select node'
+      Events.trigger 'node:edit', @
+  #    $('.djedi-overlay').show()
     @
 
   deselect: ->
-    @selected = no
-    @$outline.removeClass 'selected'
-#    $('.djedi-overlay').hide()
+    if @preview
+      @selected = no
+      @$outline.removeClass 'selected'
+  #    $('.djedi-overlay').hide()
+    @
 
 
 ################################################[  SEARCH  ]############################################################
