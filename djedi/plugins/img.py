@@ -38,7 +38,8 @@ class ImagePluginBase(BasePlugin):
 
             # Add image url to loaded data
             filename = data.get('filename', None)
-            data['url'] = self._url(filename) if filename else None
+            if filename:
+                data['url'] = self._url(filename)
 
             return data
         else:

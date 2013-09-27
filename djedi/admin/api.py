@@ -160,6 +160,7 @@ class RenderApi(APIView):
         try:
             plugin = plugins.get(ext)
             data, meta = self.get_post_data(request)
+            data = plugin.load(data)
         except UnknownPlugin:
             raise Http404
         else:

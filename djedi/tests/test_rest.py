@@ -196,6 +196,15 @@ class RestTest(DjediTest, UserMixin, AssertionMixin):
         assert response.status_code == 200
         assert response.content == u'<h1>Djedi</h1>'
 
+        url = reverse('admin:djedi_api.render', args=['img'])
+        response = self.client.post(url, {'data': json.dumps({
+            'url': '/foo/bar.png',
+            'width': '64',
+            'height': '64'
+        })})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, u'<img height="64" src="/foo/bar.png" width="64" />')
+
     def test_editor(self):
         url = reverse('admin:djedi_cms.editor', args=['sv-se@page/title.foo'])
         response = self.client.get(url)
