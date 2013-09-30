@@ -256,7 +256,7 @@ class Plugin
     @navigate @uri
 
   navigate: (uri) ->
-    @$el.attr 'src', document.location.pathname + "node/#{encodeURIComponent uri}/editor"
+    @$el.attr 'src', document.location.pathname + "node/#{encodeURIComponent(encodeURIComponent uri)}/editor"
 
   connect: =>
     console.log 'Plugin.connect()'

@@ -27,7 +27,7 @@
     };
 
     Client.prototype.e = function(uri) {
-      return encodeURIComponent((uri || this.uri).valueOf());
+      return encodeURIComponent(encodeURIComponent((uri || this.uri).valueOf()));
     };
 
     Client.prototype.AJAX = function(method, path, data, callback) {

@@ -2,6 +2,7 @@ from collections import defaultdict
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.template.response import TemplateResponse
+from django.utils.http import urlunquote
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
@@ -58,6 +59,9 @@ class APIView(View):
 
         return data['data'], data['meta']
 
+    def decode_uri(self, uri):
+        return urlunquote(uri)
+
     def render_to_response(self, content=u''):
         return HttpResponse(content)
 
@@ -72,6 +76,7 @@ class NodeApi(JSONResponseMixin, APIView):
         JSON Response:
             {uri: x, content: y}
         """
+        uri = self.decode_uri(uri)
         node = cio.get(uri, lazy=False)
 
         if node.content is None:
@@ -89,6 +94,7 @@ class NodeApi(JSONResponseMixin, APIView):
         JSON Response:
             {uri: x, content: y}
         """
+        uri = self.decode_uri(uri)
         data, meta = self.get_post_data(request)
         meta['author'] = request.user.username
         node = cio.set(uri, data, publish=False, **meta)
@@ -98,6 +104,7 @@ class NodeApi(JSONResponseMixin, APIView):
         """
         Delete versioned uri and return empty text response on success.
         """
+        uri = self.decode_uri(uri)
         uris = cio.delete(uri)
 
         if not uri in uris:
@@ -115,6 +122,7 @@ class PublishApi(JSONResponseMixin, APIView):
         JSON Response:
             {uri: x, content: y}
         """
+        uri = self.decode_uri(uri)
         node = cio.publish(uri)
 
         if not node:
@@ -132,6 +140,7 @@ class RevisionsApi(JSONResponseMixin, APIView):
         JSON Response:
             [[uri, state], ...]
         """
+        uri = self.decode_uri(uri)
         revisions = cio.revisions(uri)
         revisions = [list(revision) for revision in revisions]  # Convert tuples to lists
         return self.render_to_json(revisions)
@@ -147,6 +156,7 @@ class LoadApi(JSONResponseMixin, APIView):
         JSON Response:
             {uri: x, data: y}
         """
+        uri = self.decode_uri(uri)
         node = cio.load(uri)
         return self.render_to_json(node)
 
@@ -173,6 +183,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
     @never_cache
     def get(self, request, uri):
         try:
+            uri = self.decode_uri(uri)
             uri = URI(uri)
             plugins.resolve(uri)
         except UnknownPlugin:
@@ -182,6 +193,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
 
     @never_cache
     def post(self, request, uri):
+        uri = self.decode_uri(uri)
         data, meta = self.get_post_data(request)
         meta['author'] = request.user.username
         node = cio.set(uri, data, publish=False, **meta)

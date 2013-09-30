@@ -1,10 +1,10 @@
 import cio
 import os
 import simplejson as json
-import urllib
 from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.test import Client
+from django.utils.http import urlquote
 from cio.plugins import plugins
 from cio.backends import storage
 from cio.backends.exceptions import PersistenceError, NodeDoesNotExist
@@ -54,13 +54,24 @@ class RestTest(DjediTest, UserMixin, AssertionMixin):
         client.login(username=master.username, password='test')
         self.client = client
 
+    def get_api_url(self, url_name, uri):
+        return reverse('admin:' + url_name, args=[urlquote(urlquote(uri, ''), '')])
+
     def get(self, url_name, uri):
-        url = reverse('admin:' + url_name, args=[urllib.quote(uri)])
+        url = self.get_api_url(url_name, uri)
         return self.client.get(url)
 
     def post(self, url_name, uri, data):
-        url = reverse('admin:' + url_name, args=[urllib.quote(uri)])
+        url = self.get_api_url(url_name, uri)
         return self.client.post(url, data)
+
+    def put(self, url_name, uri, data=None):
+        url = self.get_api_url(url_name, uri)
+        return self.client.put(url, data=data or {})
+
+    def delete(self, url_name, uri):
+        url = self.get_api_url(url_name, uri)
+        return self.client.delete(url)
 
     def test_get(self):
         response = self.get('djedi_api', 'i18n://sv-se@page/title')
@@ -136,15 +147,12 @@ class RestTest(DjediTest, UserMixin, AssertionMixin):
             storage.backend._create(URI(node['uri']), None)
 
     def test_delete(self):
-        url = reverse('admin:djedi_api', args=['i18n://sv-se@page/title'])
-
-        response = self.client.delete(url)
+        response = self.delete('djedi_api', 'i18n://sv-se@page/title')
         self.assertEqual(response.status_code, 404)
 
         node = cio.set('i18n://sv-se@page/title.md', u'# Djedi')
 
-        url = reverse('admin:djedi_api', args=[urllib.quote(node.uri, '')])
-        response = self.client.delete(url)
+        response = self.delete('djedi_api', node.uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, u'')
 
@@ -155,49 +163,41 @@ class RestTest(DjediTest, UserMixin, AssertionMixin):
         self.assertIsNone(node.content)
 
     def test_publish(self):
-        url = reverse('admin:djedi_api', args=['i18n://sv-se@page/title'])
-
         node = cio.set('sv-se@page/title', u'Djedi', publish=False)
 
-        response = self.client.get(url)
+        response = self.get('djedi_api', 'i18n://sv-se@page/title')
         assert response.status_code == 404
 
-        url = reverse('admin:djedi_api.publish', args=[urllib.quote(node.uri, '')])
-        response = self.client.put(url)
+        response = self.put('djedi_api.publish', node.uri)
         assert response.status_code == 200
 
-        url = reverse('admin:djedi_api', args=['i18n://sv-se@page/title'])
-        response = self.client.get(url)
+        response = self.get('djedi_api', 'i18n://sv-se@page/title')
         assert response.status_code == 200
         assert json_node(response) == {'uri': 'i18n://sv-se@page/title.txt#1', 'content': u'Djedi'}
 
-        url = reverse('admin:djedi_api.publish', args=[urllib.quote('i18n://sv-se@foo/bar.txt#draft', '')])
-        response = self.client.put(url)
+        response = self.put('djedi_api.publish', 'i18n://sv-se@foo/bar.txt#draft')
+
         assert response.status_code == 404
 
     def test_revisions(self):
         cio.set('sv-se@page/title', u'Djedi 1')
         cio.set('sv-se@page/title', u'Djedi 2')
 
-        url = reverse('admin:djedi_api.revisions', args=['sv-se@page/title'])
-        response = self.client.get(url)
+        response = self.get('djedi_api.revisions', 'sv-se@page/title')
         assert response.status_code == 200
 
         content = json.loads(response.content)
         assert content == [['i18n://sv-se@page/title.txt#1', False], ['i18n://sv-se@page/title.txt#2', True]]
 
     def test_render(self):
-        url = reverse('admin:djedi_api.render', args=['foo'])
-        response = self.client.post(url, {'data': u'# Djedi'})
+        response = self.post('djedi_api.render', 'foo', {'data': u'# Djedi'})
         assert response.status_code == 404
 
-        url = reverse('admin:djedi_api.render', args=['md'])
-        response = self.client.post(url, {'data': u'# Djedi'})
+        response = self.post('djedi_api.render', 'md', {'data': u'# Djedi'})
         assert response.status_code == 200
         assert response.content == u'<h1>Djedi</h1>'
 
-        url = reverse('admin:djedi_api.render', args=['img'])
-        response = self.client.post(url, {'data': json.dumps({
+        response = self.post('djedi_api.render', 'img', {'data': json.dumps({
             'url': '/foo/bar.png',
             'width': '64',
             'height': '64'
@@ -206,26 +206,22 @@ class RestTest(DjediTest, UserMixin, AssertionMixin):
         self.assertEqual(response.content, u'<img height="64" src="/foo/bar.png" width="64" />')
 
     def test_editor(self):
-        url = reverse('admin:djedi_cms.editor', args=['sv-se@page/title.foo'])
-        response = self.client.get(url)
+        response = self.get('djedi_cms.editor', 'sv-se@page/title.foo')
         assert response.status_code == 404
 
-        url = reverse('admin:djedi_cms.editor', args=['sv-se@page/title'])
-        response = self.client.get(url)
+        response = self.get('djedi_cms.editor', 'sv-se@page/title')
         assert response.status_code == 404
 
         for ext in plugins:
-            url = reverse('admin:djedi_cms.editor', args=['sv-se@page/title.' + ext])
-            response = self.client.get(url)
+            response = self.get('djedi_cms.editor', 'sv-se@page/title.' + ext)
             assert response.status_code == 200
             assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
 
-        url = reverse('admin:djedi_cms.editor', args=['sv-se@page/title'])
-        response = self.client.post(url, {'data': u'Djedi'})
+        response = self.post('djedi_cms.editor', 'sv-se@page/title', {'data': u'Djedi'})
         assert response.status_code == 200
 
     def test_upload(self):
-        url = reverse('admin:djedi_api', args=['i18n://sv-se@header/logo.img'])
+        # url = reverse('admin:djedi_api', args=['i18n://sv-se@header/logo.img'])
 
         tests_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(tests_dir, 'assets', 'image.png')
@@ -239,13 +235,13 @@ class RestTest(DjediTest, UserMixin, AssertionMixin):
             'data[alt]': u'Zwitter',
             'meta[comment]': u'VW'
         }
-        response = self.client.post(url, form)
+        response = self.post('djedi_api', 'i18n://sv-se@header/logo.img', form)
         self.assertEqual(response.status_code, 200)
 
         with open(image_path) as image:
             file = File(image, name=image_path)
             form['data[file]'] = file
-            response = self.client.post(url, form)
+            response = self.post('djedi_api', 'i18n://sv-se@header/logo.img', form)
             self.assertEqual(response.status_code, 200)
 
             node = json_node(response, simple=False)
@@ -269,5 +265,5 @@ class RestTest(DjediTest, UserMixin, AssertionMixin):
             form['data[width]'] = form['data[height]'] = u'32'
             form['data[filename]'] = node['data']['filename']
 
-            response = self.client.post(url, form)
+            response = self.post('djedi_api', 'i18n://sv-se@header/logo.img', form)
             self.assertEqual(response.status_code, 200)

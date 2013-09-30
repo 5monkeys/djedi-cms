@@ -14,7 +14,7 @@ class Client
     @baseUrl + path
 
   e: (uri) ->
-    encodeURIComponent (uri or @uri).valueOf()
+    encodeURIComponent(encodeURIComponent (uri or @uri).valueOf())
 
   AJAX: (method, path, data, callback) ->
     if callback?

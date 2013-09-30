@@ -328,7 +328,7 @@
     }
 
     Plugin.prototype.navigate = function(uri) {
-      return this.$el.attr('src', document.location.pathname + ("node/" + (encodeURIComponent(uri)) + "/editor"));
+      return this.$el.attr('src', document.location.pathname + ("node/" + (encodeURIComponent(encodeURIComponent(uri))) + "/editor"));
     };
 
     Plugin.prototype.connect = function() {
