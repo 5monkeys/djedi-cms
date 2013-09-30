@@ -18,19 +18,15 @@ $ pip install djedi-cms
 
 ## Configure
 * Add `djedi` to `INSTALLED_APPS`
-* Enable django admin or include `djedi.urls` in your root urls with namespace `admin`
 * Manage syncdb *(if using default django model djedi backend)*
+* Enable django admin or include `djedi.urls` in your root urls with namespace `admin`
+* Add suitable djedi middleware early in `MIDDLEWARE_CLASSES`:
 
-
-### Enable djedi cms admin panel
-
-Load `djedi_admin` in your base template and add admin tag at the bottom of your page
-```django
-{% load djedi_admin %}
-<body>
-    ...
-    {% djedi_admin %}
-</body>
+```python
+MIDDLEWARE_CLASSES = (
+    'djedi.middleware.translation.DjediTranslationMiddleware',
+    # ...
+)
 ```
 
 

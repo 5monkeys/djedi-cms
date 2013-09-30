@@ -9,7 +9,7 @@ from cio.plugins import plugins
 from cio.backends import storage
 from cio.backends.exceptions import PersistenceError, NodeDoesNotExist
 from cio.utils.uri import URI
-from djedi.tests.base import DjediTest, AssertionMixin, UserMixin
+from djedi.tests.base import DjediTest, UserMixin, ClientTest
 
 
 def json_node(response, simple=True):
@@ -45,14 +45,7 @@ class PermissionTest(DjediTest, UserMixin):
         assert response.status_code == 404
 
 
-class RestTest(DjediTest, UserMixin, AssertionMixin):
-
-    def setUp(self):
-        super(RestTest, self).setUp()
-        master = self.create_djedi_master()
-        client = Client(enforce_csrf_checks=True)
-        client.login(username=master.username, password='test')
-        self.client = client
+class RestTest(ClientTest):
 
     def get_api_url(self, url_name, uri):
         return reverse('admin:' + url_name, args=[urlquote(urlquote(uri, ''), '')])

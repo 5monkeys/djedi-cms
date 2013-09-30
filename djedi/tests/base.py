@@ -2,6 +2,7 @@ import shutil
 from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth.models import User, Group
+from django.test import Client
 from django.test import TransactionTestCase
 
 
@@ -86,3 +87,13 @@ class UserMixin(object):
         user.groups.add(group)
         user.save()
         return user
+
+
+class ClientTest(DjediTest, UserMixin, AssertionMixin):
+
+    def setUp(self):
+        super(ClientTest, self).setUp()
+        master = self.create_djedi_master()
+        client = Client(enforce_csrf_checks=True)
+        client.login(username=master.username, password='test')
+        self.client = client
