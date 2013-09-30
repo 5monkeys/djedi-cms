@@ -49,10 +49,10 @@ class AdminPanelMixin(object):
     def body_append(self, response, html):
         content = smart_unicode(response.content)
         end_body = u'</body>'
-        parts = content.lower().rsplit(end_body, 1)
+        end_body_index = content.lower().rfind(end_body)
 
-        if len(parts) == 2:
-            response.content = parts[0] + html + end_body + parts[1]
+        if end_body_index >= 0:
+            response.content = content[:end_body_index] + html + end_body + content[end_body_index + 7:]
 
             if response.get('Content-Length', None):
                 response['Content-Length'] = len(response.content)
