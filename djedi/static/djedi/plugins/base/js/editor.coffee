@@ -327,23 +327,29 @@ class window.Editor
           @setState 'revert'
     else
       data = @initial.data or ''
-      @renderContent data, (content) =>
-        @trigger 'node:render', @node.uri.valueOf(), content
+      @renderContent data, yes, (content) =>
         @node.uri = uri.valueOf()
         @node.data = data
         @node.content = content
         @onLoad @node
 
-  renderContent: (data, callback) ->
+  renderContent: (data, doTrigger, callback) ->
     console.log 'Editor.renderContent()'
     plugin = @node.uri.ext
     data = {data: data} if typeof(data) == 'string'
     content = ''
+
     if callback
       @api.render plugin, data, (content) =>
+        if doTrigger
+          @trigger 'node:render', @node.uri.valueOf(), content
         callback content if callback
+
     else
       content = @api.render plugin, data
+      if doTrigger
+        @trigger 'node:render', @node.uri.valueOf(), content
+
     content
 
   publish: =>

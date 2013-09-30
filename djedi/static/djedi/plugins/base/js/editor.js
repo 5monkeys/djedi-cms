@@ -413,8 +413,7 @@
         });
       } else {
         data = this.initial.data || '';
-        return this.renderContent(data, function(content) {
-          _this.trigger('node:render', _this.node.uri.valueOf(), content);
+        return this.renderContent(data, true, function(content) {
           _this.node.uri = uri.valueOf();
           _this.node.data = data;
           _this.node.content = content;
@@ -423,7 +422,7 @@
       }
     };
 
-    Editor.prototype.renderContent = function(data, callback) {
+    Editor.prototype.renderContent = function(data, doTrigger, callback) {
       var content, plugin,
         _this = this;
       console.log('Editor.renderContent()');
@@ -436,12 +435,18 @@
       content = '';
       if (callback) {
         this.api.render(plugin, data, function(content) {
+          if (doTrigger) {
+            _this.trigger('node:render', _this.node.uri.valueOf(), content);
+          }
           if (callback) {
             return callback(content);
           }
         });
       } else {
         content = this.api.render(plugin, data);
+        if (doTrigger) {
+          this.trigger('node:render', this.node.uri.valueOf(), content);
+        }
       }
       return content;
     };

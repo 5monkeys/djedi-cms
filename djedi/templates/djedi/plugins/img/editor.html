@@ -40,7 +40,7 @@
                 <div class="form-group">
                     <label class="col-xs-2 control-label"><i class="icon-crop"></i> Crop</label>
                     <div class="col-xs-10">
-                        <input type="text" name="data[crop]" id="field-crop" class="form-control">
+                        <input type="text" name="data[crop]" id="field-crop" class="form-control" placeholder="left,top,right,bottom">
                     </div>
                 </div>
             </fieldset>
@@ -66,14 +66,7 @@
                     </div>
                 </div>
             </fieldset>
-            <!--
-            <fieldset>
-                <div class="form-group">
-                    <label>Filename:</label>
-                    <p class="form-control-static" id="filename">{{ data.filename|default:'' }}</p>
-                </div>
-            </fieldset>
-            -->
+        </div>
     </div>
 {% endblock editor %}
 
