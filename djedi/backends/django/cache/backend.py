@@ -13,7 +13,8 @@ class DjangoCacheBackend(CacheBackend):
 
         try:
             from django.core.cache import get_cache
-            cache = get_cache('djedi')
+            cache_name = self.config.get('NAME', 'djedi')
+            cache = get_cache(cache_name)
         except (InvalidCacheBackendError, ValueError):
             from django.core.cache import cache
 
