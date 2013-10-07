@@ -28,7 +28,7 @@ class PermissionTest(DjediTest, UserMixin):
 
     def test_permissions(self):
         client = Client()
-        url = reverse('admin:djedi_api', args=['i18n://sv-se@page/title'])
+        url = reverse('admin:djedi:api', args=['i18n://sv-se@page/title'])
 
         response = client.get(url)
         assert response.status_code == 403
@@ -48,7 +48,7 @@ class PermissionTest(DjediTest, UserMixin):
 class RestTest(ClientTest):
 
     def get_api_url(self, url_name, uri):
-        return reverse('admin:' + url_name, args=[urlquote(urlquote(uri, ''), '')])
+        return reverse('admin:djedi:' + url_name, args=[urlquote(urlquote(uri, ''), '')])
 
     def get(self, url_name, uri):
         url = self.get_api_url(url_name, uri)
@@ -67,15 +67,15 @@ class RestTest(ClientTest):
         return self.client.delete(url)
 
     def test_get(self):
-        response = self.get('djedi_api', 'i18n://sv-se@page/title')
+        response = self.get('api', 'i18n://sv-se@page/title')
         self.assertEqual(response.status_code, 404)
 
         cio.set('i18n://sv-se@page/title.md', u'# Djedi', publish=False)
 
-        response = self.get('djedi_api', 'i18n://sv-se@page/title')
+        response = self.get('api', 'i18n://sv-se@page/title')
         self.assertEqual(response.status_code, 404)
 
-        response = self.get('djedi_api', 'i18n://sv-se@page/title#draft')
+        response = self.get('api', 'i18n://sv-se@page/title#draft')
         self.assertEqual(response.status_code, 200)
         node = json_node(response)
         self.assertKeys(node, 'uri', 'content')
@@ -83,7 +83,7 @@ class RestTest(ClientTest):
         self.assertEqual(node['content'], u'<h1>Djedi</h1>')
 
     def test_load(self):
-        response = self.get('djedi_api.load', 'i18n://sv-se@page/title')
+        response = self.get('api.load', 'i18n://sv-se@page/title')
         self.assertEqual(response.status_code, 200)
         json_content = json.loads(response.content)
         self.assertEqual(json_content['uri'], 'i18n://sv-se@page/title.txt')
@@ -91,33 +91,33 @@ class RestTest(ClientTest):
         self.assertEqual(len(json_content['meta'].keys()), 0)
 
         # TODO: Should get 404
-        # response = self.get('djedi_api.load', 'i18n://sv-se@page/title#1')
+        # response = self.get('api.load', 'i18n://sv-se@page/title#1')
         # self.assertEqual(response.status_code, 404)
 
         cio.set('i18n://sv-se@page/title.md', u'# Djedi')
 
-        response = self.get('djedi_api.load', 'sv-se@page/title')
+        response = self.get('api.load', 'sv-se@page/title')
         self.assertEqual(response.status_code, 200)
         node = json_node(response, simple=False)
         meta = node.pop('meta', {})
         self.assertDictEqual(node, {'uri': 'i18n://sv-se@page/title.md#1', 'data': u'# Djedi', 'content': u'<h1>Djedi</h1>'})
         self.assertKeys(meta, 'modified_at', 'published_at', 'is_published')
 
-        response = self.get('djedi_api.load', 'i18n://sv-se@page/title#1')
+        response = self.get('api.load', 'i18n://sv-se@page/title#1')
         json_content = json.loads(response.content)
         self.assertEqual(json_content['uri'], 'i18n://sv-se@page/title.md#1')
 
         self.assertEqual(len(cio.revisions('i18n://sv-se@page/title')), 1)
 
     def test_set(self):
-        response = self.post('djedi_api', 'i18n://page/title', {'data': u'# Djedi'})
+        response = self.post('api', 'i18n://page/title', {'data': u'# Djedi'})
         self.assertEqual(response.status_code, 400)
 
-        response = self.post('djedi_api', 'i18n://sv-se@page/title.txt', {'data': u'# Djedi', 'data[extra]': u'foobar'})
+        response = self.post('api', 'i18n://sv-se@page/title.txt', {'data': u'# Djedi', 'data[extra]': u'foobar'})
         self.assertEqual(response.status_code, 400)
 
         uri = 'i18n://sv-se@page/title.md'
-        response = self.post('djedi_api', uri, {'data': u'# Djedi', 'meta[message]': u'lundberg'})
+        response = self.post('api', uri, {'data': u'# Djedi', 'meta[message]': u'lundberg'})
         self.assertEqual(response.status_code, 200)
         node = json_node(response, simple=False)
         meta = node.pop('meta')
@@ -132,7 +132,7 @@ class RestTest(ClientTest):
         self.assertEqual(node.uri, 'i18n://sv-se@page/title.md#1')
         self.assertEqual(node.content, u'<h1>Djedi</h1>')
 
-        response = self.post('djedi_api', node.uri, {'data': u'# Djedi', 'meta[message]': u'Lundberg'})
+        response = self.post('api', node.uri, {'data': u'# Djedi', 'meta[message]': u'Lundberg'})
         node = json_node(response, simple=False)
         self.assertEqual(node['meta']['message'], u'Lundberg')
 
@@ -140,12 +140,12 @@ class RestTest(ClientTest):
             storage.backend._create(URI(node['uri']), None)
 
     def test_delete(self):
-        response = self.delete('djedi_api', 'i18n://sv-se@page/title')
+        response = self.delete('api', 'i18n://sv-se@page/title')
         self.assertEqual(response.status_code, 404)
 
         node = cio.set('i18n://sv-se@page/title.md', u'# Djedi')
 
-        response = self.delete('djedi_api', node.uri)
+        response = self.delete('api', node.uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, u'')
 
@@ -158,17 +158,17 @@ class RestTest(ClientTest):
     def test_publish(self):
         node = cio.set('sv-se@page/title', u'Djedi', publish=False)
 
-        response = self.get('djedi_api', 'i18n://sv-se@page/title')
+        response = self.get('api', 'i18n://sv-se@page/title')
         assert response.status_code == 404
 
-        response = self.put('djedi_api.publish', node.uri)
+        response = self.put('api.publish', node.uri)
         assert response.status_code == 200
 
-        response = self.get('djedi_api', 'i18n://sv-se@page/title')
+        response = self.get('api', 'i18n://sv-se@page/title')
         assert response.status_code == 200
         assert json_node(response) == {'uri': 'i18n://sv-se@page/title.txt#1', 'content': u'Djedi'}
 
-        response = self.put('djedi_api.publish', 'i18n://sv-se@foo/bar.txt#draft')
+        response = self.put('api.publish', 'i18n://sv-se@foo/bar.txt#draft')
 
         assert response.status_code == 404
 
@@ -176,21 +176,21 @@ class RestTest(ClientTest):
         cio.set('sv-se@page/title', u'Djedi 1')
         cio.set('sv-se@page/title', u'Djedi 2')
 
-        response = self.get('djedi_api.revisions', 'sv-se@page/title')
+        response = self.get('api.revisions', 'sv-se@page/title')
         assert response.status_code == 200
 
         content = json.loads(response.content)
         assert content == [['i18n://sv-se@page/title.txt#1', False], ['i18n://sv-se@page/title.txt#2', True]]
 
     def test_render(self):
-        response = self.post('djedi_api.render', 'foo', {'data': u'# Djedi'})
+        response = self.post('api.render', 'foo', {'data': u'# Djedi'})
         assert response.status_code == 404
 
-        response = self.post('djedi_api.render', 'md', {'data': u'# Djedi'})
+        response = self.post('api.render', 'md', {'data': u'# Djedi'})
         assert response.status_code == 200
         assert response.content == u'<h1>Djedi</h1>'
 
-        response = self.post('djedi_api.render', 'img', {'data': json.dumps({
+        response = self.post('api.render', 'img', {'data': json.dumps({
             'url': '/foo/bar.png',
             'width': '64',
             'height': '64'
@@ -199,23 +199,21 @@ class RestTest(ClientTest):
         self.assertEqual(response.content, u'<img height="64" src="/foo/bar.png" width="64" />')
 
     def test_editor(self):
-        response = self.get('djedi_cms.editor', 'sv-se@page/title.foo')
+        response = self.get('cms.editor', 'sv-se@page/title.foo')
         assert response.status_code == 404
 
-        response = self.get('djedi_cms.editor', 'sv-se@page/title')
+        response = self.get('cms.editor', 'sv-se@page/title')
         assert response.status_code == 404
 
         for ext in plugins:
-            response = self.get('djedi_cms.editor', 'sv-se@page/title.' + ext)
+            response = self.get('cms.editor', 'sv-se@page/title.' + ext)
             assert response.status_code == 200
             assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
 
-        response = self.post('djedi_cms.editor', 'sv-se@page/title', {'data': u'Djedi'})
+        response = self.post('cms.editor', 'sv-se@page/title', {'data': u'Djedi'})
         assert response.status_code == 200
 
     def test_upload(self):
-        # url = reverse('admin:djedi_api', args=['i18n://sv-se@header/logo.img'])
-
         tests_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(tests_dir, 'assets', 'image.png')
 
@@ -228,13 +226,13 @@ class RestTest(ClientTest):
             'data[alt]': u'Zwitter',
             'meta[comment]': u'VW'
         }
-        response = self.post('djedi_api', 'i18n://sv-se@header/logo.img', form)
+        response = self.post('api', 'i18n://sv-se@header/logo.img', form)
         self.assertEqual(response.status_code, 200)
 
         with open(image_path) as image:
             file = File(image, name=image_path)
             form['data[file]'] = file
-            response = self.post('djedi_api', 'i18n://sv-se@header/logo.img', form)
+            response = self.post('api', 'i18n://sv-se@header/logo.img', form)
             self.assertEqual(response.status_code, 200)
 
             node = json_node(response, simple=False)
@@ -258,5 +256,5 @@ class RestTest(ClientTest):
             form['data[width]'] = form['data[height]'] = u'32'
             form['data[filename]'] = node['data']['filename']
 
-            response = self.post('djedi_api', 'i18n://sv-se@header/logo.img', form)
+            response = self.post('api', 'i18n://sv-se@header/logo.img', form)
             self.assertEqual(response.status_code, 200)

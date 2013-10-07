@@ -1,8 +1,9 @@
-from django.utils import translation
 import cio
 import json
-from django.core.urlresolvers import reverse
+from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.loader import render_to_string
+from django.utils import translation
 from django.utils.encoding import smart_unicode
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
@@ -26,8 +27,15 @@ class AdminPanelMixin(object):
             return
 
         # Do not inject admin panel in admin
-        if request.path.startswith(reverse('admin:index')):
-            return
+        try:
+            djedi_cms_url = reverse('admin:djedi:cms')
+        except NoReverseMatch:
+            raise ImproperlyConfigured('Could not find djedi in your url conf, '
+                                       'enable django admin or include djedi.urls within the admin namespace.')
+        else:
+            admin_prefix = djedi_cms_url.strip('/').split('/')[0]
+            if request.path.startswith('/' + admin_prefix):
+                return
 
         # Do not inject admin panel on gzipped responses
         if 'gzip' in response.get('Content-Encoding', ''):

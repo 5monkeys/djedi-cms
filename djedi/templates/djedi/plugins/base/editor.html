@@ -20,7 +20,7 @@
     </head>
     <body class="editor">
         {% block form %}
-        <form id="form" role="form" enctype="multipart/form-data" method="post" action="{% url 'admin:djedi_cms.editor' uri|urlencode:''|urlencode:'' %}">
+        <form id="form" role="form" enctype="multipart/form-data" method="post" action="{% url 'admin:djedi:cms.editor' uri|urlencode:''|urlencode:'' %}">
             <header class="navbar-fixed-top">
                 <nav role="header" class="navbar navbar-default node-title">
                     <div class="plugin"></div>
@@ -53,7 +53,7 @@
 
         {% block script %}
             <script>
-                window.DJEDI_ENDPOINT = '{% url 'admin:djedi_cms' %}';
+                window.DJEDI_ENDPOINT = '{% url 'admin:djedi:cms' %}';
             </script>
             <script src="{{ STATIC_URL }}djedi/vendor/jquery/jquery.min.js?v={{ VERSION }}"></script>
             <script src="{{ STATIC_URL }}djedi/vendor/jquery.form/jquery.form.min.js?v={{ VERSION }}"></script>
