@@ -1,58 +1,12 @@
 {% load url from future %}
 <script>window.DJEDI_NODES = {{ json_nodes|safe }};</script>
 <style type="text/css">
-    #djedi-cms {
-        position: fixed;
-        top: 0;
-        right: -400px;
-        width: 400px;
-        height: 100%;
-        border: 0;
-        z-index: 30000;
-    }
-
-    #djedi-cms.fullscreen {
-        width: 100%;
-    }
-
-    #djedi-cms.closed {
-        opacity: 0.5;
-    }
-
-    #djedi-cms.closed:hover {
-        opacity: 1;
-    }
-
-    /* Style editable area (outline) */
-    .djedi-node-outline {
-        position: absolute;
-        z-index: 20000;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .djedi-node-outline.visible {
-        opacity: 0.25;
-        background-color: lightseagreen;
-    }
-    .djedi-node-outline.visible:hover {
-        opacity: 0.5;
-    }
-    .djedi-node-outline:hover {
-        opacity: 0.25;
-        background-color: lightseagreen;
-    }
-    .djedi-node-outline.selected {
-        opacity: 1;
-        background-color: transparent;
-        /*border: 2px solid darkturquoise;*/
-        -webkit-box-shadow: 0px 0px 20px 3px rgba(0, 220, 255, 0.5), inset 0px 0px 0px 2px rgba(0, 220, 255, 1);
-        box-shadow: 0px 0px 20px 3px rgba(0, 220, 255, 0.5), inset 0px 0px 0px 2px rgba(0, 220, 255, 1);
-    }
-    .djedi-overlay {
-        background-color: rgba(0, 0, 0, 0.5);
-        position: absolute;
-        z-index: 10000;
-        display: none;
-    }
+#djedi-cms{position:fixed;top:0;right:-400px;width:400px;height:100%;border:0;z-index:30000}#djedi-cms.fullscreen{width:100%}
+#djedi-cms.closed{opacity:.5}
+#djedi-cms.closed:hover{opacity:1}
+.djedi-node-outline{position:absolute;z-index:20000;border-radius:4px;cursor:pointer}.djedi-node-outline:hover{opacity:.25;background-color:#20b2aa}
+.djedi-node-outline.visible{opacity:.25;background-color:#20b2aa}.djedi-node-outline.visible:hover{opacity:.5}
+.djedi-node-outline.selected{opacity:1;background-color:transparent;-webkit-box-shadow:0 0 20px 3px rgba(0,220,255,0.5),inset 0 0 0 2px #00dcff;box-shadow:0 0 20px 3px rgba(0,220,255,0.5),inset 0 0 0 2px #00dcff}
+.djedi-overlay{background-color:rgba(0,0,0,0.5);position:absolute;z-index:10000;display:none}
 </style>
 <iframe id="djedi-cms" src="{% url 'admin:djedi:cms' %}"></iframe>
