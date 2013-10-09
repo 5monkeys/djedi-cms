@@ -1,5 +1,5 @@
 # coding=utf-8
-VERSION = (1, 0, 0, 'alpha', 9)
+VERSION = (1, 0, 0, 'beta', 1)
 
 
 def get_version(version=None):
