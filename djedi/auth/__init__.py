@@ -7,3 +7,10 @@ def has_permission(user):
             return True
 
     return False
+
+
+def get_username(user):
+    if hasattr(user, 'get_username'):
+        return user.get_username()
+    else:
+        return user.username
