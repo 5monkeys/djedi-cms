@@ -195,7 +195,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
     def post(self, request, uri):
         uri = self.decode_uri(uri)
         data, meta = self.get_post_data(request)
-        meta['author'] = request.user.username
+        meta['author'] = auth.get_username(request.user)
         node = cio.set(uri, data, publish=False, **meta)
 
         context = cio.load(node.uri)
