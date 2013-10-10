@@ -98,13 +98,23 @@ It is recommended that you use <tt class="docutils literal"><span class="pre">So
 </div>
 <div class="section" id="enable-admin">
 <h3>Enable admin<a class="headerlink" href="#enable-admin" title="Permalink to this headline">¶</a></h3>
-<p>If the Django <tt class="docutils literal"><span class="pre">AdminSite</span></tt> already is enabled, and included, in your root urls, then you&#8217;re good to go.
-Otherwise, either <a class="reference external" href="https://docs.djangoproject.com/en/dev/ref/contrib/admin/#hooking-adminsite-instances-into-your-urlconf">hook it in</a> or add <cite>djedi.urls</cite> within the <tt class="docutils literal"><span class="pre">admin</span></tt> namespace.</p>
+<p>If the Django <tt class="docutils literal"><span class="pre">AdminSite</span></tt> already is enabled, and <a class="reference external" href="https://docs.djangoproject.com/en/dev/ref/contrib/admin/#hooking-adminsite-instances-into-your-urlconf">included</a>, in your root urls, then you&#8217;re good to go.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># urls.py</span>
+
+<span class="kn">from</span> <span class="nn">django.conf.urls</span> <span class="kn">import</span> <span class="n">patterns</span><span class="p">,</span> <span class="n">include</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
+
+<span class="n">admin</span><span class="o">.</span><span class="n">autodiscover</span><span class="p">()</span>
 
 <span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
     <span class="p">(</span><span class="s">r&#39;^admin/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">)),</span>
-    <span class="c"># or</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>If you&#8217;re not using, or don&#8217;t want to use, Django admin you can always include <tt class="docutils literal"><span class="pre">djedi.urls</span></tt> within the <cite>admin</cite> namespace instead.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># urls.py</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
     <span class="p">(</span><span class="s">r&#39;^djedi/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;djedi.urls&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s">&#39;admin&#39;</span><span class="p">)),</span>
 <span class="p">)</span>
 </pre></div>

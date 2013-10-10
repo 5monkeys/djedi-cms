@@ -60,16 +60,29 @@ It is recommended that you use ``South`` to migrate your database:
 Enable admin
 ~~~~~~~~~~~~
 
-If the Django ``AdminSite`` already is enabled, and included, in your root urls, then you're good to go.
-Otherwise, either `hook it in <django-admin-site_>`_ or add `djedi.urls` within the ``admin`` namespace.
+If the Django ``AdminSite`` already is enabled, and `included <django-admin-site_>`_, in your root urls, then you're good to go.
+
+.. code-block:: python
+
+    # urls.py
+
+    from django.conf.urls import patterns, include
+    from django.contrib import admin
+
+    admin.autodiscover()
+
+    urlpatterns = patterns('',
+        (r'^admin/', include(admin.site.urls)),
+    )
+
+
+If you're not using, or don't want to use, Django admin you can always include ``djedi.urls`` within the `admin` namespace instead.
 
 .. code-block:: python
 
     # urls.py
 
     urlpatterns = patterns('',
-        (r'^admin/', include(admin.site.urls)),
-        # or
         (r'^djedi/', include('djedi.urls', namespace='admin')),
     )
 

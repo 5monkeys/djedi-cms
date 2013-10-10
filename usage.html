@@ -62,6 +62,7 @@
 <p>The key is represented by a <a class="reference internal" href="uri.html#uri"><em>URI</em></a> and the value is the content, together they combine a <tt class="docutils literal"><span class="pre">Node</span></tt>.</p>
 <div class="section" id="template-tags">
 <h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this headline">¶</a></h2>
+<p>Load <tt class="docutils literal"><span class="pre">djedi_tags</span></tt> in a template and use the <tt class="docutils literal"><span class="pre">node</span></tt> or <tt class="docutils literal"><span class="pre">blocknode</span></tt> tags</p>
 <div class="highlight-django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">load</span> <span class="nv">djedi_tags</span> <span class="cp">%}</span><span class="x"></span>
 <span class="x">&lt;body&gt;</span>
 <span class="x">    &lt;h1&gt;</span><span class="cp">{%</span> <span class="k">node</span> <span class="s1">&#39;page/home/title.txt&#39;</span> <span class="nv">default</span><span class="o">=</span><span class="s1">&#39;Djedi&#39;</span> <span class="cp">%}</span><span class="x">&lt;/h1&gt;</span>
