@@ -58,16 +58,19 @@
             
   <div class="section" id="plugins">
 <span id="id1"></span><h1>Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h1>
-<p>Djedi CMS plugins handles content serialization and rendering.
-Each plugin has its own extension which is referred to in the request <a class="reference internal" href="uri.html#uri"><em>URI</em></a>.
-Plugins are activated by adding the the full class path in the <tt class="docutils literal"><span class="pre">PLUGINS</span></tt> setting.</p>
-<p>Default settings:</p>
+<p>Djedi CMS plugins handles content serialization and rendering.</p>
+<div class="section" id="enable-plugins">
+<h2>Enable plugins<a class="headerlink" href="#enable-plugins" title="Permalink to this headline">¶</a></h2>
+<p>Each plugin has its own extension which is referred to in the request <a class="reference internal" href="uri.html#uri"><em>URI</em></a>.
+Enable plugins by adding the the full class path in the <tt class="docutils literal"><span class="pre">PLUGINS</span></tt> djedi setting.</p>
+<p><strong>Default settings:</strong></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s">&#39;cio.plugins.txt.TextPlugin&#39;</span><span class="p">,</span>
     <span class="s">&#39;cio.plugins.md.MarkdownPlugin&#39;</span><span class="p">,</span>
     <span class="s">&#39;djedi.plugins.img.ImagePlugin&#39;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
+</div>
 </div>
 <div class="section" id="built-in-plugins">
 <h2>Built-in plugins<a class="headerlink" href="#built-in-plugins" title="Permalink to this headline">¶</a></h2>
@@ -153,6 +156,7 @@ you can configure the image plugin setting <tt class="docutils literal"><span cl
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Plugins</a><ul>
+<li><a class="reference internal" href="#enable-plugins">Enable plugins</a></li>
 <li><a class="reference internal" href="#built-in-plugins">Built-in plugins</a><ul>
 <li><a class="reference internal" href="#text-plugin">Text Plugin</a></li>
 <li><a class="reference internal" href="#markdown-plugin">Markdown Plugin</a></li>

@@ -4,10 +4,15 @@ Plugins
 =======
 
 Djedi CMS plugins handles content serialization and rendering.
-Each plugin has its own extension which is referred to in the request :ref:`uri`.
-Plugins are activated by adding the the full class path in the ``PLUGINS`` setting.
 
-Default settings:
+
+Enable plugins
+--------------
+
+Each plugin has its own extension which is referred to in the request :ref:`uri`.
+Enable plugins by adding the the full class path in the ``PLUGINS`` djedi setting.
+
+**Default settings:**
 
 .. code-block:: python
 
