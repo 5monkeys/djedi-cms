@@ -8,11 +8,23 @@ Djedi CMS is more or less a highly configurable key/value store, built on top of
 All managed content within djedi is represented by a ``Node``. Each node has a unique resource identifier called :ref:`uri`,
 which holds necessary information to lookup, persist or render node content.
 
+Nodes also relies on :ref:`plugins` handling the content serialization and rendering.
+Plugins gets resolved by the `extension` part of the node uri.
+
+**URI example**::
+
+    i18n://en-us@page/home/body.md#draft
+
+    [scheme] :// [namespace] @ [path] . [extension] # [version]
+
+
+Examine the :ref:`uri` and :ref:`plugins` sections for deeper understanding and use cases.
+
 
 Djedi in your templates
 -----------------------
 
-The most common way of using Djedi CMS is to make content editable and i18n compliant in your templates.
+The most common way of using Djedi CMS is to make content editable and `i18n` compliant in your templates.
 
 Load ``djedi_tags`` in a template and use the ``node`` or ``blocknode`` tags.
 

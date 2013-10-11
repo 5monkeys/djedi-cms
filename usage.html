@@ -61,9 +61,17 @@
 <p>Djedi CMS is more or less a highly configurable key/value store, built on top of the content pipeline library <a class="reference external" href="https://github.com/5monkeys/content-io/">content-io</a>.</p>
 <p>All managed content within djedi is represented by a <tt class="docutils literal"><span class="pre">Node</span></tt>. Each node has a unique resource identifier called <a class="reference internal" href="uri.html#uri"><em>URI</em></a>,
 which holds necessary information to lookup, persist or render node content.</p>
+<p>Nodes also relies on <a class="reference internal" href="plugins.html#plugins"><em>Plugins</em></a> handling the content serialization and rendering.
+Plugins gets resolved by the <cite>extension</cite> part of the node uri.</p>
+<p><strong>URI example</strong>:</p>
+<div class="highlight-python"><pre>i18n://en-us@page/home/body.md#draft
+
+[scheme] :// [namespace] @ [path] . [extension] # [version]</pre>
+</div>
+<p>Examine the <a class="reference internal" href="uri.html#uri"><em>URI</em></a> and <a class="reference internal" href="plugins.html#plugins"><em>Plugins</em></a> sections for deeper understanding and use cases.</p>
 <div class="section" id="djedi-in-your-templates">
 <h2>Djedi in your templates<a class="headerlink" href="#djedi-in-your-templates" title="Permalink to this headline">¶</a></h2>
-<p>The most common way of using Djedi CMS is to make content editable and i18n compliant in your templates.</p>
+<p>The most common way of using Djedi CMS is to make content editable and <cite>i18n</cite> compliant in your templates.</p>
 <p>Load <tt class="docutils literal"><span class="pre">djedi_tags</span></tt> in a template and use the <tt class="docutils literal"><span class="pre">node</span></tt> or <tt class="docutils literal"><span class="pre">blocknode</span></tt> tags.</p>
 <div class="highlight-django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">load</span> <span class="nv">djedi_tags</span> <span class="cp">%}</span><span class="x"></span>
 <span class="x">&lt;body&gt;</span>

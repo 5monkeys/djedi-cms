@@ -4,7 +4,7 @@ Plugins
 =======
 
 Djedi CMS plugins handles content serialization and rendering.
-Each plugin has its own extension which is referred to in the request URI.
+Each plugin has its own extension which is referred to in the request :ref:`uri`.
 Plugins are activated by adding the the full class path in the ``PLUGINS`` setting.
 
 Default settings:
@@ -33,6 +33,7 @@ Text Plugin
 
 The text plugin is a plugin in its simplest form, not modifying the content either when persisting or rendering.
 
+----
 
 Markdown Plugin
 ~~~~~~~~~~~~~~~
@@ -41,13 +42,14 @@ Markdown Plugin
 :Extension: md
 :Dependencies: Markdown
 
-The markdown plugin depends on the `Markdown <https://pypi.python.org/pypi/Markdown/>`_ package.
+The markdown plugin depends on the `Markdown <https://pypi.python.org/pypi/Markdown/>`_ python package.
 It renders persisted markdown syntax as html.
 
 .. code-block:: sh
 
     $ pip install Markdown
 
+----
 
 Image Plugin
 ~~~~~~~~~~~~
@@ -64,7 +66,7 @@ It depends on the python imaging library, and it's recommended that you use the 
 
     $ pip install Pillow
 
-Uploaded images gets persisted using Django's file storage api. If you don't want to use the default storage,
+Uploaded images gets persisted using Django's file storage api. If you don't want to use the default file storage,
 you can configure the image plugin setting ``FILE_STORAGE``.
 
 .. code-block:: python

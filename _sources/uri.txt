@@ -32,19 +32,19 @@ Possible schemes are:
 Namespace
 ---------
 
-Each scheme contains at least one namespace, for example the ``i18n`` scheme uses the namespace as a locale, determine wich language to use.
+Each scheme contains at least one namespace, for example the ``i18n`` scheme uses the namespace as a `locale`, determining wich language to use.
 
 
 Path
 ----
 
-The path is a unique node identifier within the given namespace and scheme.
+The path is a unique node key within the given namespace and scheme.
 
 
 Extension
 ---------
 
-The extension resolves wich plugin to use when editing and rendering a node.
+The extension resolves which plugin to use for content management.
 
 
 Version

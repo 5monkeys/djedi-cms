@@ -59,7 +59,7 @@
   <div class="section" id="plugins">
 <span id="id1"></span><h1>Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h1>
 <p>Djedi CMS plugins handles content serialization and rendering.
-Each plugin has its own extension which is referred to in the request URI.
+Each plugin has its own extension which is referred to in the request <a class="reference internal" href="uri.html#uri"><em>URI</em></a>.
 Plugins are activated by adding the the full class path in the <tt class="docutils literal"><span class="pre">PLUGINS</span></tt> setting.</p>
 <p>Default settings:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">(</span>
@@ -88,6 +88,7 @@ Plugins are activated by adding the the full class path in the <tt class="docuti
 </table>
 <p>The text plugin is a plugin in its simplest form, not modifying the content either when persisting or rendering.</p>
 </div>
+<hr class="docutils" />
 <div class="section" id="markdown-plugin">
 <h3>Markdown Plugin<a class="headerlink" href="#markdown-plugin" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
@@ -102,12 +103,13 @@ Plugins are activated by adding the the full class path in the <tt class="docuti
 </tr>
 </tbody>
 </table>
-<p>The markdown plugin depends on the <a class="reference external" href="https://pypi.python.org/pypi/Markdown/">Markdown</a> package.
+<p>The markdown plugin depends on the <a class="reference external" href="https://pypi.python.org/pypi/Markdown/">Markdown</a> python package.
 It renders persisted markdown syntax as html.</p>
 <div class="highlight-sh"><div class="highlight"><pre><span class="nv">$ </span>pip install Markdown
 </pre></div>
 </div>
 </div>
+<hr class="docutils" />
 <div class="section" id="image-plugin">
 <h3>Image Plugin<a class="headerlink" href="#image-plugin" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
@@ -128,7 +130,7 @@ It depends on the python imaging library, and it&#8217;s recommended that you us
 <div class="highlight-sh"><div class="highlight"><pre><span class="nv">$ </span>pip install Pillow
 </pre></div>
 </div>
-<p>Uploaded images gets persisted using Django&#8217;s file storage api. If you don&#8217;t want to use the default storage,
+<p>Uploaded images gets persisted using Django&#8217;s file storage api. If you don&#8217;t want to use the default file storage,
 you can configure the image plugin setting <tt class="docutils literal"><span class="pre">FILE_STORAGE</span></tt>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">IMG</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;FILE_STORAGE&#39;</span><span class="p">:</span> <span class="n">my_file_storage</span>
