@@ -3,7 +3,7 @@
 URI
 ===
 
-The uri is a ``Node`` resource identifier, containing all necessary parts to lookup or persist given content.
+The uri is a ``Node`` resource identifier, containing all necessary parts needed to make a djedi node request.
 
 ::
 

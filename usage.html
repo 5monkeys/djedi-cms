@@ -59,10 +59,12 @@
   <div class="section" id="usage">
 <span id="id1"></span><h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
 <p>Djedi CMS is more or less a highly configurable key/value store, built on top of the content pipeline library <a class="reference external" href="https://github.com/5monkeys/content-io/">content-io</a>.</p>
-<p>The key is represented by a <a class="reference internal" href="uri.html#uri"><em>URI</em></a> and the value is the content, together they combine a <tt class="docutils literal"><span class="pre">Node</span></tt>.</p>
-<div class="section" id="template-tags">
-<h2>Template tags<a class="headerlink" href="#template-tags" title="Permalink to this headline">¶</a></h2>
-<p>Load <tt class="docutils literal"><span class="pre">djedi_tags</span></tt> in a template and use the <tt class="docutils literal"><span class="pre">node</span></tt> or <tt class="docutils literal"><span class="pre">blocknode</span></tt> tags</p>
+<p>All managed content within djedi is represented by a <tt class="docutils literal"><span class="pre">Node</span></tt>. Each node has a unique resource identifier called <a class="reference internal" href="uri.html#uri"><em>URI</em></a>,
+which holds necessary information to lookup, persist or render node content.</p>
+<div class="section" id="djedi-in-your-templates">
+<h2>Djedi in your templates<a class="headerlink" href="#djedi-in-your-templates" title="Permalink to this headline">¶</a></h2>
+<p>The most common way of using Djedi CMS is to make content editable and i18n compliant in your templates.</p>
+<p>Load <tt class="docutils literal"><span class="pre">djedi_tags</span></tt> in a template and use the <tt class="docutils literal"><span class="pre">node</span></tt> or <tt class="docutils literal"><span class="pre">blocknode</span></tt> tags.</p>
 <div class="highlight-django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">load</span> <span class="nv">djedi_tags</span> <span class="cp">%}</span><span class="x"></span>
 <span class="x">&lt;body&gt;</span>
 <span class="x">    &lt;h1&gt;</span><span class="cp">{%</span> <span class="k">node</span> <span class="s1">&#39;page/home/title.txt&#39;</span> <span class="nv">default</span><span class="o">=</span><span class="s1">&#39;Djedi&#39;</span> <span class="cp">%}</span><span class="x">&lt;/h1&gt;</span>
@@ -71,9 +73,63 @@
 
 <span class="x">    </span><span class="cp">{%</span> <span class="k">blocknode</span> <span class="s1">&#39;page/home/body.md&#39;</span> <span class="cp">%}</span><span class="x"></span>
 <span class="x">        ## I&#39;m a djedi apprentice</span>
-<span class="x">        This is fun!</span>
+<span class="x">        This is easy!</span>
 <span class="x">    </span><span class="cp">{%</span> <span class="k">endblocknode</span> <span class="cp">%}</span><span class="x"></span>
 <span class="x">&lt;/body&gt;</span>
+</pre></div>
+</div>
+<div class="section" id="node-tag">
+<h3>Node tag<a class="headerlink" href="#node-tag" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">node</span></tt> tag takes one argument, the <a class="reference internal" href="uri.html#uri"><em>URI</em></a>, and two optional keyword arguments; <cite>default</cite> and <cite>edit</cite>.</p>
+<ul>
+<li><dl class="first docutils">
+<dt><strong>default</strong> (<em>empty unicode</em>)</dt>
+<dd><p class="first last">Content displayed for new nodes not existing in the storage backend.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>edit</strong> (<em>True</em>)</dt>
+<dd><p class="first last">Enable/disable inline editing. Useful if content is not visible, like a meta-tag or tag attribute, preventing user interaction.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="highlight-django"><div class="highlight"><pre><span class="x">&lt;input placeholder=&quot;</span><span class="cp">{%</span> <span class="k">node</span> <span class="s1">&#39;foo/bar&#39;</span> <span class="nv">default</span><span class="o">=</span><span class="s1">&#39;Search&#39;</span> <span class="nv">edit</span><span class="o">=</span><span class="kp">False</span> <span class="cp">%}</span><span class="x">&quot;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="blocknode-tag">
+<h3>Blocknode tag<a class="headerlink" href="#blocknode-tag" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">blocknode</span></tt> tag is similar to the <tt class="docutils literal"><span class="pre">node</span></tt> tag except that it lacks the <cite>default</cite> keyword argument
+and using the block body as default content instead. Beyond the <cite>edit</cite> kwarg, the <tt class="docutils literal"><span class="pre">blocknode</span></tt> can take any arbitrary
+keyword argument for use as a content formatting context.</p>
+<div class="highlight-django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">blocknode</span> <span class="s1">&#39;page/home/intro.md&#39;</span> <span class="nv">user</span><span class="o">=</span><span class="nv">user.first_name</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    ## Welcome </span><span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span><span class="x">!</span>
+<span class="x">    I love using dynamic variables in my translatable texts.</span>
+<span class="cp">{%</span> <span class="k">endblocknode</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="djedi-in-your-code">
+<h2>Djedi in your code<a class="headerlink" href="#djedi-in-your-code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cio</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span> <span class="o">=</span> <span class="n">cio</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;mail/activation/body&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">u&#39;Welcome&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span><span class="o">.</span><span class="n">uri</span>
+<span class="go">&lt;URI &#39;i18n://en-us@mail/activation/body.txt&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span><span class="o">.</span><span class="n">content</span>
+<span class="go">u&#39;Welcome&#39;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span> <span class="o">=</span> <span class="n">cio</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;sv-se@mail/activation/body&#39;</span><span class="p">,</span> <span class="s">u&#39;Välkommen&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span><span class="o">.</span><span class="n">uri</span>
+<span class="go">&lt;URI &#39;i18n://sv-se@mail/activation/body.txt#draft&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span><span class="o">.</span><span class="n">content</span>
+<span class="go">u&#39;Välkommen&#39;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span> <span class="o">=</span> <span class="n">cio</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s">&#39;sv-se@mail/activation/body.txt#draft&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span><span class="o">.</span><span class="n">uri</span>
+<span class="go">&lt;URI &#39;i18n://sv-se@mail/activation/body.txt#1&#39;&gt;</span>
 </pre></div>
 </div>
 </div>
@@ -91,7 +147,12 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Usage</a><ul>
-<li><a class="reference internal" href="#template-tags">Template tags</a></li>
+<li><a class="reference internal" href="#djedi-in-your-templates">Djedi in your templates</a><ul>
+<li><a class="reference internal" href="#node-tag">Node tag</a></li>
+<li><a class="reference internal" href="#blocknode-tag">Blocknode tag</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#djedi-in-your-code">Djedi in your code</a></li>
 </ul>
 </li>
 </ul>
