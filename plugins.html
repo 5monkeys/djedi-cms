@@ -62,7 +62,7 @@
 <div class="section" id="enable-plugins">
 <h2>Enable plugins<a class="headerlink" href="#enable-plugins" title="Permalink to this headline">¶</a></h2>
 <p>Each plugin has its own extension which is referred to in the request <a class="reference internal" href="uri.html#uri"><em>URI</em></a>.
-Enable plugins by adding the the full class path in the <tt class="docutils literal"><span class="pre">PLUGINS</span></tt> djedi setting.</p>
+Enable plugins by adding the the full class path to the <tt class="docutils literal"><span class="pre">PLUGINS</span></tt> djedi setting.</p>
 <p><strong>Default settings:</strong></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s">&#39;cio.plugins.txt.TextPlugin&#39;</span><span class="p">,</span>
@@ -127,13 +127,13 @@ It renders persisted markdown syntax as html.</p>
 </tr>
 </tbody>
 </table>
-<p>The image plugin handles drag and drop image uploads, and renders html image tags.
+<p>The image plugin handles drag and drop image uploads, cropping, resizing and rendering html image tags.
 It depends on the python imaging library, and it&#8217;s recommended that you use the more up-to-date
 <a class="reference external" href="https://pypi.python.org/pypi/Pillow/">Pillow</a> fork.</p>
 <div class="highlight-sh"><div class="highlight"><pre><span class="nv">$ </span>pip install Pillow
 </pre></div>
 </div>
-<p>Uploaded images gets persisted using Django&#8217;s file storage api. If you don&#8217;t want to use the default file storage,
+<p>Uploaded images gets persisted using Django&#8217;s <a class="reference external" href="https://docs.djangoproject.com/en/dev/ref/files/storage/">file storage api</a>. If you don&#8217;t want to use the default file storage,
 you can configure the image plugin setting <tt class="docutils literal"><span class="pre">FILE_STORAGE</span></tt>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">IMG</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;FILE_STORAGE&#39;</span><span class="p">:</span> <span class="n">my_file_storage</span>
