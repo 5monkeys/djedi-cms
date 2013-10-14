@@ -49,7 +49,7 @@ Node tag
 The ``node`` tag takes one argument, the :ref:`uri`, and two optional keyword arguments; `default` and `edit`.
 
 - **default** (*empty unicode*)
-    Content displayed for new nodes not existing in the storage backend.
+    Content displayed for new nodes / not persisted in the storage backend.
 
 - **edit** (*True*)
     Enable/disable inline editing. Useful if content is not visible, like a meta-tag or tag attribute, preventing user interaction.
@@ -84,19 +84,19 @@ Djedi in your code
 .. code-block:: python
 
     >>> import cio
-    >>> node = cio.get('mail/activation/body', default=u'Welcome')
+    >>> node = cio.get('mail/receipt/subject', default=u'Thanks!')
     >>> node.uri
-    <URI 'i18n://en-us@mail/activation/body.txt'>
+    <URI 'i18n://en-us@mail/receipt/subject.txt'>
     >>> node.content
-    u'Welcome'
+    u'Thanks!'
 
-    >>> node = cio.set('sv-se@mail/activation/body', u'Välkommen')
+    >>> node = cio.set('sv-se@mail/receipt/subject', u'Tack!', publish=False)
     >>> node.uri
-    <URI 'i18n://sv-se@mail/activation/body.txt#draft'>
+    <URI 'i18n://sv-se@mail/receipt/subject.txt#draft'>
     >>> node.content
-    u'Välkommen'
+    u'Tack!'
 
-    >>> node = cio.publish('sv-se@mail/activation/body.txt#draft')
+    >>> node = cio.publish('sv-se@mail/receipt/subject.txt#draft')
     >>> node.uri
-    <URI 'i18n://sv-se@mail/activation/body.txt#1'>
+    <URI 'i18n://sv-se@mail/receipt/subject.txt#1'>
 

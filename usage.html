@@ -92,7 +92,7 @@ Plugins gets resolved by the <cite>extension</cite> part of the node uri.</p>
 <ul>
 <li><dl class="first docutils">
 <dt><strong>default</strong> (<em>empty unicode</em>)</dt>
-<dd><p class="first last">Content displayed for new nodes not existing in the storage backend.</p>
+<dd><p class="first last">Content displayed for new nodes / not persisted in the storage backend.</p>
 </dd>
 </dl>
 </li>
@@ -123,21 +123,21 @@ keyword argument for use as a content formatting context.</p>
 <div class="section" id="djedi-in-your-code">
 <h2>Djedi in your code<a class="headerlink" href="#djedi-in-your-code" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cio</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span> <span class="o">=</span> <span class="n">cio</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;mail/activation/body&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">u&#39;Welcome&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span> <span class="o">=</span> <span class="n">cio</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;mail/receipt/subject&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">u&#39;Thanks!&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">node</span><span class="o">.</span><span class="n">uri</span>
-<span class="go">&lt;URI &#39;i18n://en-us@mail/activation/body.txt&#39;&gt;</span>
+<span class="go">&lt;URI &#39;i18n://en-us@mail/receipt/subject.txt&#39;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">node</span><span class="o">.</span><span class="n">content</span>
-<span class="go">u&#39;Welcome&#39;</span>
+<span class="go">u&#39;Thanks!&#39;</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span> <span class="o">=</span> <span class="n">cio</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;sv-se@mail/activation/body&#39;</span><span class="p">,</span> <span class="s">u&#39;Välkommen&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span> <span class="o">=</span> <span class="n">cio</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;sv-se@mail/receipt/subject&#39;</span><span class="p">,</span> <span class="s">u&#39;Tack!&#39;</span><span class="p">,</span> <span class="n">publish</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">node</span><span class="o">.</span><span class="n">uri</span>
-<span class="go">&lt;URI &#39;i18n://sv-se@mail/activation/body.txt#draft&#39;&gt;</span>
+<span class="go">&lt;URI &#39;i18n://sv-se@mail/receipt/subject.txt#draft&#39;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">node</span><span class="o">.</span><span class="n">content</span>
-<span class="go">u&#39;Välkommen&#39;</span>
+<span class="go">u&#39;Tack!&#39;</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span> <span class="o">=</span> <span class="n">cio</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s">&#39;sv-se@mail/activation/body.txt#draft&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">node</span> <span class="o">=</span> <span class="n">cio</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s">&#39;sv-se@mail/receipt/subject.txt#draft&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">node</span><span class="o">.</span><span class="n">uri</span>
-<span class="go">&lt;URI &#39;i18n://sv-se@mail/activation/body.txt#1&#39;&gt;</span>
+<span class="go">&lt;URI &#39;i18n://sv-se@mail/receipt/subject.txt#1&#39;&gt;</span>
 </pre></div>
 </div>
 </div>
