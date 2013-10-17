@@ -3,7 +3,7 @@
 URI
 ===
 
-The uri is a ``Node`` resource identifier, containing all necessary parts to lookup or persist given content.
+The uri is a ``Node`` resource identifier, containing all necessary parts needed to make a djedi node request.
 
 ::
 
@@ -15,9 +15,9 @@ The uri is a ``Node`` resource identifier, containing all necessary parts to loo
 Scheme
 ------
 
-The scheme uri part sets the scope to look within for the given node path.
+The ``scheme`` uri part sets the scope to look within for the given node ``path``.
 
-Possible schemes are:
+Possible schemes:
 
 - **i18n**
     *Internationalization scope; defining languages*
@@ -32,22 +32,22 @@ Possible schemes are:
 Namespace
 ---------
 
-Each scheme contains at least one namespace, for example the ``i18n`` scheme uses the namespace as a locale, determine wich language to use.
+Each ``scheme`` contains at least one ``namespace``, for example the `i18n` scheme uses the namespace as a `locale`, determining which language to use.
 
 
 Path
 ----
 
-The path is a unique node identifier within the given namespace and scheme.
+The ``path`` is a unique node key within the given ``namespace`` and ``scheme``.
 
 
 Extension
 ---------
 
-The extension resolves wich plugin to use when editing and rendering a node.
+The ``extension`` resolves which plugin to use for content management.
 
 
 Version
 -------
 
-Nodes supports versioning and the version part represents a version number or string.
+Nodes supports revisioning, and the ``version`` part represents a version number or string.

@@ -4,10 +4,15 @@ Plugins
 =======
 
 Djedi CMS plugins handles content serialization and rendering.
-Each plugin has its own extension which is referred to in the request URI.
-Plugins are activated by adding the the full class path in the ``PLUGINS`` setting.
 
-Default settings:
+
+Enable plugins
+--------------
+
+Each plugin has its own extension which is referred to in the request :ref:`uri`.
+Enable plugins by adding the the full class path to the ``PLUGINS`` djedi setting.
+
+**Default settings:**
 
 .. code-block:: python
 
@@ -33,6 +38,7 @@ Text Plugin
 
 The text plugin is a plugin in its simplest form, not modifying the content either when persisting or rendering.
 
+----
 
 Markdown Plugin
 ~~~~~~~~~~~~~~~
@@ -41,13 +47,14 @@ Markdown Plugin
 :Extension: md
 :Dependencies: Markdown
 
-The markdown plugin depends on the `Markdown <https://pypi.python.org/pypi/Markdown/>`_ package.
+The markdown plugin depends on the `Markdown <https://pypi.python.org/pypi/Markdown/>`_ python package.
 It renders persisted markdown syntax as html.
 
 .. code-block:: sh
 
     $ pip install Markdown
 
+----
 
 Image Plugin
 ~~~~~~~~~~~~
@@ -56,7 +63,7 @@ Image Plugin
 :Extension: img
 :Dependencies: PIL
 
-The image plugin handles drag and drop image uploads, and renders html image tags.
+The image plugin handles drag and drop image uploads, cropping, resizing and rendering html image tags.
 It depends on the python imaging library, and it's recommended that you use the more up-to-date
 `Pillow <https://pypi.python.org/pypi/Pillow/>`_ fork.
 
@@ -64,7 +71,7 @@ It depends on the python imaging library, and it's recommended that you use the 
 
     $ pip install Pillow
 
-Uploaded images gets persisted using Django's file storage api. If you don't want to use the default storage,
+Uploaded images gets persisted using Django's `file storage api <django-file-storage_>`_. If you don't want to use the default file storage,
 you can configure the image plugin setting ``FILE_STORAGE``.
 
 .. code-block:: python
@@ -73,3 +80,6 @@ you can configure the image plugin setting ``FILE_STORAGE``.
         'FILE_STORAGE': my_file_storage
     }
 
+
+
+.. _django-file-storage: https://docs.djangoproject.com/en/dev/ref/files/storage/

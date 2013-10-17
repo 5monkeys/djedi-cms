@@ -89,4 +89,3 @@ If you're not using, or don't want to use, Django admin you can always include `
 
 .. _django-admin-site: https://docs.djangoproject.com/en/dev/ref/contrib/admin/#hooking-adminsite-instances-into-your-urlconf
 .. _cheese-shop: https://pypi.python.org/pypi/djedi-cms/
-    :target
