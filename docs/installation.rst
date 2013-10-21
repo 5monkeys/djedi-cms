@@ -15,8 +15,17 @@ Djedi CMS is easiest installed from the `cheese shop <cheese-shop_>`_ using pip:
 
     $ pip install djedi-cms
 
-Plugins may require additional eggs like ``Markdown`` and ``Pillow`` (PIL)
+**Note:** Plugins may require additional eggs like ``Markdown`` and ``Pillow`` (PIL)
 which is described in the :ref:`plugins` section.
+
+Source
+~~~~~~
+
+You can always fork or clone Djedi CMS at `Github <github_>`_
+
+.. code-block:: sh
+
+    $ git clone git@github.com:5monkeys/djedi-cms.git
 
 
 Configure
@@ -87,5 +96,6 @@ If you're not using, or don't want to use, Django admin you can always include `
     )
 
 
+.. _github: https://github.com/5monkeys/djedi-cms
 .. _django-admin-site: https://docs.djangoproject.com/en/dev/ref/contrib/admin/#hooking-adminsite-instances-into-your-urlconf
 .. _cheese-shop: https://pypi.python.org/pypi/djedi-cms/
