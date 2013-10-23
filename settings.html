@@ -54,16 +54,10 @@
             
   <div class="section" id="settings">
 <h1>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h1>
-<p>Djedi is configured in your django project&#8217;s <tt class="docutils literal"><span class="pre">settings.py</span></tt> with the <tt class="docutils literal"><span class="pre">DJEDI</span></tt> dict variable.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">DJEDI</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-    <span class="n">ENVIRONMENT</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="c"># ...</span>
-<span class="p">)</span>
-</pre></div>
-</div>
+<p>Djedi is configured in your django project&#8217;s <tt class="docutils literal"><span class="pre">settings.py</span></tt>.</p>
 <div class="section" id="environment">
 <h2>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">ENVIRONMENT</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">DJEDI_ENVIRONMENT</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s">&#39;i18n&#39;</span><span class="p">:</span> <span class="s">&#39;en-us&#39;</span><span class="p">,</span>  <span class="c"># May be tuple representing fallback chain</span>
         <span class="s">&#39;l10n&#39;</span><span class="p">:</span> <span class="s">&#39;local&#39;</span><span class="p">,</span>
@@ -75,12 +69,12 @@
 </div>
 <div class="section" id="backends">
 <h2>Backends<a class="headerlink" href="#backends" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">CACHE</span> <span class="o">=</span> <span class="s">&#39;djedi.backends.django.cache.Backend&#39;</span>  <span class="c"># &#39;locmem://&#39;</span>
-<span class="n">STORAGE</span> <span class="o">=</span> <span class="s">&#39;djedi.backends.django.db.Backend&#39;</span>   <span class="c"># &#39;sqlite://:memory:&#39;</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">DJEDI_CACHE</span> <span class="o">=</span> <span class="s">&#39;djedi.backends.django.cache.Backend&#39;</span> <span class="c"># &#39;locmem://&#39;</span>
+<span class="n">DJEDI_STORAGE</span> <span class="o">=</span> <span class="s">&#39;djedi.backends.django.db.Backend&#39;</span>  <span class="c"># &#39;sqlite://:memory:&#39;</span>
 </pre></div>
 </div>
 <p>Backends may also be configured dict wise to allow additional backend specific config:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">CACHE</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">DJEDI_CACHE</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;BACKEND&#39;</span><span class="p">:</span> <span class="s">&#39;djedi.backends.django.cache.Backend&#39;</span><span class="p">,</span>
     <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="s">&#39;djedi&#39;</span><span class="p">,</span>
     <span class="s">&#39;FOO&#39;</span><span class="p">:</span> <span class="s">&#39;bar&#39;</span><span class="p">,</span>
@@ -90,7 +84,7 @@
 </div>
 <div class="section" id="pipeline">
 <h2>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">PIPELINE</span> <span class="o">=</span> <span class="p">(</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">DJEDI_PIPELINE</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s">&#39;cio.pipeline.pipes.cache.CachePipe&#39;</span><span class="p">,</span>
     <span class="s">&#39;cio.pipeline.pipes.meta.MetaPipe&#39;</span><span class="p">,</span>
     <span class="s">&#39;cio.pipeline.pipes.plugin.PluginPipe&#39;</span><span class="p">,</span>
@@ -105,10 +99,10 @@
 <p>The Djedi CMS admin supports theming to blend in and match your projects design.
 Built-in themes is enabled through their names and external themes needs their full static path.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># Built-in themes (darth|luke)</span>
-<span class="n">THEME</span> <span class="o">=</span> <span class="s">&#39;darth&#39;</span>
+<span class="n">DJEDI_THEME</span> <span class="o">=</span> <span class="s">&#39;darth&#39;</span>
 
 <span class="c"># External themes</span>
-<span class="n">THEME</span> <span class="o">=</span> <span class="s">&#39;/static/path/to/theme.css&#39;</span>
+<span class="n">DJEDI_THEME</span> <span class="o">=</span> <span class="s">&#39;/static/path/to/theme.css&#39;</span>
 </pre></div>
 </div>
 </div>

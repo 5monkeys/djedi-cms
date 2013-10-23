@@ -64,7 +64,7 @@
 <p>Each plugin has its own extension which is referred to in the request <a class="reference internal" href="uri.html#uri"><em>URI</em></a>.
 Enable plugins by adding the the full class path to the <tt class="docutils literal"><span class="pre">PLUGINS</span></tt> djedi setting.</p>
 <p><strong>Default settings:</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">PLUGINS</span> <span class="o">=</span> <span class="p">(</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">DJEDI_PLUGINS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s">&#39;cio.plugins.txt.TextPlugin&#39;</span><span class="p">,</span>
     <span class="s">&#39;cio.plugins.md.MarkdownPlugin&#39;</span><span class="p">,</span>
     <span class="s">&#39;djedi.plugins.img.ImagePlugin&#39;</span><span class="p">,</span>
@@ -135,7 +135,7 @@ It depends on the python imaging library, and it&#8217;s recommended that you us
 </div>
 <p>Uploaded images gets persisted using Django&#8217;s <a class="reference external" href="https://docs.djangoproject.com/en/dev/ref/files/storage/">file storage api</a>. If you don&#8217;t want to use the default file storage,
 you can configure the image plugin setting <tt class="docutils literal"><span class="pre">FILE_STORAGE</span></tt>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">IMG</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">DJEDI_IMG_PLUGIN</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;FILE_STORAGE&#39;</span><span class="p">:</span> <span class="n">my_file_storage</span>
 <span class="p">}</span>
 </pre></div>
