@@ -58,3 +58,5 @@ if django.VERSION[:2] >= (1, 3):
 else:
     DATABASE_ENGINE = 'sqlite3'
     CACHE_BACKEND = 'djedi.tests.backends.DebugLocMemCache'
+
+DJEDI_THEME = 'luke'

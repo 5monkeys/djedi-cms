@@ -31,8 +31,8 @@ def configure():
     from django.conf import settings as django_settings
     from cio.conf import settings
 
-    # Configure content-io with django settings
-    conf = dict(
+    # Configure content-io with djedi defaults and user django settings
+    config = dict(
         ENVIRONMENT={
             'default': {
                 'i18n': django_settings.LANGUAGE_CODE,
@@ -49,5 +49,10 @@ def configure():
         ],
         THEME='darth'
     )
-    conf.update(getattr(django_settings, 'DJEDI', {}))
-    settings.configure(conf)
+
+    for setting in ('ENVIRONMENT', 'CACHE', 'STORAGE', 'PIPELINE', 'PLUGINS', 'THEME'):
+        conf = getattr(django_settings, 'DJEDI_%s' % setting, None)
+        if conf is not None:
+            config[setting] = conf
+
+    settings.configure(config)
