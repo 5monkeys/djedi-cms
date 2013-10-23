@@ -60,3 +60,9 @@ else:
     CACHE_BACKEND = 'djedi.tests.backends.DebugLocMemCache'
 
 DJEDI_THEME = 'luke'
+
+DJEDI = {
+    'IMG': {
+        'foo': 'bar'
+    }
+}

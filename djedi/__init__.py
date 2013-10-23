@@ -31,7 +31,7 @@ def configure():
     from django.conf import settings as django_settings
     from cio.conf import settings
 
-    # Configure content-io with djedi defaults and user django settings
+    # Djedi default config
     config = dict(
         ENVIRONMENT={
             'default': {
@@ -50,9 +50,14 @@ def configure():
         THEME='darth'
     )
 
+    # Update config with global djedi django settings
+    config.update(getattr(django_settings, 'DJEDI', {}))
+
+    # Overwrite config with prefixed variables from django settings
     for setting in ('ENVIRONMENT', 'CACHE', 'STORAGE', 'PIPELINE', 'PLUGINS', 'THEME'):
         conf = getattr(django_settings, 'DJEDI_%s' % setting, None)
         if conf is not None:
             config[setting] = conf
 
+    # Configure content-io settings
     settings.configure(config)
