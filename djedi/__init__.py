@@ -51,9 +51,3 @@ def configure():
     )
     conf.update(getattr(django_settings, 'DJEDI', {}))
     settings.configure(conf)
-
-    # Reload configuration based content-io modules
-    from cio.plugins import plugins
-    from cio.environment import env
-    plugins.load()
-    env.reset()
