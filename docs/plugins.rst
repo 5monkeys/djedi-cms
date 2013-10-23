@@ -16,7 +16,7 @@ Enable plugins by adding the the full class path to the ``PLUGINS`` djedi settin
 
 .. code-block:: python
 
-    PLUGINS = (
+    DJEDI_PLUGINS = (
         'cio.plugins.txt.TextPlugin',
         'cio.plugins.md.MarkdownPlugin',
         'djedi.plugins.img.ImagePlugin',
@@ -76,7 +76,7 @@ you can configure the image plugin setting ``FILE_STORAGE``.
 
 .. code-block:: python
 
-    IMG = {
+    DJEDI_IMG_PLUGIN = {
         'FILE_STORAGE': my_file_storage
     }
 
