@@ -135,8 +135,12 @@ It depends on the python imaging library, and it&#8217;s recommended that you us
 </div>
 <p>Uploaded images gets persisted using Django&#8217;s <a class="reference external" href="https://docs.djangoproject.com/en/dev/ref/files/storage/">file storage api</a>. If you don&#8217;t want to use the default file storage,
 you can configure the image plugin setting <tt class="docutils literal"><span class="pre">FILE_STORAGE</span></tt>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">DJEDI_IMG_PLUGIN</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&#39;FILE_STORAGE&#39;</span><span class="p">:</span> <span class="n">my_file_storage</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># settings.py</span>
+
+<span class="n">DJEDI</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;IMG&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;FILE_STORAGE&#39;</span><span class="p">:</span> <span class="n">my_file_storage</span>
+    <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>

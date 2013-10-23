@@ -76,8 +76,12 @@ you can configure the image plugin setting ``FILE_STORAGE``.
 
 .. code-block:: python
 
-    DJEDI_IMG_PLUGIN = {
-        'FILE_STORAGE': my_file_storage
+    # settings.py
+
+    DJEDI = {
+        'IMG': {
+            'FILE_STORAGE': my_file_storage
+        }
     }
 
 
