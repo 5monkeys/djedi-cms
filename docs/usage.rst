@@ -64,12 +64,12 @@ Blocknode tag
 
 The ``blocknode`` tag is similar to the ``node`` tag except that it lacks the `default` keyword argument
 and using the block body as default content instead. Beyond the `edit` kwarg, the ``blocknode`` can take any arbitrary
-keyword argument for use as a content formatting context.
+keyword argument for use as a content formatting context using python string format syntax.
 
 .. code-block:: django
 
-    {% blocknode 'page/home/intro.md' user=user.first_name %}
-        ## Welcome {{ name }}!
+    {% blocknode 'page/home/intro.md' name=user.first_name %}
+        ## Welcome {name}!
         I love using dynamic variables in my translatable texts.
     {% endblocknode %}
 
