@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -13,7 +14,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
+        URL_ROOT:    '',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -111,9 +112,9 @@ Plugins gets resolved by the <cite>extension</cite> part of the node uri.</p>
 <h3>Blocknode tag<a class="headerlink" href="#blocknode-tag" title="Permalink to this headline">¶</a></h3>
 <p>The <tt class="docutils literal"><span class="pre">blocknode</span></tt> tag is similar to the <tt class="docutils literal"><span class="pre">node</span></tt> tag except that it lacks the <cite>default</cite> keyword argument
 and using the block body as default content instead. Beyond the <cite>edit</cite> kwarg, the <tt class="docutils literal"><span class="pre">blocknode</span></tt> can take any arbitrary
-keyword argument for use as a content formatting context.</p>
-<div class="highlight-django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">blocknode</span> <span class="s1">&#39;page/home/intro.md&#39;</span> <span class="nv">user</span><span class="o">=</span><span class="nv">user.first_name</span> <span class="cp">%}</span><span class="x"></span>
-<span class="x">    ## Welcome </span><span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span><span class="x">!</span>
+keyword argument for use as a content formatting context using python string format syntax.</p>
+<div class="highlight-django"><div class="highlight"><pre><span class="cp">{%</span> <span class="k">blocknode</span> <span class="s1">&#39;page/home/intro.md&#39;</span> <span class="nv">name</span><span class="o">=</span><span class="nv">user.first_name</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    ## Welcome {name}!</span>
 <span class="x">    I love using dynamic variables in my translatable texts.</span>
 <span class="cp">{%</span> <span class="k">endblocknode</span> <span class="cp">%}</span><span class="x"></span>
 </pre></div>
