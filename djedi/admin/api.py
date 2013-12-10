@@ -60,7 +60,13 @@ class APIView(View):
         return data['data'], data['meta']
 
     def decode_uri(self, uri):
-        return urlunquote(uri)
+        decoded = urlunquote(uri)
+
+        # If uri got decoded then recursive try more times until nothing more can be decoded
+        if decoded != uri:
+            decoded = self.decode_uri(decoded)
+
+        return decoded
 
     def render_to_response(self, content=u''):
         return HttpResponse(content)
