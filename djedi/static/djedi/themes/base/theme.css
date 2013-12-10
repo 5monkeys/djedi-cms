@@ -1,5 +1,0 @@
-NameError: variable @state-success-bg is undefined in /Users/jonas/dev/5monkeys/djedi-cms/djedi/static/djedi/vendor/bootstrap/less/tables.less on line 173, column 29:
-172 // Generate the contextual variants
-173 .table-row-variant(success; @state-success-bg; @state-success-border);
-174 .table-row-variant(danger; @state-danger-bg; @state-danger-border);
-

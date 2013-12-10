@@ -468,7 +468,8 @@
         right: 0
       }, animate);
       this.page.$cms.removeClass('closed');
-      this.$body.addClass('embedded');
+      this.$body.removeClass('closed');
+      this.$body.addClass('embedded open');
       this.page.showNodes();
       return this.settings.set('panelIsOpen', true);
     };
@@ -476,9 +477,9 @@
     CMS.prototype.close = function(animate) {
       var $brand, brandHeight, brandWidth;
       this.page.unshrink(animate);
-      $brand = $('header .navbar-brand');
-      brandWidth = $brand.outerWidth(true);
+      $brand = $('header');
       brandHeight = $brand.outerHeight(true);
+      brandWidth = brandHeight;
       this.css({
         height: "" + brandHeight + "px"
       });
@@ -486,7 +487,8 @@
         right: "" + (brandWidth - this.width) + "px"
       }, animate);
       this.page.$cms.addClass('closed');
-      this.$body.removeClass('embedded');
+      this.$body.addClass('closed');
+      this.$body.removeClass('embedded open');
       this.page.hideNodes();
       return this.settings.set('panelIsOpen', false);
     };

@@ -367,19 +367,21 @@ class CMS
     @css {height: '100%'}
     @css {right: 0}, animate
     @page.$cms.removeClass 'closed'
-    @$body.addClass 'embedded'
+    @$body.removeClass 'closed'
+    @$body.addClass 'embedded open'
     @page.showNodes()
     @settings.set 'panelIsOpen', yes
 
   close: (animate) ->
     @page.unshrink animate
-    $brand = $ 'header .navbar-brand'
-    brandWidth = $brand.outerWidth yes
+    $brand = $ 'header'  # .navbar-brand'
     brandHeight = $brand.outerHeight yes
+    brandWidth = brandHeight  # $brand.outerWidth yes
     @css {height: "#{brandHeight}px"}
     @css {right: "#{brandWidth-@width}px"}, animate
     @page.$cms.addClass 'closed'
-    @$body.removeClass 'embedded'
+    @$body.addClass 'closed'
+    @$body.removeClass 'embedded open'
     @page.hideNodes()
     @settings.set 'panelIsOpen', no
 

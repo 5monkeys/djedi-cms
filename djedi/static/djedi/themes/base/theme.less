@@ -216,14 +216,40 @@ header .navbar {
   }
 }
 
-.navbar-default .navbar-brand > a {
-  color: @navbar-default-brand-color;
-  text-shadow: @navbar-default-shadow;
+.navbar-brand {
+  padding: 0;
 
-  &:hover,
-  &:focus {
+  > a {
+    display: block;
+    padding: 0;
     color: @navbar-default-brand-color;
-    text-decoration: none;
+    text-shadow: @navbar-default-shadow;
+
+    &:hover,
+    &:focus {
+      color: @navbar-default-brand-color;
+      text-decoration: none;
+    }
+  }
+}
+
+body {
+  &.closed .navbar-brand > a {
+    padding: 4px 7px;
+    font-size: 42px;
+
+    > i.dc-djedi-cms {
+      display: none;
+    }
+  }
+
+  &.open .navbar-brand > a {
+    padding: 15px 15px 11px 15px;
+    font-size: 24px;
+
+    > i.dc-djedi-icon {
+      display: none;
+    }
   }
 }
 
@@ -521,6 +547,7 @@ body.editor {
 
 // Custom Fonts
 //@import "../base/fonts.less";
+@import "../base/djedi-font.less";
 
 // I18N Flags
 @import "../base/flags.less";
