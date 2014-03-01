@@ -246,6 +246,9 @@
         this.trigger('plugin:loaded', node.uri.valueOf());
       }
       this.render(node);
+      if (node.content === 'None') {
+        node.content = '';
+      }
       this.delay(0, (function(_this) {
         return function() {
           return _this.trigger('node:render', node.uri.valueOf(), node.content || '');

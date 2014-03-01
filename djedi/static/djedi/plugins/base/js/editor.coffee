@@ -176,6 +176,8 @@ class window.Editor
 
     @render node
 #    @trigger 'node:render', node.uri.valueOf(), node.content or ''
+    if node.content == 'None'
+      node.content = ''
     @delay 0, => @trigger 'node:render', node.uri.valueOf(), node.content or ''
     console.log 'content', node.content or ''
 
