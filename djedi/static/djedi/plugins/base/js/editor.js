@@ -313,12 +313,12 @@
             return this.actions.publish.enable();
           case 'published':
             this.$version.addClass('label-success');
-            this.actions.discard.disable();
+            this.actions.discard.enable();
             this.actions.save.disable();
             return this.actions.publish.disable();
           case 'revert':
             this.$version.addClass('label-warning');
-            this.actions.discard.disable();
+            this.actions.discard.enable();
             this.actions.save.disable();
             return this.actions.publish.enable();
         }
@@ -468,7 +468,7 @@
 
     Editor.prototype.discard = function() {
       var uri;
-      if (this.node.uri.version === 'draft') {
+      if (this.node.data !== null) {
         this.api["delete"](this.node.uri.valueOf());
       }
       uri = this.node.uri;

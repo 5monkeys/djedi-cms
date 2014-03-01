@@ -235,12 +235,12 @@ class window.Editor
           @actions.publish.enable()
         when 'published'
           @$version.addClass 'label-success'
-          @actions.discard.disable()
+          @actions.discard.enable()
           @actions.save.disable()
           @actions.publish.disable()
         when 'revert'
           @$version.addClass 'label-warning'
-          @actions.discard.disable()
+          @actions.discard.enable()
           @actions.save.disable()
           @actions.publish.enable()
 
@@ -358,8 +358,8 @@ class window.Editor
     @setState 'published'
 
   discard: =>
-    if @node.uri.version == 'draft'
-      @api.delete @node.uri.valueOf()
+    if @node.data != null
+        @api.delete @node.uri.valueOf()
 
     uri = @node.uri
     uri.version = null
