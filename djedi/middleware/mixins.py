@@ -46,10 +46,15 @@ class AdminPanelMixin(object):
             return
 
         embed = self.render_cms()
+        # Only inject the panel if nodes exist on the page
+        if not embed:
+            return
         self.body_append(response, embed)
 
     def render_cms(self):
         defaults = dict((node.uri.clone(version=None), node.initial) for node in pipeline.history.list('get'))
+        if not defaults:
+            return
         return render_to_string('djedi/cms/embed.html', {
             'json_nodes': json.dumps(defaults).replace('</', '\\x3C/'),
         })
