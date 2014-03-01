@@ -156,6 +156,7 @@
   window.Editor = (function() {
     function Editor(config) {
       this.config = config;
+      this["delete"] = __bind(this["delete"], this);
       this.discard = __bind(this.discard, this);
       this.publish = __bind(this.publish, this);
       this.loadRevision = __bind(this.loadRevision, this);
@@ -169,6 +170,7 @@
       this.api = new Client(window.DJEDI_ENDPOINT);
       this.$doc = $(document);
       this.actions = {
+        "delete": $('#button-delete'),
         discard: $('#button-discard'),
         save: $('#button-save'),
         publish: $('#button-publish')
@@ -181,6 +183,7 @@
       this.$flag = $('header .flag');
       $('#button-publish').on('click', this.publish);
       $('#button-discard').on('click', this.discard);
+      $('#button-delete').on('click', this["delete"]);
       this.$form.ajaxForm({
         beforeSubmit: this.prepareForm,
         success: this.onSave
@@ -300,27 +303,32 @@
             this.$version.addClass('label-default');
             this.actions.discard.disable();
             this.actions.save.enable();
-            return this.actions.publish.disable();
+            this.actions.publish.disable();
+            return this.actions["delete"].disable();
           case 'dirty':
             this.$version.addClass('label-danger');
             this.actions.discard.enable();
             this.actions.save.enable();
-            return this.actions.publish.disable();
+            this.actions.publish.disable();
+            return this.actions["delete"].enable();
           case 'draft':
             this.$version.addClass('label-primary');
             this.actions.discard.enable();
             this.actions.save.disable();
-            return this.actions.publish.enable();
+            this.actions.publish.enable();
+            return this.actions["delete"].enable();
           case 'published':
             this.$version.addClass('label-success');
-            this.actions.discard.enable();
+            this.actions.discard.disable();
             this.actions.save.disable();
-            return this.actions.publish.disable();
+            this.actions.publish.disable();
+            return this.actions["delete"].enable();
           case 'revert':
             this.$version.addClass('label-warning');
-            this.actions.discard.enable();
+            this.actions.discard.disable();
             this.actions.save.disable();
-            return this.actions.publish.enable();
+            this.actions.publish.enable();
+            return this.actions["delete"].enable();
         }
       }
     };
@@ -468,9 +476,18 @@
 
     Editor.prototype.discard = function() {
       var uri;
-      if (this.node.data !== null) {
+      if (this.node.uri.version === 'draft') {
         this.api["delete"](this.node.uri.valueOf());
       }
+      uri = this.node.uri;
+      uri.version = null;
+      this.node = null;
+      return this.api.load(uri.valueOf(), this.onLoad);
+    };
+
+    Editor.prototype["delete"] = function() {
+      var uri;
+      this.api["delete"](this.node.uri.valueOf());
       uri = this.node.uri;
       uri.version = null;
       this.node = null;

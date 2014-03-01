@@ -108,6 +108,7 @@ class window.Editor
     @$doc = $ document
 
     @actions =
+      delete: $ '#button-delete'
       discard: $ '#button-discard'
       save: $ '#button-save'
       publish: $ '#button-publish'
@@ -121,6 +122,7 @@ class window.Editor
 
     $('#button-publish').on 'click', @publish
     $('#button-discard').on 'click', @discard
+    $('#button-delete').on 'click', @delete
 
     # Use ajaxForm from downloads
     @$form.ajaxForm
@@ -223,26 +225,31 @@ class window.Editor
           @actions.discard.disable()
           @actions.save.enable()
           @actions.publish.disable()
+          @actions.delete.disable()
         when 'dirty'
           @$version.addClass 'label-danger'
           @actions.discard.enable()
           @actions.save.enable()
           @actions.publish.disable()
+          @actions.delete.enable()
         when 'draft'
           @$version.addClass 'label-primary'
           @actions.discard.enable()
           @actions.save.disable()
           @actions.publish.enable()
+          @actions.delete.enable()
         when 'published'
           @$version.addClass 'label-success'
-          @actions.discard.enable()
+          @actions.discard.disable()
           @actions.save.disable()
           @actions.publish.disable()
+          @actions.delete.enable()
         when 'revert'
           @$version.addClass 'label-warning'
-          @actions.discard.enable()
+          @actions.discard.disable()
           @actions.save.disable()
           @actions.publish.enable()
+          @actions.delete.enable()
 
   renderHeader: (node) ->
     uri = node.uri
@@ -358,8 +365,17 @@ class window.Editor
     @setState 'published'
 
   discard: =>
-    if @node.data != null
+    if @node.uri.version == 'draft'
         @api.delete @node.uri.valueOf()
+
+    uri = @node.uri
+    uri.version = null
+    @node = null
+
+    @api.load uri.valueOf(), @onLoad
+
+  delete: =>
+    @api.delete @node.uri.valueOf()
 
     uri = @node.uri
     uri.version = null
