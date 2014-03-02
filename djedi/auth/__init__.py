@@ -6,6 +6,8 @@ def has_permission(user):
         if user.is_staff and user.groups.filter(name__iexact='djedi').exists():
             return True
 
+        if user.has_module_perms('djedi'):
+            return True
     return False
 
 
