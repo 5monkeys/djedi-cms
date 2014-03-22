@@ -43,6 +43,9 @@ $ django-admin.py migrate djedi
 
 ### Enable admin
 
+The admin UI page is not available at the moment (we are working on it), 
+but you need to enable URLs for Djedi CMS to work:
+
 ```python
 # urls.py
 
