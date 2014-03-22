@@ -14,8 +14,9 @@ Read the full [documentation][docs] or get a quick brief below.
 
 ## Install
 
+Currently, you need to install the latest beta-version
 ```sh
-$ pip install djedi-cms
+$ pip install --pre djedi-cms
 ```
 
 ## Configure
