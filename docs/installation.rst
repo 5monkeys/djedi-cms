@@ -15,8 +15,6 @@ Djedi CMS is easiest installed from the `cheese shop <cheese-shop_>`_ using pip:
 
     $ pip install djedi-cms
 
-**Beta:** Djedi CMS is in it's 1.0 beta phase so you need to explicitly define version i.e. djedi-cms==1.0b6
-
 **Note:** Plugins may require additional eggs like ``Markdown`` and ``Pillow`` (PIL)
 which is described in the :ref:`plugins` section.
 
