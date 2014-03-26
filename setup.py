@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 install_requires = [
     'Django >= 1.4',
-    'content-io >= 1.0b7',
+    'content-io >= 1.0',
     'simplejson >= 3.2.0'
 ]
 

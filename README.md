@@ -14,9 +14,8 @@ Read the full [documentation][docs] or get a quick brief below.
 
 ## Install
 
-Currently, you need to install the latest beta-version
 ```sh
-$ pip install --pre djedi-cms
+$ pip install djedi-cms
 ```
 
 ## Configure
@@ -43,9 +42,6 @@ $ django-admin.py migrate djedi
 
 ### Enable admin
 
-The admin UI page is not available at the moment (we are working on it), 
-but you need to enable URLs for Djedi CMS to work:
-
 ```python
 # urls.py
 
@@ -53,6 +49,8 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
 )
 ```
+
+> For now, only the inline admin are in place, but we are working on the back office admin UI.
 
 
 ## Use
