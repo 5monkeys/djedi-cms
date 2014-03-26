@@ -33,7 +33,7 @@ class DjediContextMixin(object):
     def get_context_data(self, **context):
         theme = settings.THEME
 
-        if not '/' in theme:
+        if '/' not in theme:
             theme = '{static}djedi/themes/{theme}/theme.css'.format(static=django_settings.STATIC_URL, theme=theme)
 
         context['THEME'] = theme

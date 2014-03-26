@@ -113,7 +113,7 @@ class NodeApi(JSONResponseMixin, APIView):
         uri = self.decode_uri(uri)
         uris = cio.delete(uri)
 
-        if not uri in uris:
+        if uri not in uris:
             raise Http404
 
         return self.render_to_response()
