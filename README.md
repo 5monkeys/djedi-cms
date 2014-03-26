@@ -4,7 +4,7 @@ Django content management as it should be.
 
 [![Build Status](https://travis-ci.org/5monkeys/djedi-cms.png?branch=master)](https://travis-ci.org/5monkeys/djedi-cms)
 [![Coverage Status](https://coveralls.io/repos/5monkeys/djedi-cms/badge.png?branch=master)](https://coveralls.io/r/5monkeys/djedi-cms?branch=master)
-[![Downloads](https://pypip.in/v/djedi-cms/badge.png)](https://crate.io/packages/djedi-cms/)
+[![Downloads](https://pypip.in/v/djedi-cms/badge.png)](https://pypi.python.org/pypi/djedi-cms/)
 
 
 ## Documentation
