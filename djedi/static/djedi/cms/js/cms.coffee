@@ -380,6 +380,7 @@ class CMS
     @css {height: "#{brandHeight}px"}
     @css {right: "#{brandWidth-@width}px"}, animate
     @page.$cms.addClass 'closed'
+    @page.$cms.removeClass 'fullscreen'
     @$body.addClass 'closed'
     @$body.removeClass 'embedded open'
     @page.hideNodes()
