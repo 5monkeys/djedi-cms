@@ -487,6 +487,7 @@
         right: "" + (brandWidth - this.width) + "px"
       }, animate);
       this.page.$cms.addClass('closed');
+      this.page.$cms.removeClass('fullscreen');
       this.$body.addClass('closed');
       this.$body.removeClass('embedded open');
       this.page.hideNodes();
