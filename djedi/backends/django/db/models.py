@@ -14,3 +14,6 @@ class Node(models.Model):
     class Meta:
         app_label = u'djedi'
         db_table = 'djedi_node'
+
+    def __unicode__(self):
+        return self.key
