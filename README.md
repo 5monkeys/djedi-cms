@@ -1,3 +1,5 @@
+test test test
+
 ![Django CMS](https://raw.github.com/5monkeys/djedi-cms/master/docs/_static/djedi-landscape.png)
 
 Django content management as it should be.
