@@ -17,17 +17,48 @@ def render_node(node, context=None, edit=True):
         return output
 
 
-@register.lazy_tag
-def node(key, default=None, edit=True):
+class DjediNode(template.Node):
+    def __init__(self, uri, default, kwargs):
+        self.uri = uri
+        self.default = default
+        self.reload_node()
+        self.kwargs = kwargs
+
+    def reload_node(self):
+        self.node = cio.get(self.uri, self.default or u'')
+
+    def render(self, context):
+        # Resolve tag kwargs against context
+        resolved_kwargs = dict((key, value.resolve(context)) for key, value in self.kwargs.iteritems())
+        edit = resolved_kwargs.pop('edit', True)
+
+        return render_node(self.node, context=resolved_kwargs, edit=edit)
+
+
+class SimpleNode(DjediNode):
     """
     Simple node tag:
     {% node 'page/title' default='Lorem ipsum' edit=True %}
     """
-    node = cio.get(key, default=default or u'')
-    return lambda _: render_node(node, edit=edit)
+    @classmethod
+    def tag(cls, parser, token):
+        # Parse tag args and kwargs
+        bits = token.split_contents()[1:]
+        params = ('uri', 'edit', 'default')
+        args, kwargs = parse_bits(parser, bits, params, None, True, ('', True,), None, 'node')
+
+        # Assert uri is the only tag arg
+        if len(args) > 1:
+            raise TemplateSyntaxError('Malformed arguments to blocknode tag')
+
+        # Resolve uri variable
+        uri = args[0].resolve({})
+        default = kwargs['default'].resolve({}) if 'default' in kwargs else u''
+
+        return cls(uri, default, kwargs)
 
 
-class BlockNode(template.Node):
+class BlockNode(DjediNode):
     """
     Block node tag using body content as default:
     {% blocknode 'page/title' edit=True %}
@@ -57,21 +88,8 @@ class BlockNode(template.Node):
         default = default.strip('\n\r')
         default = textwrap.dedent(default)
 
-        # Get node for uri, lacks context variable lookup due to lazy loading.
-        node = cio.get(uri, default)
+        return cls(uri, default, kwargs)
 
-        return cls(tokens, node, kwargs)
 
-    def __init__(self, tokens, node, kwargs):
-        self.tokens = tokens
-        self.node = node
-        self.kwargs = kwargs
-
-    def render(self, context):
-        # Resolve tag kwargs against context
-        resolved_kwargs = dict((key, value.resolve(context)) for key, value in self.kwargs.iteritems())
-        edit = resolved_kwargs.pop('edit', True)
-
-        return render_node(self.node, context=resolved_kwargs, edit=edit)
-
+register.tag('node', SimpleNode.tag)
 register.tag('blocknode', BlockNode.tag)
