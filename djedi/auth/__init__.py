@@ -1,4 +1,5 @@
-def has_permission(user):
+def has_permission(request):
+    user = request.user
     if user:
         if user.is_superuser:
             return True
@@ -9,7 +10,8 @@ def has_permission(user):
     return False
 
 
-def get_username(user):
+def get_username(request):
+    user = request.user
     if hasattr(user, 'get_username'):
         return user.get_username()
     else:

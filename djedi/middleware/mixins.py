@@ -23,7 +23,7 @@ class AdminPanelMixin(object):
         user = getattr(request, 'user', None)
 
         # Validate user permissions
-        if not has_permission(user):
+        if not has_permission(request):
             return
 
         # Do not inject admin panel in admin

@@ -21,7 +21,7 @@ class APIView(View):
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
-        if not auth.has_permission(request.user):
+        if not auth.has_permission(request):
             raise PermissionDenied
 
         try:
@@ -102,7 +102,7 @@ class NodeApi(JSONResponseMixin, APIView):
         """
         uri = self.decode_uri(uri)
         data, meta = self.get_post_data(request)
-        meta['author'] = auth.get_username(request.user)
+        meta['author'] = auth.get_username(request)
         node = cio.set(uri, data, publish=False, **meta)
         return self.render_to_json(node)
 
@@ -201,7 +201,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
     def post(self, request, uri):
         uri = self.decode_uri(uri)
         data, meta = self.get_post_data(request)
-        meta['author'] = auth.get_username(request.user)
+        meta['author'] = auth.get_username(request)
         node = cio.set(uri, data, publish=False, **meta)
 
         context = cio.load(node.uri)
