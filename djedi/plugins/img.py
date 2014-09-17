@@ -1,10 +1,6 @@
 import json
+import six
 from django.utils.html import escape
-
-try:
-    import cStringIO as StringIO
-except ImportError:
-    import StringIO
 from cio.plugins.base import BasePlugin
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from hashlib import sha1
@@ -13,7 +9,7 @@ from os import path
 
 class ImagePluginBase(BasePlugin):
 
-    ext = 'img'
+    ext = u'img'
 
     def _open(self, filename):
         raise NotImplementedError
@@ -27,7 +23,11 @@ class ImagePluginBase(BasePlugin):
     def _create_filename(self, filename, **kwargs):
         name, ext = path.splitext(filename)
         dir, name = name.rsplit(path.sep, 1)
-        name += ''.join((key + str(value) for key, value in kwargs.iteritems()))
+        name += ''.join(sorted(key + str(value) for key, value in six.iteritems(kwargs)))
+
+        if six.PY3:
+            name = name.encode('utf-8')
+
         name = sha1(name).hexdigest()
         subdir = name[:2]
         return path.sep.join((dir, subdir, name + ext))
@@ -94,7 +94,7 @@ class ImagePluginBase(BasePlugin):
 
             # Write file
             if filename != data.get('filename'):
-                new_file = StringIO.StringIO()
+                new_file = six.BytesIO()
                 image.save(new_file, format)
                 filename = self._save(filename, new_file)
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
+from sys import version_info
 
 
 install_requires = [
@@ -9,11 +10,13 @@ install_requires = [
 ]
 
 tests_require = [
-    'unittest2',
     'coverage',
     'Markdown <= 2.4.1',
     'Pillow'
 ]
+
+if version_info < (3,):
+    tests_require += ['unittest2']
 
 version = __import__('djedi').__version__
 

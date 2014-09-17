@@ -1,10 +1,11 @@
 import cio
 import json
+import six
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.loader import render_to_string
 from django.utils import translation
-from django.utils.encoding import smart_unicode
+from djedi.utils.encoding import smart_unicode
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
 
@@ -56,11 +57,12 @@ class AdminPanelMixin(object):
 
     def body_append(self, response, html):
         content = smart_unicode(response.content)
-        end_body = u'</body>'
-        end_body_index = content.lower().rfind(end_body)
+        idx = content.lower().rfind(u'</body>')
 
-        if end_body_index >= 0:
-            response.content = content[:end_body_index] + html + end_body + content[end_body_index + 7:]
+        if idx >= 0:
+            response.content = u''.join((content[:idx],
+                                         html,
+                                         content[idx:]))
 
             if response.get('Content-Length', None):
                 response['Content-Length'] = len(response.content)

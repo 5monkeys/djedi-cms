@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 import os
 import sys
-import unittest2
+import six
+
+if six.PY2:
+    import unittest2 as unittest
+else:
+    import unittest
 
 
 def main():
@@ -12,15 +17,25 @@ def main():
 
     # Discover tests
     os.environ['DJANGO_SETTINGS_MODULE'] = 'djedi.tests.settings'
-    unittest2.defaultTestLoader.discover('djedi')
+    unittest.defaultTestLoader.discover('djedi')
+
+    import django
+
+    if hasattr(django, "setup"):
+        django.setup()
 
     # Run tests
     import django
     if hasattr(django, 'setup'):
         django.setup()
 
-    from django.test.simple import DjangoTestSuiteRunner
-    runner = DjangoTestSuiteRunner(verbosity=1, interactive=True, failfast=False)
+    if django.VERSION < (1,7):
+        from django.test.simple import DjangoTestSuiteRunner as TestRunner
+    else:
+        from django.test.runner import DiscoverRunner as TestRunner
+
+    runner = TestRunner(verbosity=1, interactive=True, failfast=False)
+
     exit_code = runner.run_tests(['djedi'])
 
     sys.exit(exit_code)
