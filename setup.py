@@ -4,6 +4,7 @@ from sys import version_info
 
 
 install_requires = [
+    'six',
     'Django >= 1.4',
     'content-io >= 1.0.2',
     'simplejson >= 3.2.0'
@@ -54,6 +55,9 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
