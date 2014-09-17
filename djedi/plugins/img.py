@@ -9,7 +9,7 @@ from os import path
 
 class ImagePluginBase(BasePlugin):
 
-    ext = u'img'
+    ext = 'img'
 
     def _open(self, filename):
         raise NotImplementedError
