@@ -12,6 +12,7 @@ env:
   - DJANGO=Django==1.7
 
 install:
+  - if [[ "${TRAVIS_PYTHON_VERSION}" == "2.6" ]]; then pip install importlib unittest2 "markdown<=2.4"; fi
   - pip install $DJANGO flake8 python-coveralls
   - pip install -e .
   - pip install "file://`pwd`#egg=djedi-cms[tests]"
