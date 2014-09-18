@@ -1,6 +1,5 @@
 import cio
 import json
-import six
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.loader import render_to_string

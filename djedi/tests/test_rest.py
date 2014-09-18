@@ -1,7 +1,6 @@
 import cio
 import os
 import simplejson as json
-import six
 from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.test import Client

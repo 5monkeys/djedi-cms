@@ -1,4 +1,3 @@
-import six
 from django.core.urlresolvers import reverse
 from djedi.utils.encoding import smart_unicode
 from djedi.tests.base import ClientTest
