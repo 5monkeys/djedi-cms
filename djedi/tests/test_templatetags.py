@@ -48,7 +48,7 @@ class TagTest(DjediTest, AssertionMixin):
                 Lightning *fast*!
             {% endblocknode %}
         """)
-        assert html == u'<h1>Djedi</h1>\n<p>Lightning <em>fast</em>!</p>'
+        self.assertRenderedMarkdown(html, u'# Djedi\nLightning *fast*!')
 
         cio.set('i18n://sv-se@page/body.txt', u'Lightning fast!')
         html = self.render(u"""

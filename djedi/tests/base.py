@@ -1,3 +1,4 @@
+import cio
 import shutil
 from contextlib import contextmanager
 from django.conf import settings
@@ -72,6 +73,14 @@ class AssertionMixin(object):
         if updates >= 0:
             num_updates = len([q for q in queries if q['sql'].startswith('UPDATE')])
             assert num_updates == updates
+
+    def assertRenderedMarkdown(self, value, source):
+        if cio.PY26:
+            self.assertEqual(value, source)  # Markdown lacks Support for python 2.6
+        else:
+            from markdown import markdown
+            rendered = markdown(source)
+            self.assertEqual(value, rendered)
 
 
 class UserMixin(object):

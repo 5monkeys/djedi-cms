@@ -80,7 +80,7 @@ class RestTest(ClientTest):
         node = json_node(response)
         self.assertKeys(node, 'uri', 'content')
         self.assertEqual(node['uri'], 'i18n://sv-se@page/title.md#draft')
-        self.assertEqual(node['content'], u'<h1>Djedi</h1>')
+        self.assertRenderedMarkdown(node['content'], u'# Djedi')
 
     def test_load(self):
         response = self.get('api.load', 'i18n://sv-se@page/title')
@@ -100,7 +100,8 @@ class RestTest(ClientTest):
         self.assertEqual(response.status_code, 200)
         node = json_node(response, simple=False)
         meta = node.pop('meta', {})
-        self.assertDictEqual(node, {'uri': 'i18n://sv-se@page/title.md#1', 'data': u'# Djedi', 'content': u'<h1>Djedi</h1>'})
+        content = u'# Djedi' if cio.PY26 else u'<h1>Djedi</h1>'
+        self.assertDictEqual(node, {'uri': 'i18n://sv-se@page/title.md#1', 'data': u'# Djedi', 'content': content})
         self.assertKeys(meta, 'modified_at', 'published_at', 'is_published')
 
         response = self.get('api.load', 'i18n://sv-se@page/title#1')
@@ -121,7 +122,8 @@ class RestTest(ClientTest):
         self.assertEqual(response.status_code, 200)
         node = json_node(response, simple=False)
         meta = node.pop('meta')
-        self.assertDictEqual(node, {'uri': 'i18n://sv-se@page/title.md#draft', 'content': u'<h1>Djedi</h1>'})
+        content = u'# Djedi' if cio.PY26 else u'<h1>Djedi</h1>'
+        self.assertDictEqual(node, {'uri': 'i18n://sv-se@page/title.md#draft', 'content': content})
         self.assertEqual(meta['author'], u'master')
         self.assertEqual(meta['message'], u'lundberg')
 
@@ -130,7 +132,7 @@ class RestTest(ClientTest):
         cio.publish(uri)
         node = cio.get(uri, lazy=False)
         self.assertEqual(node.uri, 'i18n://sv-se@page/title.md#1')
-        self.assertEqual(node.content, u'<h1>Djedi</h1>')
+        self.assertRenderedMarkdown(node.content, u'# Djedi')
 
         response = self.post('api', node.uri, {'data': u'# Djedi', 'meta[message]': u'Lundberg'})
         node = json_node(response, simple=False)
@@ -188,7 +190,7 @@ class RestTest(ClientTest):
 
         response = self.post('api.render', 'md', {'data': u'# Djedi'})
         assert response.status_code == 200
-        assert response.content == u'<h1>Djedi</h1>'
+        self.assertRenderedMarkdown(response.content, u'# Djedi')
 
         response = self.post('api.render', 'img', {'data': json.dumps({
             'url': '/foo/bar.png',
