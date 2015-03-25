@@ -6041,7 +6041,6 @@ body.editor {
 iframe {
   width: 100%;
   border: 0;
-  height: 0;
   display: block;
 }
 #search-panel .search-bar {
