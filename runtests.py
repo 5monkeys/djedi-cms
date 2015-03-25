@@ -15,6 +15,10 @@ def main():
     unittest2.defaultTestLoader.discover('djedi')
 
     # Run tests
+    import django
+    if hasattr(django, 'setup'):
+        django.setup()
+
     from django.test.simple import DjangoTestSuiteRunner
     runner = DjangoTestSuiteRunner(verbosity=1, interactive=True, failfast=False)
     exit_code = runner.run_tests(['djedi'])

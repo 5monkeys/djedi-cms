@@ -11,7 +11,7 @@ install_requires = [
 tests_require = [
     'unittest2',
     'coverage',
-    'Markdown',
+    'Markdown <= 2.4.1',
     'Pillow'
 ]
 
