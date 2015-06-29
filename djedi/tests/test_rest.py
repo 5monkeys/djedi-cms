@@ -190,7 +190,7 @@ class RestTest(ClientTest):
 
         response = self.post('api.render', 'md', {'data': u'# Djedi'})
         assert response.status_code == 200
-        self.assertRenderedMarkdown(response.content, u'# Djedi')
+        self.assertRenderedMarkdown(smart_unicode(response.content), u'# Djedi')
 
         response = self.post('api.render', 'img', {'data': json.dumps({
             'url': '/foo/bar.png',
