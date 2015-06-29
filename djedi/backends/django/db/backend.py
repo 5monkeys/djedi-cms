@@ -1,8 +1,11 @@
 import logging
+
 from django.db import IntegrityError
 from cio.backends.base import DatabaseBackend
 from cio.backends.exceptions import NodeDoesNotExist, PersistenceError
-from .models import Node
+
+# Use absolute import here or Django 1.7 complains about duplicate models.
+from djedi.backends.django.db.models import Node
 
 logger = logging.getLogger(__name__)
 
