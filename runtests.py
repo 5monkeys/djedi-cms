@@ -19,11 +19,6 @@ def main():
     os.environ['DJANGO_SETTINGS_MODULE'] = 'djedi.tests.settings'
     unittest.defaultTestLoader.discover('djedi')
 
-    import django
-
-    if hasattr(django, "setup"):
-        django.setup()
-
     # Run tests
     import django
     if hasattr(django, 'setup'):
