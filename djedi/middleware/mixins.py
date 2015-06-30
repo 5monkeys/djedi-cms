@@ -1,12 +1,15 @@
-import cio
 import json
+
+import cio
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template.loader import render_to_string
 from django.utils import translation
-from djedi.utils.encoding import smart_unicode
+
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
+from djedi.compat import render_to_string
+from djedi.utils.encoding import smart_unicode
 
 
 class TranslationMixin(object):
