@@ -1,7 +1,6 @@
 from collections import defaultdict
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
-from django.template.response import TemplateResponse
 from django.utils.http import urlunquote
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
@@ -14,6 +13,7 @@ from cio.utils.uri import URI
 
 from .exceptions import InvalidNodeData
 from .mixins import JSONResponseMixin, DjediContextMixin
+from ..compat import TemplateResponse
 from .. import auth
 
 

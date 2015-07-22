@@ -1,18 +1,27 @@
 import cio
 from django.contrib.auth.models import User
 from django.template import Context, TemplateSyntaxError
-from django.template.loader import get_template_from_string
 from cio.backends import cache
 from cio.pipeline import pipeline
 from djedi.templatetags.template import register
 from djedi.tests.base import DjediTest, AssertionMixin
+
+try:
+    from django.template.loader import get_template_from_string
+except ImportError:
+    # Django 1.8+ has multiple template engines, we only test Django's for now.
+    from django.template import engines
+
+    def get_template_from_string(template_code):
+        return engines['django'].from_string(template_code)
 
 
 class TagTest(DjediTest, AssertionMixin):
 
     def render(self, source, context=None):
         source = u'{% load djedi_tags %}' + source.strip()
-        return get_template_from_string(source).render(Context(context or {})).strip()
+        context = Context(context or {})
+        return get_template_from_string(source).render(context).strip()
 
     def test_node_tag(self):
         html = self.render(u"{% node 'page/title' edit=False %}")

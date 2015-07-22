@@ -5,10 +5,11 @@ except ImportError:
 
 from django.contrib.admin import ModelAdmin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
 from django.views.generic import View
+
 from .mixins import DjediContextMixin
 from ..auth import has_permission
+from ..compat import render
 
 
 class Admin(ModelAdmin):

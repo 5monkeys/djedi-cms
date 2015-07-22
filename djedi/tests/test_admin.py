@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from django.utils.encoding import smart_unicode
+from djedi.utils.encoding import smart_unicode
 from djedi.tests.base import ClientTest
 
 
@@ -8,13 +8,13 @@ class PanelTest(ClientTest):
     def test_embed(self):
         url = reverse('index')
         response = self.client.get(url)
-        self.assertIn(u'Djedi Test', response.content)
-        self.assertIn(u'window.DJEDI_NODES', response.content)
+        self.assertIn(u'Djedi Test', smart_unicode(response.content))
+        self.assertIn(u'window.DJEDI_NODES', smart_unicode(response.content))
 
     def test_cms(self):
         url = reverse('admin:djedi:cms')
         response = self.client.get(url)
-        self.assertIn(u'<title>djedi cms</title>', response.content)
+        self.assertIn(u'<title>djedi cms</title>', smart_unicode(response.content))
 
     def test_django_admin(self):
         # Patch django admin index

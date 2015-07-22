@@ -1,19 +1,23 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
+from sys import version_info
 
 
 install_requires = [
+    'six',
     'Django >= 1.4',
     'content-io >= 1.0.2',
     'simplejson >= 3.2.0'
 ]
 
 tests_require = [
-    'unittest2',
     'coverage',
     'Markdown <= 2.4.1',
     'Pillow'
 ]
+
+if version_info < (3,):
+    tests_require += ['unittest2']
 
 version = __import__('djedi').__version__
 
@@ -51,6 +55,9 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],

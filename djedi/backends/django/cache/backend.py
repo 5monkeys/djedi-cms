@@ -1,5 +1,6 @@
+import six
 from django.core.cache import InvalidCacheBackendError
-from django.utils.encoding import smart_str, smart_unicode
+from djedi.utils.encoding import smart_str, smart_unicode
 from cio.backends.base import CacheBackend
 
 
@@ -47,15 +48,14 @@ class DjangoCacheBackend(CacheBackend):
         """
         if content is None:
             content = self.NONE
-        return smart_str(unicode(uri) + u'|' + content)
+        return smart_str('|'.join([six.text_type(uri), content]))
 
     def _decode_content(self, content):
         """
         Split node string to uri and content and convert back to unicode.
         """
-        uri, _, content = content.partition('|')
+        content = smart_unicode(content)
+        uri, _, content = content.partition(u'|')
         if content == self.NONE:
             content = None
-        else:
-            content = smart_unicode(content)
         return uri or None, content

@@ -1,9 +1,12 @@
 import json
 import logging
+
 from django import template
-from django.template.loader import render_to_string
+
 from cio.pipeline import pipeline
-from ..auth import has_permission
+from djedi.auth import has_permission
+from djedi.compat import render_to_string
+
 
 register = template.Library()
 logger = logging.getLogger(__name__)
