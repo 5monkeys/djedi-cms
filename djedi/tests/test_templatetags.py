@@ -121,3 +121,18 @@ class TagTest(DjediTest, AssertionMixin):
             return lambda _: u'foo'
         html = self.render("{% bar %}")
         assert html == u'foo'
+
+    def test_djedi_admin_tag(self):
+        source = u"""
+            {% load djedi_admin %}
+            {% djedi_admin %}
+        """
+
+        user = User(first_name=u'Jonas', last_name=u'Lundberg')
+        context = {'user': user}
+        html = self.render(source, context)
+        assert html == u''
+
+        user.is_superuser = True
+        html = self.render(source, context)
+        assert u'<script>window.DJEDI_NODES = {};</script>' in html
