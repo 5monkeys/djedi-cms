@@ -10,3 +10,4 @@ dist
 docs/_build
 docs/_themes/
 tests/media
+htmlcov/
