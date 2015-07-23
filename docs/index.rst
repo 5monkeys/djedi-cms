@@ -9,6 +9,19 @@ It differs from other CMS's in a control manner. Your urls, views and templates 
 You will not loose control of your urls or get forced to hook your logic and views backward-*ish* behind the CMS.
 
 
+Upgrading to 1.1
+----------------
+
+If you are using django <1.7 it might be best to upgrade South to 1.0 to make sure there is no conflict with the new migrations.
+If you cannot upgrade South then you need to set SOUTH_MIGRATION_MODULES_.
+
+.. code-block:: python
+
+   SOUTH_MIGRATION_MODULES = {
+      'djedi': 'djedi.south_migrations'
+   }
+
+
 User Guide
 ----------
 
@@ -19,3 +32,6 @@ User Guide
    usage
    plugins
    settings
+
+
+.. _SOUTH_MIGRATION_MODULES: http://south.readthedocs.org/en/latest/settings.html#south-migration-modules
