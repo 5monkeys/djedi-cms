@@ -21,13 +21,12 @@ def main():
 
     # Run tests
     import django
-    if hasattr(django, 'setup'):
-        django.setup()
 
-    if django.VERSION < (1,7):
+    if django.VERSION < (1, 7):
         from django.test.simple import DjangoTestSuiteRunner as TestRunner
     else:
         from django.test.runner import DiscoverRunner as TestRunner
+        django.setup()
 
     runner = TestRunner(verbosity=1, interactive=True, failfast=False)
 
