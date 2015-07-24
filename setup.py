@@ -13,7 +13,8 @@ install_requires = [
 tests_require = [
     'coverage',
     'Markdown <= 2.4.1',
-    'Pillow'
+    'Pillow',
+    'django-discover-runner'
 ]
 
 if version_info < (3,):
