@@ -5,7 +5,6 @@ from sys import version_info
 
 install_requires = [
     'six',
-    'Django >= 1.4',
     'content-io >= 1.0.2',
     'simplejson >= 3.2.0'
 ]
@@ -14,7 +13,6 @@ tests_require = [
     'coverage',
     'Markdown <= 2.4.1',
     'Pillow',
-    'django-discover-runner'
 ]
 
 if version_info < (3,):
