@@ -62,7 +62,6 @@ class DjangoCacheBackend(CacheBackend):
         return uri or None, content
 
 
-
 class DebugLocMemCache(LocMemCache):
 
     def __init__(self, *args, **kwargs):
