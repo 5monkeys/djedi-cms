@@ -58,7 +58,7 @@ class AdminPanelMixin(object):
         })
 
     def body_append(self, response, html):
-        idx = response.content.rfind(b'</body>')
+        idx = response.content.lower().rfind(b'</body>')
 
         if idx >= 0:
             response.content = b''.join((response.content[:idx],
