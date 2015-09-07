@@ -58,13 +58,12 @@ class AdminPanelMixin(object):
         })
 
     def body_append(self, response, html):
-        content = smart_unicode(response.content)
-        idx = content.lower().rfind(u'</body>')
+        idx = response.content.rfind(b'</body>')
 
         if idx >= 0:
-            response.content = u''.join((content[:idx],
-                                         html,
-                                         content[idx:]))
+            response.content = b''.join((response.content[:idx],
+                                         html.encode('utf8'),
+                                         response.content[idx:]))
 
             if response.get('Content-Length', None):
                 response['Content-Length'] = len(response.content)
