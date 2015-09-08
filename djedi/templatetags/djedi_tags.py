@@ -1,4 +1,5 @@
 import cio
+import six
 import textwrap
 from django import template
 from django.template import TemplateSyntaxError
@@ -69,7 +70,7 @@ class BlockNode(template.Node):
 
     def render(self, context):
         # Resolve tag kwargs against context
-        resolved_kwargs = dict((key, value.resolve(context)) for key, value in self.kwargs.iteritems())
+        resolved_kwargs = dict((key, value.resolve(context)) for key, value in six.iteritems(self.kwargs))
         edit = resolved_kwargs.pop('edit', True)
 
         return render_node(self.node, context=resolved_kwargs, edit=edit)

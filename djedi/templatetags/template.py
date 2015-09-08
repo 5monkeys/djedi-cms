@@ -1,7 +1,8 @@
 from functools import partial
 from inspect import getargspec
 from django import template
-from django.template import Node, TemplateSyntaxError, generic_tag_compiler
+from django.template import Context
+from django.template.base import Node, TemplateSyntaxError, generic_tag_compiler
 
 register = template.Library()
 
@@ -34,7 +35,7 @@ def lazy_tag(self, func=None, takes_context=None, name=None, node_class=None):
                 self.args = args
                 self.kwargs = kwargs
 
-                resolved_args, resolved_kwargs = self.get_resolved_arguments({})
+                resolved_args, resolved_kwargs = self.get_resolved_arguments(Context({}))
 
                 self.resolved_args = resolved_args
                 self.resolved_kwargs = resolved_kwargs

@@ -1,12 +1,14 @@
-import cio
 import json
+
+import cio
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template.loader import render_to_string
 from django.utils import translation
-from django.utils.encoding import smart_unicode
+
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
+from djedi.compat import render_to_string
 
 
 class TranslationMixin(object):
@@ -55,12 +57,12 @@ class AdminPanelMixin(object):
         })
 
     def body_append(self, response, html):
-        content = smart_unicode(response.content)
-        end_body = u'</body>'
-        end_body_index = content.lower().rfind(end_body)
+        idx = response.content.lower().rfind(b'</body>')
 
-        if end_body_index >= 0:
-            response.content = content[:end_body_index] + html + end_body + content[end_body_index + 7:]
+        if idx >= 0:
+            response.content = b''.join((response.content[:idx],
+                                         html.encode('utf8'),
+                                         response.content[idx:]))
 
             if response.get('Content-Length', None):
                 response['Content-Length'] = len(response.content)
