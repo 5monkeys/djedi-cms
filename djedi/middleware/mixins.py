@@ -9,7 +9,6 @@ from django.utils import translation
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
 from djedi.compat import render_to_string
-from djedi.utils.encoding import smart_unicode
 
 
 class TranslationMixin(object):
