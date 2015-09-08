@@ -1,5 +1,9 @@
 language: python
 
+# Use travis-ci's new container infrastructure
+# http://docs.travis-ci.com/user/migrating-from-legacy/
+sudo: false
+
 python:
   - "2.6"
   - "2.7"
