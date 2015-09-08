@@ -1,10 +1,10 @@
-![Django CMS](https://raw.github.com/5monkeys/djedi-cms/master/docs/_static/djedi-landscape.png)
+![Djedi CMS](https://raw.github.com/5monkeys/djedi-cms/master/docs/_static/djedi-landscape.png)
 
 Django content management as it should be.
 
-[![Build Status](https://travis-ci.org/5monkeys/djedi-cms.png?branch=master)](https://travis-ci.org/5monkeys/djedi-cms)
-[![Coverage Status](https://coveralls.io/repos/5monkeys/djedi-cms/badge.png?branch=master)](https://coveralls.io/r/5monkeys/djedi-cms?branch=master)
-[![Downloads](https://pypip.in/v/djedi-cms/badge.png)](https://pypi.python.org/pypi/djedi-cms/)
+[![Build Status](https://img.shields.io/travis/5monkeys/djedi-cms.svg)](https://travis-ci.org/5monkeys/djedi-cms)
+[![Coverage Status](https://img.shields.io/coveralls/5monkeys/djedi-cms/master.svg)](https://coveralls.io/r/5monkeys/djedi-cms?branch=master)
+[![Downloads](https://img.shields.io/pypi/dm/djedi-cms.svg)](https://img.shields.io/pypi/dm/djedi-cms.svg)
 
 
 ## Documentation
