@@ -1,4 +1,5 @@
 import six
+import django
 from django.core.cache import InvalidCacheBackendError
 from djedi.utils.encoding import smart_str, smart_unicode
 from cio.backends.base import CacheBackend
@@ -14,9 +15,13 @@ class DjangoCacheBackend(CacheBackend):
         super(DjangoCacheBackend, self).__init__(**config)
 
         try:
-            from django.core.cache import get_cache
             cache_name = self.config.get('NAME', 'djedi')
-            cache = get_cache(cache_name)
+            if django.VERSION < (1, 8):
+                from django.core.cache import get_cache
+                cache = get_cache(cache_name)
+            else:
+                from django.core.cache import caches
+                cache = caches[cache_name]
         except (InvalidCacheBackendError, ValueError):
             from django.core.cache import cache
 
