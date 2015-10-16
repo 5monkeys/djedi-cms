@@ -217,3 +217,18 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
             'djedi/plugins/%s/editor.html' % context['uri'].ext,
             'djedi/plugins/base/editor.html'
         ], self.get_context_data(**context))
+
+
+class SearchApi(JSONResponseMixin, APIView):
+
+    @never_cache
+    def get(self, request, uri=''):
+        """
+        Search nodes.
+
+        JSON Response:
+            {uri: x, data: y}
+        """
+        uri = self.decode_uri(uri)
+        uris = cio.search(uri)
+        return self.render_to_json(uris)

@@ -3,7 +3,7 @@ try:
 except ImportError:
     from django.conf.urls.defaults import patterns, url
 
-from .api import NodeApi, LoadApi, PublishApi, RevisionsApi, RenderApi, NodeEditor
+from .api import NodeApi, LoadApi, PublishApi, RevisionsApi, RenderApi, NodeEditor, SearchApi
 from .cms import DjediCMS
 
 urlpatterns = patterns(
@@ -15,4 +15,5 @@ urlpatterns = patterns(
     url(r'^node/(?P<uri>.+)/revisions$', RevisionsApi.as_view(), name='api.revisions'),
     url(r'^node/(?P<uri>.+)$', NodeApi.as_view(), name='api'),
     url(r'^plugin/(?P<ext>\w+)$', RenderApi.as_view(), name='api.render'),
+    url(r'^search/(?P<uri>.*)$', SearchApi.as_view(), name='api.search'),
 )

@@ -260,3 +260,46 @@ class RestTest(ClientTest):
 
             response = self.post('api', 'i18n://sv-se@header/logo.img', form)
             self.assertEqual(response.status_code, 200)
+
+    def assertSearch(self, uri, result):
+        response = self.get('api.search', uri)
+        self.assertEqual(response.status_code, 200)
+
+        content = json.loads(response.content)
+        self.assertListEqual(content, result)
+
+    def test_search(self):
+        cio.set('sv-se@page/title', u'Titel')
+        cio.set('sv-se@page/title#draft', u'Ny titel')
+        cio.set('en@page/title', u'Title')
+        cio.set('l10n://a@page/title.md', u'Header')
+        cio.set('l10n://a@foo/bar', u'')
+
+        self.assertSearch('', [
+            'i18n://en@page/title.txt',
+            'i18n://sv-se@page/title.txt',
+            'l10n://a@foo/bar.txt',
+            'l10n://a@page/title.md',
+        ])
+        self.assertSearch('i18n://', [
+            'i18n://en@page/title.txt',
+            'i18n://sv-se@page/title.txt',
+        ])
+        self.assertSearch('en@', [
+            'i18n://en@page/title.txt',
+        ])
+        self.assertSearch('page/', [
+            'i18n://en@page/title.txt',
+            'i18n://sv-se@page/title.txt',
+            'l10n://a@page/title.md',
+        ])
+        self.assertSearch('i18n://en@', [
+            'i18n://en@page/title.txt',
+        ])
+        self.assertSearch('i18n://page/', [
+            'i18n://en@page/title.txt',
+            'i18n://sv-se@page/title.txt',
+        ])
+        self.assertSearch('en@page/', [
+            'i18n://en@page/title.txt',
+        ])

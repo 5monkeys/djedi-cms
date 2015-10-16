@@ -3,6 +3,7 @@ import logging
 from django.db import IntegrityError
 from cio.backends.base import DatabaseBackend
 from cio.backends.exceptions import NodeDoesNotExist, PersistenceError
+from cio.utils.uri import URI
 
 # Use absolute import here or Django 1.7 complains about duplicate models.
 from djedi.backends.django.db.models import Node
@@ -66,6 +67,22 @@ class DjangoModelStorageBackend(DatabaseBackend):
         nodes = Node.objects.filter(key=key).order_by('date_created')
         revisions = nodes.values_list('plugin', 'version', 'is_published')
         return [(key.clone(ext=plugin, version=version), is_published) for plugin, version, is_published in revisions]
+
+    def search(self, uri):
+        nodes = Node.objects.all()
+        filters = []
+        if uri.scheme:
+            filters.append(('key__startswith', uri.scheme))
+        if uri.namespace:
+            filters.append(('key__contains', '://%s@' % uri.namespace))
+        if uri.path:
+            filters.append(('key__contains', '@' + uri.path))
+
+        for key, value in filters:
+            nodes = nodes.filter(**{key: value})
+
+        nodes = nodes.values_list('key', 'plugin').distinct().order_by('key', 'plugin')
+        return [URI(key).clone(ext=ext) for key, ext in nodes]
 
     def _get(self, uri):
         key = self._build_key(uri)
