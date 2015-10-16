@@ -1,5 +1,5 @@
 test:
-	django-admin.py test --settings=djedi.tests.settings djedi --verbosity=2
+	python setup.py test
 
 flake8:
 	flake8 djedi
