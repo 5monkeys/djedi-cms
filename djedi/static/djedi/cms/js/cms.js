@@ -62,8 +62,10 @@
       this.select = __bind(this.select, this);
       this.uri = uri.to_uri();
       this.data = data;
-      this.$el = $("span[data-i18n='" + (this.id()) + "']", container);
-      this.preview = this.$el.length > 0;
+      if (container) {
+        this.$el = $("span[data-i18n='" + (this.id()) + "']", container);
+      }
+      this.preview = this.$el ? this.$el.length > 0 : false;
       if (this.preview) {
         this.$outline = $('<div class="djedi-node-outline">');
         this.$outline.on('click', this.select);
@@ -398,12 +400,29 @@
         panelIsOpen: false
       });
       this.search = new Search;
-      if (window.parent !== window) {
+      if (window.parent === window) {
+        this.admin();
+      } else {
         this.embed();
+        $('#brand').on('click', this.toggleOpen);
       }
       Events.on('node:edit', this.openEditor);
-      $('#brand').on('click', this.toggleOpen);
     }
+
+    CMS.prototype.admin = function() {
+      var nodes, uri, uris, _i, _len;
+      this.api = new window.Client(window.DJEDI_ENDPOINT);
+      uris = this.api.search();
+      console.log('Search found uris', uris);
+      nodes = {};
+      for (_i = 0, _len = uris.length; _i < _len; _i++) {
+        uri = uris[_i];
+        nodes[uri] = new Node(uri);
+      }
+      console.log('Searched nodes', nodes);
+      this.search.addNodes(nodes);
+      return this.openPanel('search');
+    };
 
     CMS.prototype.embed = function() {
       this.$body.addClass('embedded');

@@ -42,8 +42,8 @@ class Node
   constructor: (uri, data, container) ->
     @uri = uri.to_uri()
     @data = data
-    @$el = $ "span[data-i18n='#{@id()}']", container
-    @preview = @$el.length > 0
+    @$el = $("span[data-i18n='#{@id()}']", container) if container
+    @preview = if @$el then @$el.length > 0 else no
 
     # Create node outline
     if @preview
@@ -307,12 +307,30 @@ class CMS
 
     @search = new Search
 
-    # Set embed mode and initialize nodes from page
-    if window.parent != window
+    if window.parent == window
+      # Full screen admin mode, initialize nodes from API
+      @admin()
+    else
+      # Set embed mode and initialize nodes from page
       @embed()
+      $('#brand').on 'click', @toggleOpen
 
     Events.on 'node:edit', @openEditor
-    $('#brand').on 'click', @toggleOpen
+
+  admin: ->
+    @api = new window.Client window.DJEDI_ENDPOINT
+    uris = @api.search()
+
+    console.log 'Search found uris', uris
+
+    nodes = {}
+    for uri in uris
+      nodes[uri] = new Node uri
+
+    console.log 'Searched nodes', nodes
+
+    @search.addNodes nodes
+    @openPanel 'search'
 
   embed: ->
     @$body.addClass 'embedded'

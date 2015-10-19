@@ -39,9 +39,13 @@
             <section id="editor-panel" class="tab-pane active"></section>
             <section id="settings-panel" class="tab-pane hide"></section>
         </div>
+        <script>
+            window.DJEDI_ENDPOINT = '{% url 'admin:djedi:cms' %}';
+        </script>
         <script src="{% static 'djedi/vendor/jquery/jquery.min.js' %}?v={{ VERSION }}"></script>
         <script src="{% static 'djedi/vendor/bootstrap/js/bootstrap.min.js' %}?v={{ VERSION }}"></script>
         <script src="{% static 'djedi/cms/js/uri.js' %}?v={{ VERSION }}"></script>
+        <script src="{% static 'djedi/cms/js/client.js' %}?v={{ VERSION }}"></script>
         <script src="{% static 'djedi/cms/js/cms.js' %}?v={{ VERSION }}"></script>
     </body>
 </html>
