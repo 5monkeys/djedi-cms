@@ -15,3 +15,15 @@ coverage:
 
 clean:
 	rm -rf .tox/ dist/ *.egg *.egg-info .coverage
+
+js:
+	coffee -c djedi/static/djedi/cms/js/uri.coffee && \
+	coffee -c djedi/static/djedi/cms/js/client.coffee && \
+	coffee -c djedi/static/djedi/cms/js/cms.coffee && \
+	coffee -c djedi/static/djedi/plugins/base/js/editor.coffee && \
+	coffee -c djedi/static/djedi/plugins/img/js/img.coffee
+
+css:
+	lessc -ru djedi/static/djedi/themes/darth/theme.less djedi/static/djedi/themes/darth/theme.css && \
+	lessc -ru djedi/static/djedi/themes/luke/theme.less djedi/static/djedi/themes/luke/theme.css
+
