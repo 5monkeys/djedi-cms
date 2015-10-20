@@ -2,12 +2,15 @@ import codecs
 import os
 import re
 
+from django.template import TemplateDoesNotExist
+from django.utils.encoding import smart_unicode
+
 import cio
 import cio.conf
-from django.template import TemplateDoesNotExist
 
 
 NODE_PATTERN = re.compile(r"\{%\s*node '(?P<uri>[^']+)'(\s+default='(?P<default>[^']+)')?\s*%\}")
+BLOCKNODE_PATTERN = re.compile(r"\{%\s*blocknode '(?P<uri>[^']+)'.*%\}\s*(?P<default>.+)\s*\{% endblocknode %\}")
 
 
 def get_template_dirs():
@@ -60,12 +63,29 @@ def find_nodes():
                 with codecs.open(path, encoding='utf-8') as f:
                     source = f.read()
 
-                    for match in NODE_PATTERN.finditer(source):
-                        match = match.groupdict()
-                        node = cio.get(match['uri'], default=match['default'], lazy=True)
-                        node._flushed = True  # Prevent from being sent through pipeline
-                        uri = node.uri.clone(ext=node.uri.ext or cio.conf.settings.URI_DEFAULT_EXT)
-                        if uri not in nodes:
-                            nodes[uri] = node.initial
+                    simple_nodes = search_nodes(NODE_PATTERN, source)
+                    block_nodes = search_nodes(BLOCKNODE_PATTERN, source)
+
+                    nodes.update(simple_nodes)
+                    nodes.update(block_nodes)
+
+    return nodes
+
+
+def search_nodes(pattern, source):
+    """
+    :param pattern: Compiled regex pattern
+    :param str source:
+    :return dict:
+    """
+    nodes = {}
+
+    for match in pattern.finditer(source):
+        match = match.groupdict()
+        node = cio.get(match['uri'], default=match['default'], lazy=True)
+        node._flushed = True  # Prevent from being sent through pipeline
+        uri = node.uri.clone(ext=node.uri.ext or cio.conf.settings.URI_DEFAULT_EXT)
+        if uri not in nodes:
+            nodes[uri] = smart_unicode(node.initial) if node.initial is not None else None
 
     return nodes
