@@ -73,16 +73,16 @@ class AssertionMixin(object):
         setattr(connection, DEBUG_CURSOR_ATTR, pre_debug_cursor)
 
         if calls >= 0:
-            assert num_queries == calls
+            self.assertEqual(num_queries, calls, 'Database calls: %r != %r' % (num_queries, calls))
         if selects >= 0:
             num_selects = len([q for q in queries if q['sql'].startswith('SELECT')])
-            assert num_selects == selects
+            self.assertEqual(num_selects, selects, 'Database selects: %r != %r' % (num_selects, selects))
         if inserts >= 0:
             num_inserts = len([q for q in queries if q['sql'].startswith('INSERT')])
-            assert num_inserts == inserts
+            self.assertEqual(num_inserts, inserts, 'Database inserts: %r != %r' % (num_inserts, inserts))
         if updates >= 0:
             num_updates = len([q for q in queries if q['sql'].startswith('UPDATE')])
-            assert num_updates == updates
+            self.assertEqual(num_updates, updates, 'Database updates: %r != %r' % (num_updates, updates))
 
     def assertRenderedMarkdown(self, value, source):
         if cio.PY26:
