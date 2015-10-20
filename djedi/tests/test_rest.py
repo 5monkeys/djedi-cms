@@ -269,13 +269,13 @@ class RestTest(ClientTest):
         dirs = [d[max(0, d.rfind('djedi')):] for d in dirs]
 
         os.path.abspath(__file__)
-        self.assertSetEqual(set(dirs), {
+        self.assertSetEqual(set(dirs), set([
             u'djedi/templates',
             u'djedi/tests/templates',
             u'djedi/tests/app/templates',
             u'django/contrib/auth/templates',
             u'django/contrib/admin/templates',
-        })
+        ]))
 
     def test_find_nodes(self):
         with self.assertDB(calls=0):
