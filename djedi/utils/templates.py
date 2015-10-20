@@ -3,10 +3,10 @@ import os
 import re
 
 from django.template import TemplateDoesNotExist
-from django.utils.encoding import smart_unicode
 
 import cio
 import cio.conf
+from .encoding import smart_unicode
 
 
 NODE_PATTERN = re.compile(r"\{%\s*node '(?P<uri>[^']+)'(\s+default='(?P<default>[^']+)')?\s*%\}")
