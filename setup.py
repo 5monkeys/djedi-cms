@@ -5,7 +5,7 @@ from sys import version_info
 
 install_requires = [
     'six',
-    'content-io >= 1.1',
+    'content-io >= 1.2',
     'simplejson >= 3.2.0'
 ]
 
