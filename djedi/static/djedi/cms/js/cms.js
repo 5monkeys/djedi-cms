@@ -5,8 +5,6 @@
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  console.log = function() {};
-
   Events = $({});
 
   Events.handler = (function(_this) {
@@ -410,16 +408,14 @@
     }
 
     CMS.prototype.admin = function() {
-      var nodes, uri, uris, _i, _len;
+      var data, nodes, uri;
       this.api = new window.Client(window.DJEDI_ENDPOINT);
-      uris = this.api.search();
-      console.log('Search found uris', uris);
-      nodes = {};
-      for (_i = 0, _len = uris.length; _i < _len; _i++) {
-        uri = uris[_i];
-        nodes[uri] = new Node(uri);
+      nodes = this.api.search();
+      console.log('Search found nodes', nodes);
+      for (uri in nodes) {
+        data = nodes[uri];
+        nodes[uri] = new Node(uri, data);
       }
-      console.log('Searched nodes', nodes);
       this.search.addNodes(nodes);
       return this.openPanel('search');
     };

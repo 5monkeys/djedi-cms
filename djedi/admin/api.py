@@ -1,4 +1,5 @@
 from collections import defaultdict
+
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.utils.http import urlunquote
@@ -10,10 +11,10 @@ import cio
 from cio.plugins import plugins
 from cio.plugins.exceptions import UnknownPlugin
 from cio.utils.uri import URI
-
 from .exceptions import InvalidNodeData
 from .mixins import JSONResponseMixin, DjediContextMixin
 from ..compat import TemplateResponse
+from ..utils import templates
 from .. import auth
 
 
@@ -227,8 +228,15 @@ class SearchApi(JSONResponseMixin, APIView):
         Search nodes.
 
         JSON Response:
-            {uri: x, data: y}
+            {uri: default, ...}
         """
-        uri = self.decode_uri(uri)
-        uris = cio.search(uri)
-        return self.render_to_json(uris)
+        nodes = templates.find_nodes()
+
+        # TODO: Extend with existing nodes in storage.
+        # TODO: Challenge: Handle uri duplicates but with different namespaces.
+        # uri = self.decode_uri(uri)
+        # uris = cio.search(uri)
+        # for uri in uris:
+        #     nodes.setdefault(uri)
+
+        return self.render_to_json(nodes)

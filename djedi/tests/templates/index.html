@@ -1,9 +1,12 @@
+{% load djedi_tags %}
 <!DOCTYPE html>
 <html>
     <head>
         <title>Djedi Test</title>
+        <meta key="node" value="{% node 'foo/bar.md' %}" />
+        <meta key="node" value="{% node 'ham/spam.md' default='Ham spam' %}" />
     </head>
     <body>
-    DJEDİ
+        DJEDİ
     </boDy>
 </html>

@@ -11,6 +11,7 @@ from cio.backends.exceptions import PersistenceError, NodeDoesNotExist
 from cio.utils.uri import URI
 from djedi.tests.base import DjediTest, UserMixin, ClientTest
 from djedi.utils.encoding import smart_unicode
+from djedi.utils.templates import get_template_dirs, find_nodes
 
 
 def json_node(response, simple=True):
@@ -262,11 +263,45 @@ class RestTest(ClientTest):
             self.assertEqual(response.status_code, 200)
 
     def assertSearch(self, uri, result):
+        result = dict(result.items())
+        result.update({
+            'i18n://sv-se@foo/bar.md': None,
+            'i18n://sv-se@foo/bar/baz.txt': u'Foo bar',
+            'i18n://sv-se@ham/spam.md': u'Ham spam',
+            'l10n://djedi@site/title.txt': u'Title'
+        })
+
         response = self.get('api.search', uri)
         self.assertEqual(response.status_code, 200)
 
         content = json.loads(response.content)
-        self.assertListEqual(content, result)
+        self.assertDictEqual(content, result)
+
+    def test_get_template_dirs(self):
+        dirs = get_template_dirs()
+
+        dirs = [d[max(0, d.rfind('django')):] for d in dirs]
+        dirs = [d[max(0, d.rfind('djedi')):] for d in dirs]
+
+        os.path.abspath(__file__)
+        self.assertSetEqual(set(dirs), {
+            u'djedi/templates',
+            u'djedi/tests/templates',
+            u'djedi/tests/app/templates',
+            u'django/contrib/auth/templates',
+            u'django/contrib/admin/templates',
+        })
+
+    def test_find_nodes(self):
+        with self.assertDB(calls=0):
+            nodes = find_nodes()
+            nodes = dict(nodes)
+            self.assertDictEqual(nodes, {
+                'i18n://sv-se@foo/bar.md': None,
+                'i18n://sv-se@foo/bar/baz.txt': u'Foo bar',
+                'i18n://sv-se@ham/spam.md': u'Ham spam',
+                'l10n://djedi@site/title.txt': u'Title'
+            })
 
     def test_search(self):
         cio.set('sv-se@page/title', u'Titel')
@@ -274,32 +309,33 @@ class RestTest(ClientTest):
         cio.set('en@page/title', u'Title')
         cio.set('l10n://a@page/title.md', u'Header')
         cio.set('l10n://a@foo/bar', u'')
+        cio.set('i18n://sv-se@foo/bar/baz.txt', u'Foo bar baz')
 
-        self.assertSearch('', [
-            'i18n://en@page/title.txt',
-            'i18n://sv-se@page/title.txt',
-            'l10n://a@foo/bar.txt',
-            'l10n://a@page/title.md',
-        ])
-        self.assertSearch('i18n://', [
-            'i18n://en@page/title.txt',
-            'i18n://sv-se@page/title.txt',
-        ])
-        self.assertSearch('en@', [
-            'i18n://en@page/title.txt',
-        ])
-        self.assertSearch('page/', [
-            'i18n://en@page/title.txt',
-            'i18n://sv-se@page/title.txt',
-            'l10n://a@page/title.md',
-        ])
-        self.assertSearch('i18n://en@', [
-            'i18n://en@page/title.txt',
-        ])
-        self.assertSearch('i18n://page/', [
-            'i18n://en@page/title.txt',
-            'i18n://sv-se@page/title.txt',
-        ])
-        self.assertSearch('en@page/', [
-            'i18n://en@page/title.txt',
-        ])
+        self.assertSearch('', {
+            'i18n://en@page/title.txt': None,
+            'i18n://sv-se@page/title.txt': None,
+            'l10n://a@foo/bar.txt': None,
+            'l10n://a@page/title.md': None,
+        })
+        self.assertSearch('i18n://', {
+            'i18n://en@page/title.txt': None,
+            'i18n://sv-se@page/title.txt': None,
+        })
+        self.assertSearch('en@', {
+            'i18n://en@page/title.txt': None,
+        })
+        self.assertSearch('page/', {
+            'i18n://en@page/title.txt': None,
+            'i18n://sv-se@page/title.txt': None,
+            'l10n://a@page/title.md': None,
+        })
+        self.assertSearch('i18n://en@', {
+            'i18n://en@page/title.txt': None,
+        })
+        self.assertSearch('i18n://page/', {
+            'i18n://en@page/title.txt': None,
+            'i18n://sv-se@page/title.txt': None,
+        })
+        self.assertSearch('en@page/', {
+            'i18n://en@page/title.txt': None,
+        })

@@ -319,15 +319,12 @@ class CMS
 
   admin: ->
     @api = new window.Client window.DJEDI_ENDPOINT
-    uris = @api.search()
+    nodes = @api.search()
 
-    console.log 'Search found uris', uris
+    console.log 'Search found nodes', nodes
 
-    nodes = {}
-    for uri in uris
-      nodes[uri] = new Node uri
-
-    console.log 'Searched nodes', nodes
+    for uri, data of nodes
+      nodes[uri] = new Node uri, data
 
     @search.addNodes nodes
     @openPanel 'search'

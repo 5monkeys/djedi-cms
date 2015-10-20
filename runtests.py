@@ -31,6 +31,7 @@ DEFAULT_SETTINGS = dict(
         'django.contrib.sessions',
         'django.contrib.admin',
         'djedi',
+        'djedi.tests.app'
     ],
     TEMPLATE_CONTEXT_PROCESSORS=[],
 
@@ -46,6 +47,22 @@ DEFAULT_SETTINGS = dict(
     TEMPLATE_DIRS=(
         os.path.join(ROOT, 'templates'),
     ),
+    TEMPLATE_LOADERS=(
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader'
+    ),
+    TEMPLATES=[
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [
+                os.path.join(ROOT, 'templates')
+            ],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [],
+            },
+        },
+    ],
 
     PASSWORD_HASHERS=(
         'django.contrib.auth.hashers.MD5PasswordHasher',
