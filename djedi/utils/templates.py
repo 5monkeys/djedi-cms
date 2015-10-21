@@ -24,13 +24,12 @@ def get_template_dirs():
     try:
         # Django 1.8+ has multiple template engines, we only test Django's for now.
         from django.template.loader import engines
+
         for engine in engines.all():
             template_dirs.extend(engine.template_dirs)
 
     except ImportError:
-        from django.template import loader
-        from django.template.loader import template_source_loaders, find_template_loader, find_template
-        from django.template.loaders.app_directories import app_template_dirs
+        from django.template.loader import template_source_loaders, find_template
 
         try:
             find_template('')  # Ensure template_source_loaders is populated
