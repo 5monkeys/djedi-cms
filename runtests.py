@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.ERROR)
 TEMPLATE_DEBUG = True
 TEMPLATE_CONTEXT_PROCESSORS = []
 TEMPLATE_DIRS = [
-  os.path.join(ROOT, 'templates'),
+    os.path.join(ROOT, 'templates'),
 ]
 
 DEFAULT_SETTINGS = dict(

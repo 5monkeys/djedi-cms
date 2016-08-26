@@ -32,5 +32,5 @@ def generic_tag_compiler(parser, token, params, varargs, varkw, defaults,
     """
     bits = token.split_contents()[1:]
     args, kwargs = parse_bits(parser, bits, params, varargs, varkw,
-                             defaults, takes_context, name)
+                              defaults, takes_context, name)
     return node_class(takes_context, args, kwargs)

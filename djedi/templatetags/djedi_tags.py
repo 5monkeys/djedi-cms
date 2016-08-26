@@ -1,7 +1,6 @@
 import cio
 import six
 import textwrap
-import django
 from django import template
 from django.template import TemplateSyntaxError
 from .template import register
