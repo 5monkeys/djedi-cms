@@ -1,8 +1,14 @@
 from functools import partial
 from inspect import getargspec
+
+import django
 from django import template
 from django.template import Context
-from django.template.base import Node, TemplateSyntaxError, generic_tag_compiler
+from django.template.base import Node, TemplateSyntaxError
+if django.VERSION < (1, 9):
+    from django.template.base import generic_tag_compiler
+else:
+    from djedi.compat import generic_tag_compiler
 
 register = template.Library()
 

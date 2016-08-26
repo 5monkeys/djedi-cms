@@ -1,7 +1,11 @@
+import django
 try:
-    from django.conf.urls import patterns, include, url
+    from django.conf.urls import include, url
+    if django.VERSION < (1, 9):
+        from django.conf.urls import patterns
 except ImportError:
     from django.conf.urls.defaults import patterns, include, url
+
 
 from django.contrib.admin import ModelAdmin
 from django.core.exceptions import PermissionDenied
@@ -18,11 +22,15 @@ class Admin(ModelAdmin):
     verbose_name_plural = verbose_name
 
     def get_urls(self):
-        return patterns(
-            '',
+        urls = [
             url(r'^', include('djedi.admin.urls', namespace='djedi')),
             url(r'', lambda: None, name='djedi_cms_changelist')  # Placeholder to show change link to CMS in admin
-        )
+        ]
+
+        if django.VERSION < (1, 9):
+            return patterns('', *urls)
+        else:
+            return urls
 
     def has_change_permission(self, request, obj=None):
         return has_permission(request.user)

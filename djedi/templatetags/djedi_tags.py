@@ -1,10 +1,11 @@
 import cio
 import six
 import textwrap
+import django
 from django import template
 from django.template import TemplateSyntaxError
-from django.template.base import parse_bits
 from .template import register
+from djedi.compat import parse_bits
 
 
 def render_node(node, context=None, edit=True):
