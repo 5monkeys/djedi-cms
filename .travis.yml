@@ -11,16 +11,13 @@ env:
   - TOXENV=py33-django16
   - TOXENV=py33-django17
   - TOXENV=py33-django18
-  - TOXENV=py33-django19
-  - TOXENV=py33-django110
-  - TOXENV=py34-django16
   - TOXENV=py34-django17
   - TOXENV=py34-django18
   - TOXENV=py34-django19
   - TOXENV=py34-django110
-  - TOXENV=py35-django18
-  - TOXENV=py35-django19
-  - TOXENV=py35-django110
+#  - TOXENV=py35-django18
+#  - TOXENV=py35-django19
+#  - TOXENV=py35-django110
   - TOXENV=flake8
   - TOXENV=coverage
 
