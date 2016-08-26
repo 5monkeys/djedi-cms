@@ -1,5 +1,5 @@
-from .test_admin import *
-from .test_cache import *
-from .test_rest import *
-from .test_settings import *
-from .test_templatetags import *
+from .test_admin import *  # noqa
+from .test_cache import *  # noqa
+from .test_rest import *  # noqa
+from .test_settings import *  # noqa
+from .test_templatetags import *  # noqa
