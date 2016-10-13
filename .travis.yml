@@ -26,5 +26,5 @@ script:
   - tox
 
 after_success:
+  - pip install --quiet python-coveralls
   - coveralls
-
