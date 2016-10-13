@@ -25,6 +25,6 @@ install:
 script:
   - tox
 
-after_success:
-  - pip install --quiet python-coveralls
-  - coveralls
+deploy:
+  provider: script
+  script: pip install --quiet python-coveralls && coveralls
