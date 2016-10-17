@@ -1,9 +1,10 @@
-# Setup content-io configuration
+from cio.backends import storage
+
 import djedi
-djedi.configure()
 
 # Setup node django model based on backend
-from cio.backends import storage
 if storage.backend.scheme == 'db':
-    from .backends.django.db.models import Node
-    Node
+    from djedi.backends.django.db.models import Node  # noqa
+
+# Setup content-io configuration
+djedi.configure()

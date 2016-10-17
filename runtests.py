@@ -11,10 +11,14 @@ ROOT = os.path.join(os.path.dirname(__file__), 'djedi/tests')
 
 logging.basicConfig(level=logging.ERROR)
 
+TEMPLATE_DEBUG = True
+TEMPLATE_CONTEXT_PROCESSORS = []
+TEMPLATE_DIRS = [
+    os.path.join(ROOT, 'templates'),
+]
 
 DEFAULT_SETTINGS = dict(
     DEBUG=True,
-    TEMPLATE_DEBUG=True,
 
     MIDDLEWARE_CLASSES=(
         'django.middleware.common.CommonMiddleware',
@@ -32,7 +36,23 @@ DEFAULT_SETTINGS = dict(
         'django.contrib.admin',
         'djedi',
     ],
-    TEMPLATE_CONTEXT_PROCESSORS=[],
+
+    TEMPLATE_DEBUG=TEMPLATE_DEBUG,
+    TEMPLATE_CONTEXT_PROCESSORS=TEMPLATE_CONTEXT_PROCESSORS,
+    TEMPLATE_DIRS=TEMPLATE_DIRS,
+
+    TEMPLATES=[
+        {
+
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+            'DIRS': TEMPLATE_DIRS,
+            'OPTIONS': {
+                'debug': TEMPLATE_DEBUG,
+                'context_processors': TEMPLATE_CONTEXT_PROCESSORS
+            }
+        }
+    ],
 
     MEDIA_ROOT=os.path.join(ROOT, 'media'),
     STATIC_ROOT=os.path.join(ROOT, 'static'),
@@ -42,10 +62,6 @@ DEFAULT_SETTINGS = dict(
 
     LANGUAGE_CODE='sv-se',
     SECRET_KEY="iufoj=mibkpdz*%bob9-DJEDI-52x(%49rqgv8gg45k36kjcg76&-y5=!",
-
-    TEMPLATE_DIRS=(
-        os.path.join(ROOT, 'templates'),
-    ),
 
     PASSWORD_HASHERS=(
         'django.contrib.auth.hashers.MD5PasswordHasher',
@@ -70,7 +86,6 @@ DEFAULT_SETTINGS = dict(
             'foo': 'bar'
         }
     },
-
 )
 
 
@@ -94,8 +109,9 @@ def main():
         runner_class = DjangoTestSuiteRunner
         test_args = ['djedi']
 
-    failures = runner_class(
-        verbosity=1, interactive=True, failfast=False).run_tests(test_args)
+    failures = runner_class(verbosity=1,
+                            interactive=True,
+                            failfast=True).run_tests(test_args)
     sys.exit(failures)
 
 
