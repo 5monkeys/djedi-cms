@@ -33,7 +33,8 @@ class AdminPanelMixin(object):
             djedi_cms_url = reverse('admin:djedi:cms')
         except NoReverseMatch:
             raise ImproperlyConfigured('Could not find djedi in your url conf, '
-                                       'enable django admin or include djedi.urls within the admin namespace.')
+                                       'enable django admin or include '
+                                       'djedi.urls within the admin namespace.')
         else:
             admin_prefix = djedi_cms_url.strip('/').split('/')[0]
             if request.path.startswith('/' + admin_prefix):
@@ -44,14 +45,18 @@ class AdminPanelMixin(object):
             return
 
         # Only inject admin panel in html pages
-        if response.get('Content-Type', '').split(';')[0] not in ('text/html', 'application/xhtml+xml'):
+        content_type = response.get('Content-Type', '').split(';')[0]
+        if content_type not in ('text/html', 'application/xhtml+xml'):
             return
 
         embed = self.render_cms()
         self.body_append(response, embed)
 
     def render_cms(self):
-        defaults = dict((node.uri.clone(version=None), node.initial) for node in pipeline.history.list('get'))
+        defaults = dict(
+            (node.namespace_uri.clone(version=None), node.initial)
+            for node in pipeline.history.list('get')
+        )
         return render_to_string('djedi/cms/embed.html', {
             'json_nodes': json.dumps(defaults).replace('</', '\\x3C/'),
         })
