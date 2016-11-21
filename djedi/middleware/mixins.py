@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils import translation
 
+from cio.conf import settings
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
 from djedi.compat import render_to_string
@@ -53,10 +54,21 @@ class AdminPanelMixin(object):
         self.body_append(response, embed)
 
     def render_cms(self):
+        def get_requested_uri(node):
+            # Get first namespace URI, remove any version and ensures extension.
+            # TODO: Default extension fallback should be handled in content-io
+            uri = node.namespace_uri
+            uri = uri.clone(
+                ext=uri.ext or settings.URI_DEFAULT_EXT,
+                version=None,
+            )
+            return uri
+
         defaults = dict(
-            (node.namespace_uri.clone(version=None), node.initial)
+            (get_requested_uri(node), node.initial)
             for node in pipeline.history.list('get')
         )
+
         return render_to_string('djedi/cms/embed.html', {
             'json_nodes': json.dumps(defaults).replace('</', '\\x3C/'),
         })

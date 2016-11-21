@@ -10,6 +10,7 @@ class PanelTest(ClientTest):
         response = self.client.get(url)
         self.assertIn(u'Djedi Test', smart_unicode(response.content))
         self.assertIn(u'window.DJEDI_NODES', smart_unicode(response.content))
+        self.assertIn(u'i18n://sv-se@foo/bar.txt', smart_unicode(response.content))
         self.assertIn(u'</body>', smart_unicode(response.content).lower())
 
     def test_cms(self):
