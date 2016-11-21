@@ -75,4 +75,5 @@ class BlockNode(template.Node):
 
         return render_node(self.node, context=resolved_kwargs, edit=edit)
 
+
 register.tag('blocknode', BlockNode.tag)
