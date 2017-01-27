@@ -28,23 +28,18 @@ class AdminPanelMixin(object):
     def inject_admin_panel(self, request, response):
         user = getattr(request, 'user', None)
 
-        # Validate user permissions
-        if not has_permission(user):
-            _log.debug('insufficient permissions, not injecting.')
+        # Do not inject admin panel on gzipped responses
+        if 'gzip' in response.get('Content-Encoding', ''):
+            _log.debug('gzip detected, not injecting panel.')
+            return
+
+        # Only inject admin panel in html pages
+        content_type = response.get('Content-Type', '').split(';')[0]
+        if content_type not in ('text/html', 'application/xhtml+xml'):
+            _log.debug('Non-HTML Content-Type detected, not injecting')
             return
 
         # Do not inject admin panel in admin
-        try:
-            djedi_cms_url = reverse('admin:djedi:cms')
-        except NoReverseMatch:
-            raise ImproperlyConfigured('Could not find djedi in your url conf, '
-                                       'enable django admin or include '
-                                       'djedi.urls within the admin namespace.')
-        else:
-            if request.path.startswith(djedi_cms_url):
-                _log.debug('djedi page detected, not injecting panel')
-                return
-
         try:
             admin_prefix = reverse('admin:index')
         except NoReverseMatch:
@@ -60,15 +55,20 @@ class AdminPanelMixin(object):
                 )
                 return
 
-        # Do not inject admin panel on gzipped responses
-        if 'gzip' in response.get('Content-Encoding', ''):
-            _log.debug('gzip detected, not injecting panel.')
-            return
+        try:
+            djedi_cms_url = reverse('admin:djedi:cms')
+        except NoReverseMatch:
+            raise ImproperlyConfigured('Could not find djedi in your url conf, '
+                                       'enable django admin or include '
+                                       'djedi.urls within the admin namespace.')
+        else:
+            if request.path.startswith(djedi_cms_url):
+                _log.debug('djedi page detected, not injecting panel')
+                return
 
-        # Only inject admin panel in html pages
-        content_type = response.get('Content-Type', '').split(';')[0]
-        if content_type not in ('text/html', 'application/xhtml+xml'):
-            _log.debug('Non-HTML Content-Type detected, not injecting')
+        # Validate user permissions
+        if not has_permission(user):
+            _log.debug('insufficient permissions, not injecting.')
             return
 
         embed = self.render_cms()
