@@ -1,4 +1,5 @@
 import json
+import logging
 
 import cio
 
@@ -10,6 +11,8 @@ from cio.conf import settings
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
 from djedi.compat import render_to_string
+
+_log = logging.getLogger(__name__)
 
 
 class TranslationMixin(object):
@@ -27,6 +30,7 @@ class AdminPanelMixin(object):
 
         # Validate user permissions
         if not has_permission(user):
+            _log.debug('insufficient permissions, not injecting.')
             return
 
         # Do not inject admin panel in admin
@@ -37,17 +41,34 @@ class AdminPanelMixin(object):
                                        'enable django admin or include '
                                        'djedi.urls within the admin namespace.')
         else:
-            admin_prefix = djedi_cms_url.strip('/').split('/')[0]
-            if request.path.startswith('/' + admin_prefix):
+            if request.path.startswith(djedi_cms_url):
+                _log.debug('djedi page detected, not injecting panel')
+                return
+
+        try:
+            admin_prefix = reverse('admin:index')
+        except NoReverseMatch:
+            _log.debug(
+                'No reverse match for "admin:index", can\'t detect '
+                'django-admin pages'
+            )
+        else:
+            if request.path.startswith(admin_prefix):
+                _log.debug(
+                    'admin page detected, not injecting panel. admin_prefix=%r',
+                    admin_prefix
+                )
                 return
 
         # Do not inject admin panel on gzipped responses
         if 'gzip' in response.get('Content-Encoding', ''):
+            _log.debug('gzip detected, not injecting panel.')
             return
 
         # Only inject admin panel in html pages
         content_type = response.get('Content-Type', '').split(';')[0]
         if content_type not in ('text/html', 'application/xhtml+xml'):
+            _log.debug('Non-HTML Content-Type detected, not injecting')
             return
 
         embed = self.render_cms()
