@@ -12,7 +12,7 @@ install_requires = [
 tests_require = [
     'coverage',
     'Markdown <= 2.4.1',
-    'Pillow',
+    'Pillow <= 3.4.2',
 ]
 
 if version_info < (3,):
