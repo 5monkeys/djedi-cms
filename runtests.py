@@ -14,7 +14,6 @@ logging.basicConfig(level=logging.ERROR)
 
 DEFAULT_SETTINGS = dict(
     DEBUG=True,
-    TEMPLATE_DEBUG=True,
 
     MIDDLEWARE_CLASSES=(
         'django.middleware.common.CommonMiddleware',
@@ -32,7 +31,6 @@ DEFAULT_SETTINGS = dict(
         'django.contrib.admin',
         'djedi',
     ],
-    TEMPLATE_CONTEXT_PROCESSORS=[],
 
     MEDIA_ROOT=os.path.join(ROOT, 'media'),
     STATIC_ROOT=os.path.join(ROOT, 'static'),
@@ -43,9 +41,24 @@ DEFAULT_SETTINGS = dict(
     LANGUAGE_CODE='sv-se',
     SECRET_KEY="iufoj=mibkpdz*%bob9-DJEDI-52x(%49rqgv8gg45k36kjcg76&-y5=!",
 
-    TEMPLATE_DIRS=(
-        os.path.join(ROOT, 'templates'),
-    ),
+    TEMPLATE_DEBUG=True,
+    TEMPLATE_CONTEXT_PROCESSORS=[],
+    TEMPLATE_DIRS=(os.path.join(ROOT, 'templates'),),
+
+    TEMPLATES=[
+        {
+
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+            'DIRS': (os.path.join(ROOT, 'templates'),),
+            'OPTIONS': {
+                'debug': True,
+                'context_processors': [
+                    'django.contrib.auth.context_processors.auth',
+                ]
+            }
+        }
+    ],
 
     PASSWORD_HASHERS=(
         'django.contrib.auth.hashers.MD5PasswordHasher',
@@ -95,7 +108,9 @@ def main():
         test_args = ['djedi']
 
     failures = runner_class(
-        verbosity=1, interactive=True, failfast=False).run_tests(test_args)
+        verbosity=1,
+        interactive=True,
+        failfast=False).run_tests(test_args)
     sys.exit(failures)
 
 

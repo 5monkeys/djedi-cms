@@ -3,8 +3,8 @@ import six
 import textwrap
 from django import template
 from django.template import TemplateSyntaxError
-from django.template.base import parse_bits
 from .template import register
+from ..compat import parse_bits
 
 
 def render_node(node, context=None, edit=True):
