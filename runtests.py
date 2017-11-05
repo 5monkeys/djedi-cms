@@ -1,25 +1,102 @@
 #!/usr/bin/env python
+
 import os
 import sys
-import unittest2
+import logging
+
+from django.conf import settings
+import django
+
+ROOT = os.path.join(os.path.dirname(__file__), 'djedi/tests')
+
+logging.basicConfig(level=logging.ERROR)
+
+
+DEFAULT_SETTINGS = dict(
+    DEBUG=True,
+    TEMPLATE_DEBUG=True,
+
+    MIDDLEWARE_CLASSES=(
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'djedi.middleware.translation.DjediTranslationMiddleware',
+    ),
+
+    INSTALLED_APPS=[
+        'django.contrib.staticfiles',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.admin',
+        'djedi',
+    ],
+    TEMPLATE_CONTEXT_PROCESSORS=[],
+
+    MEDIA_ROOT=os.path.join(ROOT, 'media'),
+    STATIC_ROOT=os.path.join(ROOT, 'static'),
+    MEDIA_URL='/media/',
+    STATIC_URL='/static/',
+    ROOT_URLCONF='djedi.tests.urls',
+
+    LANGUAGE_CODE='sv-se',
+    SECRET_KEY="iufoj=mibkpdz*%bob9-DJEDI-52x(%49rqgv8gg45k36kjcg76&-y5=!",
+
+    TEMPLATE_DIRS=(
+        os.path.join(ROOT, 'templates'),
+    ),
+
+    PASSWORD_HASHERS=(
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ),
+
+    DATABASES={
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    },
+    CACHES={
+        'default': {
+            'BACKEND': 'djedi.backends.django.cache.backend.DebugLocMemCache'
+        }
+    },
+
+    DJEDI_THEME='luke',
+
+    DJEDI={
+        'IMG': {
+            'foo': 'bar'
+        }
+    },
+
+)
 
 
 def main():
-    # Configure python path
+    if not settings.configured:
+        settings.configure(**DEFAULT_SETTINGS)
+
+    # Compatibility with Django 1.7's stricter initialization
+    if hasattr(django, 'setup'):
+        django.setup()
+
     parent = os.path.dirname(os.path.abspath(__file__))
-    if not parent in sys.path:
-        sys.path.insert(0, parent)
+    sys.path.insert(0, parent)
 
-    # Discover tests
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'djedi.tests.settings'
-    unittest2.defaultTestLoader.discover('djedi')
+    try:
+        from django.test.runner import DiscoverRunner
+        runner_class = DiscoverRunner
+        test_args = ['djedi.tests']
+    except ImportError:
+        from django.test.simple import DjangoTestSuiteRunner
+        runner_class = DjangoTestSuiteRunner
+        test_args = ['djedi']
 
-    # Run tests
-    from django.test.simple import DjangoTestSuiteRunner
-    runner = DjangoTestSuiteRunner(verbosity=1, interactive=True, failfast=False)
-    exit_code = runner.run_tests(['djedi'])
-
-    sys.exit(exit_code)
+    failures = runner_class(
+        verbosity=1, interactive=True, failfast=False).run_tests(test_args)
+    sys.exit(failures)
 
 
 if __name__ == '__main__':

@@ -59,7 +59,7 @@ class Node
 
   setContent: (content, silent) ->
     if @preview
-      @$el.html content
+      @$el.html $($.parseHTML(content))
       @render()
 
   render: ->

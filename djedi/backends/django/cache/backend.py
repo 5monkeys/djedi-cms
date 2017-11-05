@@ -1,6 +1,8 @@
+import six
 from django.core.cache import InvalidCacheBackendError
-from django.utils.encoding import smart_str, smart_unicode
+from djedi.utils.encoding import smart_str, smart_unicode
 from cio.backends.base import CacheBackend
+from django.core.cache.backends.locmem import LocMemCache
 
 
 class DjangoCacheBackend(CacheBackend):
@@ -47,15 +49,45 @@ class DjangoCacheBackend(CacheBackend):
         """
         if content is None:
             content = self.NONE
-        return smart_str(unicode(uri) + u'|' + content)
+        return smart_str('|'.join([six.text_type(uri), content]))
 
     def _decode_content(self, content):
         """
         Split node string to uri and content and convert back to unicode.
         """
-        uri, _, content = content.partition('|')
+        content = smart_unicode(content)
+        uri, _, content = content.partition(u'|')
         if content == self.NONE:
             content = None
-        else:
-            content = smart_unicode(content)
         return uri or None, content
+
+
+class DebugLocMemCache(LocMemCache):
+
+    def __init__(self, *args, **kwargs):
+        self.calls = 0
+        self.hits = 0
+        self.misses = 0
+        super(DebugLocMemCache, self).__init__(*args, **kwargs)
+
+    def get(self, key, default=None, version=None, **kwargs):
+        result = super(DebugLocMemCache, self).get(key, default=default, version=version)
+        if kwargs.get('count', True):
+            self.calls += 1
+            if result is None:
+                self.misses += 1
+            else:
+                self.hits += 1
+        return result
+
+    def get_many(self, keys, version=None):
+        d = {}
+        for k in keys:
+            val = self.get(k, version=version, count=False)
+            if val is not None:
+                d[k] = val
+        hits = len(d)
+        self.calls += 1
+        self.hits += hits
+        self.misses += (len(keys) - hits)
+        return d

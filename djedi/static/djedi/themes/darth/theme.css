@@ -2166,8 +2166,8 @@ input[type="button"].btn-block {
 }
 @font-face {
   font-family: 'Glyphicons Halflings';
-  src: url('../fonts/glyphicons-halflings-regular.eot');
-  src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular') format('svg');
+  src: url('../../vendor/bootstrap/fonts/glyphicons-halflings-regular.eot');
+  src: url('../../vendor/bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../../vendor/bootstrap/fonts/glyphicons-halflings-regular.woff') format('woff'), url('../../vendor/bootstrap/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../../vendor/bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular') format('svg');
 }
 .glyphicon {
   position: relative;
@@ -6041,7 +6041,6 @@ body.editor {
 iframe {
   width: 100%;
   border: 0;
-  height: 0;
   display: block;
 }
 #search-panel .search-bar {
@@ -6359,6 +6358,8 @@ body.editor header .dropdown-menu {
   border-color: #666;
   text-shadow: none;
   min-width: 80px;
+  overflow: scroll;
+  max-height: 300px;
   margin-right: 45px;
 }
 body.editor header .dropdown-menu > li > a {

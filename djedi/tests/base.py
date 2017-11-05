@@ -1,9 +1,20 @@
 import shutil
+
+import cio
+import django
+
 from contextlib import contextmanager
+
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.test import Client
 from django.test import TransactionTestCase
+
+
+if django.VERSION < (1, 8):
+    DEBUG_CURSOR_ATTR = 'use_debug_cursor'
+else:
+    DEBUG_CURSOR_ATTR = 'force_debug_cursor'
 
 
 class DjediTest(TransactionTestCase):
@@ -51,15 +62,15 @@ class AssertionMixin(object):
     def assertDB(self, calls=-1, selects=-1, inserts=-1, updates=-1):
         from django.db import connection
 
-        pre_debug_cursor = connection.use_debug_cursor
-        connection.use_debug_cursor = True
+        pre_debug_cursor = getattr(connection, DEBUG_CURSOR_ATTR)
+        setattr(connection, DEBUG_CURSOR_ATTR, True)
         pre_num_queries = len(connection.queries)
 
         yield
 
         queries = connection.queries[pre_num_queries:]
         num_queries = len(queries)
-        connection.use_debug_cursor = pre_debug_cursor
+        setattr(connection, DEBUG_CURSOR_ATTR, pre_debug_cursor)
 
         if calls >= 0:
             assert num_queries == calls
@@ -72,6 +83,14 @@ class AssertionMixin(object):
         if updates >= 0:
             num_updates = len([q for q in queries if q['sql'].startswith('UPDATE')])
             assert num_updates == updates
+
+    def assertRenderedMarkdown(self, value, source):
+        if cio.PY26:
+            self.assertEqual(value, source)  # Markdown lacks Support for python 2.6
+        else:
+            from markdown import markdown
+            rendered = markdown(source)
+            self.assertEqual(value, rendered)
 
 
 class UserMixin(object):

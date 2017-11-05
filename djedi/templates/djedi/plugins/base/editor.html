@@ -1,4 +1,4 @@
-{% load static %}
+{% load static staticfiles %}
 {% load url from future %}
 <!DOCTYPE html>
 <html>
@@ -14,8 +14,8 @@
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
-          <script src="{{ STATIC_URL }}djedi/vendor/html5/html5shiv.js?v={{ VERSION }}"></script>
-          <script src="{{ STATIC_URL }}djedi/vendor/html5/respond.min.js?v={{ VERSION }}"></script>
+          <script src="{% static 'djedi/vendor/html5/html5shiv.js' %}?v={{ VERSION }}"></script>
+          <script src="{% static 'djedi/vendor/html5/respond.min.js' %}?v={{ VERSION }}"></script>
         <![endif]-->
     </head>
     <body class="editor">
@@ -55,11 +55,11 @@
             <script>
                 window.DJEDI_ENDPOINT = '{% url 'admin:djedi:cms' %}';
             </script>
-            <script src="{{ STATIC_URL }}djedi/vendor/jquery/jquery.min.js?v={{ VERSION }}"></script>
-            <script src="{{ STATIC_URL }}djedi/vendor/jquery.form/jquery.form.min.js?v={{ VERSION }}"></script>
-            <script src="{{ STATIC_URL }}djedi/vendor/bootstrap/js/bootstrap.min.js?v={{ VERSION }}"></script>
-            <script src="{{ STATIC_URL }}djedi/cms/js/uri.js?v={{ VERSION }}"></script>
-            <script src="{{ STATIC_URL }}djedi/plugins/base/js/editor.js?v={{ VERSION }}"></script>
+            <script src="{% static 'djedi/vendor/jquery/jquery.min.js' %}?v={{ VERSION }}"></script>
+            <script src="{% static 'djedi/vendor/jquery.form/jquery.form.min.js' %}?v={{ VERSION }}"></script>
+            <script src="{% static 'djedi/vendor/bootstrap/js/bootstrap.min.js' %}?v={{ VERSION }}"></script>
+            <script src="{% static 'djedi/cms/js/uri.js' %}?v={{ VERSION }}"></script>
+            <script src="{% static 'djedi/plugins/base/js/editor.js' %}?v={{ VERSION }}"></script>
             {% block plugin_script %}{% endblock plugin_script %}
         {% endblock script %}
     </body>
