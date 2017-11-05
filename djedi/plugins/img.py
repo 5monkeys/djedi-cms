@@ -74,7 +74,7 @@ class ImagePluginBase(BasePlugin):
                 try:
                     box = tuple(int(x) for x in crop.split(','))
                     image = image.crop(box)
-                except:
+                except Exception:
                     pass  # TODO: Handle image crop error
                 else:
                     filename = self._create_filename(filename, crop=crop)
@@ -84,7 +84,7 @@ class ImagePluginBase(BasePlugin):
             if (width and width != i_width) or (height and height != i_height):
                 try:
                     image = image.resize((width, height), Image.ANTIALIAS)
-                except:
+                except Exception:
                     pass
                 else:
                     filename = self._create_filename(filename, w=width, h=height)
