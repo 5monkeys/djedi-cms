@@ -41,6 +41,8 @@ install:
 script:
   - tox
 
-deploy:
-  provider: script
-  script: pip install --quiet python-coveralls && coveralls
+after_success:
+  - if [[ $TOXENV =~ coverage ]]; then
+    pip install --quiet python-coveralls;
+    coveralls --ignore-errors;
+    fi
