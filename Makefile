@@ -22,3 +22,7 @@ coverage:
 .PHONY: clean
 clean:
 	rm -rf .tox/ dist/ *.egg *.egg-info .coverage
+
+.PHONY: compile
+compile:
+	coffee -cw .
