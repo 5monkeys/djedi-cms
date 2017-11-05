@@ -143,8 +143,8 @@ class Search
 
   addNodes: (nodes) ->
     nodes = (node for uri, node of nodes)
-#    nodes.sort (n1, n2) ->
-#      if n1.uri.path < n2.uri.path then -1 else 1
+    nodes.sort (n1, n2) ->
+      if n1.uri.path < n2.uri.path then -1 else 1
 
     groups = {}
 

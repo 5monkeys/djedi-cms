@@ -190,6 +190,13 @@
         }
         return _results;
       })();
+      nodes.sort(function(n1, n2) {
+        if (n1.uri.path < n2.uri.path) {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
       groups = {};
       _results = [];
       for (_i = 0, _len = nodes.length; _i < _len; _i++) {
