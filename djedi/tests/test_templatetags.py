@@ -129,7 +129,12 @@ class TagTest(DjediTest, AssertionMixin):
         """
 
         user = User(first_name=u'Jonas', last_name=u'Lundberg')
-        context = {'user': user}
+
+        class RequestMock(object):
+            def __init__(self, user):
+                self.user = user
+
+        context = {'request': RequestMock(user=user)}
         html = self.render(source, context)
         assert html == u''
 
