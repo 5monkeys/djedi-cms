@@ -16,7 +16,7 @@ env:
 
   - TOXENV=py35-django18
 
-  - TOXENV=flake8
+  - TOXENV=lint
   - TOXENV=coverage
 
 matrix:
