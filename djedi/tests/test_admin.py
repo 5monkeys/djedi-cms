@@ -13,6 +13,15 @@ class PanelTest(ClientTest):
         self.assertIn(u'i18n://sv-se@foo/bar.txt', smart_unicode(response.content))
         self.assertIn(u'</body>', smart_unicode(response.content).lower())
 
+    def test_middleware(self):
+        with self.settings(MIDDLEWARE_CLASSES=[
+            'djedi.middleware.translation.DjediTranslationMiddleware',
+        ]):
+            url = reverse('index')
+            response = self.client.get(url)
+            self.assertNotIn(u'window.DJEDI_NODES',
+                             smart_unicode(response.content))
+
     def test_cms(self):
         url = reverse('admin:djedi:cms')
         response = self.client.get(url)
