@@ -1,11 +1,19 @@
+import logging
+
+_log = logging.getLogger(__name__)
+
+
 def has_permission(request):
-    user = request.user
+    user = getattr(request, 'user', None)
     if user:
         if user.is_superuser:
             return True
 
         if user.is_staff and user.groups.filter(name__iexact='djedi').exists():
             return True
+    else:
+        _log.warning("Request does not have `user` attribute. Make sure that "
+                     "Djedi middleware is used after AuthenticationMiddleware")
 
     return False
 
