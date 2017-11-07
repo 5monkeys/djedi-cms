@@ -25,7 +25,7 @@ class Admin(ModelAdmin):
         )
 
     def has_change_permission(self, request, obj=None):
-        return has_permission(request.user)
+        return has_permission(request)
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -37,7 +37,7 @@ class Admin(ModelAdmin):
 class DjediCMS(DjediContextMixin, View):
 
     def get(self, request):
-        if has_permission(request.user):
+        if has_permission(request):
             return render(request, 'djedi/cms/cms.html', self.get_context_data())
         else:
             raise PermissionDenied

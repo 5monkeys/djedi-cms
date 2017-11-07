@@ -26,8 +26,6 @@ class TranslationMixin(object):
 class AdminPanelMixin(object):
 
     def inject_admin_panel(self, request, response):
-        user = getattr(request, 'user', None)
-
         # Do not inject admin panel on gzipped responses
         if 'gzip' in response.get('Content-Encoding', ''):
             _log.debug('gzip detected, not injecting panel.')
@@ -67,7 +65,7 @@ class AdminPanelMixin(object):
                 return
 
         # Validate user permissions
-        if not has_permission(user):
+        if not has_permission(request):
             _log.debug('insufficient permissions, not injecting.')
             return
 

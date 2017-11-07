@@ -1,6 +1,6 @@
 .PHONY: test
 test:
-	django-admin.py test --settings=djedi.tests.settings djedi --verbosity=2
+	python setup.py test
 
 .PHONY: lint
 lint:
