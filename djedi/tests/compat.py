@@ -9,4 +9,14 @@ def cmpt_context(context):
     return Context(context)
 
 
-__all__ = ['cmpt_context']
+if django.VERSION < (1, 8):
+    from django.template.loader import get_template_from_string
+else:
+    # Django 1.8+ has multiple template engines, we only test Django's for now.
+    from django.template import engines
+
+    def get_template_from_string(template_code):
+        return engines['django'].from_string(template_code)
+
+
+__all__ = ['cmpt_context', 'get_template_from_string']
