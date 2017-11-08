@@ -1,14 +1,11 @@
-try:
-    from django.conf.urls import url
-except ImportError:
-    from django.conf.urls.defaults import url
-
-from ..compat import urlpatterns
+from ..compat import patterns, url
 
 from .api import NodeApi, LoadApi, PublishApi, RevisionsApi, RenderApi, NodeEditor
 from .cms import DjediCMS
 
-urlpatterns = urlpatterns(
+app_name = 'djedi'
+
+urlpatterns = patterns(
     url(r'^$', DjediCMS.as_view(), name='cms'),
     url(r'^node/(?P<uri>.+)/editor$', NodeEditor.as_view(), name='cms.editor'),
     url(r'^node/(?P<uri>.+)/load$', LoadApi.as_view(), name='api.load'),

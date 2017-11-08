@@ -1,8 +1,3 @@
-try:
-    from django.conf.urls import include, url
-except ImportError:
-    from django.conf.urls.defaults import include, url
-
 from django.contrib.admin import ModelAdmin
 from django.core.exceptions import PermissionDenied
 from django.views.generic import View
@@ -10,7 +5,7 @@ from django.views.generic import View
 from .mixins import DjediContextMixin
 from ..auth import has_permission
 from ..compat import render
-from ..compat import urlpatterns
+from ..compat import patterns, url, include
 
 
 class Admin(ModelAdmin):
@@ -19,7 +14,7 @@ class Admin(ModelAdmin):
     verbose_name_plural = verbose_name
 
     def get_urls(self):
-        return urlpatterns(
+        return patterns(
             url(r'^', include('djedi.admin.urls', namespace='djedi')),
             url(r'', lambda: None, name='djedi_cms_changelist')  # Placeholder to show change link to CMS in admin
         )

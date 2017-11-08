@@ -4,13 +4,12 @@ import logging
 import cio
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils import translation
 
 from cio.conf import settings
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
-from djedi.compat import render_to_string
+from djedi.compat import render_to_string, reverse, NoReverseMatch
 
 _log = logging.getLogger(__name__)
 

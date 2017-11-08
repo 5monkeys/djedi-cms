@@ -47,7 +47,6 @@ DEFAULT_SETTINGS = dict(
 
     TEMPLATES=[
         {
-
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'APP_DIRS': True,
             'DIRS': (os.path.join(ROOT, 'templates'),),
@@ -85,6 +84,7 @@ DEFAULT_SETTINGS = dict(
     },
 
 )
+DEFAULT_SETTINGS['MIDDLEWARE'] = DEFAULT_SETTINGS['MIDDLEWARE_CLASSES']
 
 
 def main():
