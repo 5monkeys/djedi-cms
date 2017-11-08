@@ -42,7 +42,8 @@ build_example:
 .PHONY: example
 example:
 	docker-compose start || make build_example
-	@echo "\n✨  Djedi-CMS example is running at http://localhost:8000 ✨\n"
+	@echo "\n✨  Djedi-CMS example is running now ✨\n"
+	docker-compose logs -f --tail=5 django
 
 .PHONY: clean
 clean:
