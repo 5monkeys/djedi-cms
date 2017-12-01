@@ -1,4 +1,4 @@
-![Django CMS](https://raw.github.com/5monkeys/djedi-cms/master/docs/_static/djedi-landscape.png)
+<img alt="Django CMS" src="https://rawgit.com/5monkeys/djedi-cms/master/docs/_static/djedi-landscape.svg" width="500"/>
 
 Django content management as it should be.
 
