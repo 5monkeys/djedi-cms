@@ -7,21 +7,39 @@ from django.template.loader import render_to_string
 from django.template.response import TemplateResponse as BaseTemplateResponse
 
 
-def urlpatterns(*urls):
-    if django.VERSION < (1, 10):
-        try:
-            from django.conf.urls.defaults import patterns
-        except ImportError:
-            from django.conf.urls import patterns
+if django.VERSION < (1, 6):
+    from django.conf.urls.defaults import include, url
+else:
+    from django.conf.urls import include, url
 
+
+if django.VERSION < (2, 0):
+    from django.core.urlresolvers import reverse, NoReverseMatch
+else:
+    from django.urls import reverse, NoReverseMatch
+
+
+def patterns(*urls):
+    if django.VERSION < (1, 6):
+        from django.conf.urls.defaults import patterns
         return patterns('', *urls)
-
-    # else
+    elif django.VERSION < (1, 10):
+        from django.conf.urls import patterns
+        return patterns('', *urls)
     return list(urls)
 
 
 if django.VERSION >= (1, 9):
-    from django.template.library import parse_bits
+    if django.VERSION < (2, 0):
+        from django.template.library import parse_bits
+    else:
+        def parse_bits(parser, bits, params, varargs, varkw, defaults,
+                       takes_context, name):
+            from django.template import library
+            return library.parse_bits(
+                parser=parser, bits=bits, params=params, varargs=varargs,
+                varkw=varkw, defaults=defaults, kwonly=(), kwonly_defaults=(),
+                takes_context=takes_context, name=name)
 
     def generic_tag_compiler(parser, token, params, varargs, varkw, defaults,
                              name, takes_context, node_class):
@@ -55,6 +73,10 @@ else:
 
 __all__ = ['render_to_string',
            'render',
-           'urlpatterns',
+           'patterns',
+           'include',
+           'url',
+           'reverse',
+           'NoReverseMatch',
            'generic_tag_compiler',
            'parse_bits']

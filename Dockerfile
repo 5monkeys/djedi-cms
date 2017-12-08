@@ -1,9 +1,9 @@
-FROM python:3
+FROM python:3.6.3
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
         gettext && \
-    pip install "Django<1.9"
+    pip install "Django>=2.0b1,<2.1"
 
 # Install Djedi-CMS
 COPY . /djedi-cms

@@ -1,4 +1,4 @@
-![Django CMS](https://raw.github.com/5monkeys/djedi-cms/master/docs/_static/djedi-landscape.png)
+<img alt="Django CMS" src="https://rawgit.com/5monkeys/djedi-cms/master/docs/_static/djedi-landscape.svg" width="500"/>
 
 Django content management as it should be.
 
@@ -21,6 +21,8 @@ $ pip install djedi-cms
 
 ## Configure
 
+Example settings for Django 2.0:
+
 ```python
 # settings.py
 
@@ -29,10 +31,10 @@ INSTALLED_APPS = (
     'djedi',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'djedi.middleware.translation.DjediTranslationMiddleware',
     # ...
-)
+]
 ```
 
 ### Bootstrap database
@@ -46,9 +48,9 @@ $ django-admin.py migrate djedi
 ```python
 # urls.py
 
-urlpatterns = patterns('',
-    (r'^admin/', include(admin.site.urls)),
-)
+urlpatterns = [
+    path('admin/', admin.site.urls),
+]
 ```
 
 > For now, only the inline admin are in place, but we are working on the back office admin UI.

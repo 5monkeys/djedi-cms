@@ -2,7 +2,6 @@ import cio
 import os
 import simplejson as json
 from django.core.files import File
-from django.core.urlresolvers import reverse
 from django.test import Client
 from django.utils.http import urlquote
 from cio.plugins import plugins
@@ -11,6 +10,7 @@ from cio.backends.exceptions import PersistenceError, NodeDoesNotExist
 from cio.utils.uri import URI
 from djedi.tests.base import DjediTest, UserMixin, ClientTest
 from djedi.utils.encoding import smart_unicode
+from ..compat import reverse
 
 
 def json_node(response, simple=True):

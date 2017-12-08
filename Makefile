@@ -1,6 +1,22 @@
+.DEFAULT_GOAL := help
+
+.PHONY: help  # shows available commands
+help:
+	@echo "\nAvailable commands:\n\n $(shell sed -n 's/^.PHONY:\(.*\)/ *\1\\n/p' Makefile)"
+
 .PHONY: test
 test:
-	python setup.py test
+	coverage run setup.py test
+
+.PHONY: test_all  # runs tests using detox, combines coverage and reports it
+test_all:
+	detox
+	make coverage
+
+.PHONY: coverage  # combines coverage and reports it
+coverage:
+	coverage combine || true
+	coverage report
 
 .PHONY: lint
 lint:
@@ -26,12 +42,8 @@ build_example:
 .PHONY: example
 example:
 	docker-compose start || make build_example
-	@echo "\n✨  Djedi-CMS example is running at http://localhost:8000 ✨\n"
-
-.PHONY: coverage
-coverage:
-	coverage run setup.py test
-	coverage report
+	@echo "\n✨  Djedi-CMS example is running now ✨\n"
+	docker-compose logs -f --tail=5 django
 
 .PHONY: clean
 clean:

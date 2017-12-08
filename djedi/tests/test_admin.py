@@ -1,6 +1,6 @@
-from django.core.urlresolvers import reverse
 from djedi.utils.encoding import smart_unicode
 from djedi.tests.base import ClientTest
+from ..compat import reverse
 
 
 class PanelTest(ClientTest):
@@ -15,6 +15,8 @@ class PanelTest(ClientTest):
 
     def test_middleware(self):
         with self.settings(MIDDLEWARE_CLASSES=[
+            'djedi.middleware.translation.DjediTranslationMiddleware',
+        ], MIDDLEWARE=[
             'djedi.middleware.translation.DjediTranslationMiddleware',
         ]):
             url = reverse('index')
