@@ -25,12 +25,12 @@ setup(
     version=version,
     description='Django content management as it should be',
     long_description=(
-        '.. image:: https://raw.github.com/5monkeys/djedi-cms/master/docs/_static/djedi-portrait.png\n\n'
+        '.. image:: https://rawgit.com/5monkeys/djedi-cms/master/docs/_static/djedi-portrait.svg\n\n'
         '- Read the documentation_\n'
         '- Browse the source_\n\n'
-        '.. image:: https://travis-ci.org/5monkeys/djedi-cms.png?branch=master\n'
+        '.. image:: https://travis-ci.org/5monkeys/djedi-cms.svg?branch=master\n'
         '    :target: https://travis-ci.org/5monkeys/djedi-cms\n'
-        '.. image:: https://coveralls.io/repos/5monkeys/djedi-cms/badge.png?branch=master\n'
+        '.. image:: https://coveralls.io/repos/5monkeys/djedi-cms/badge.svg?branch=master\n'
         '    :target: https://coveralls.io/r/5monkeys/djedi-cms?branch=master\n\n'
         '.. _documentation: http://djedi-cms.org/\n'
         '.. _source: https://github.com/5monkeys/djedi-cms\n\n'
