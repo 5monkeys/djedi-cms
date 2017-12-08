@@ -1,4 +1,4 @@
-<img alt="Django CMS" src="https://djedi-cms.org/_static/djedi-landscape.svg" width="500"/>
+<img alt="Djedi CMS" src="https://djedi-cms.org/_static/djedi-landscape.svg" width="500"/>
 
 Django content management as it should be.
 
