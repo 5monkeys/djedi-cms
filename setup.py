@@ -25,7 +25,7 @@ setup(
     version=version,
     description='Django content management as it should be',
     long_description=(
-        '.. image:: https://rawgit.com/5monkeys/djedi-cms/master/docs/_static/djedi-portrait.svg\n\n'
+        '.. image:: https://djedi-cms.org/_static/djedi-portrait.svg\n\n'
         '- Read the documentation_\n'
         '- Browse the source_\n\n'
         '.. image:: https://travis-ci.org/5monkeys/djedi-cms.svg?branch=master\n'
