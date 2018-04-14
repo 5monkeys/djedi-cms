@@ -1,0 +1,55 @@
+version: 2
+
+steps: &steps
+    steps:
+      - checkout
+      - run: {command: sudo pip install tox}
+      - run: {command: tox}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .coverage.*
+
+jobs:
+  py36:
+    docker: [{image: 'circleci/python:3.6'}]
+    environment: {TOXENV: py36-django111,py36-django20}
+    <<: *steps
+
+  py35:
+    docker: [{image: 'circleci/python:3.5'}]
+    environment: {TOXENV: py35-django18,py35-django19,py35-django110,py35-django111,py35-django20}
+    <<: *steps
+
+  py34:
+    docker: [{image: 'circleci/python:3.4'}]
+    environment: {TOXENV: py34-django17,py34-django18,py34-django19,py34-django110,py34-django111,py34-django20}
+    <<: *steps
+
+  py27:
+    docker: [{image: 'circleci/python:2.7'}]
+    environment: {TOXENV: py27-django15,py27-django16,py27-django17,py27-django18,py27-django19,py27-django110,py27-django111}
+    <<: *steps
+
+  coverage:
+    docker: [{image: 'circleci/python:3.6'}]
+    steps:
+      - checkout
+      - attach_workspace: {at: .}
+      - run: {command: sudo pip install coverage}
+      - run: {command: make coverage}
+
+workflows:
+  version: 2
+  tests-and-coverage:
+    jobs:
+      - py27
+      - py34
+      - py35
+      - py36
+      - coverage:
+          requires:
+            - py27
+            - py34
+            - py35
+            - py36

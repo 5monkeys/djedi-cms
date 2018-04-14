@@ -108,7 +108,7 @@ def main():
         test_args = ['djedi']
 
     failures = runner_class(
-        verbosity=1,
+        verbosity=2,
         interactive=True,
         failfast=False).run_tests(test_args)
     sys.exit(failures)
