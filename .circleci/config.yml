@@ -1,14 +1,14 @@
 version: 2
 
 steps: &steps
-    steps:
-      - checkout
-      - run: {command: sudo pip install tox}
-      - run: {command: tox}
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .coverage.*
+  steps:
+    - checkout
+    - run: {command: sudo pip install tox}
+    - run: {command: tox}
+    - persist_to_workspace:
+        root: .
+        paths:
+          - .coverage.*
 
 jobs:
   py36:
@@ -32,12 +32,14 @@ jobs:
     <<: *steps
 
   coverage:
-    docker: [{image: 'circleci/python:3.6'}]
+    docker: [{image: 'circleci/python:3.5'}]
     steps:
       - checkout
       - attach_workspace: {at: .}
       - run: {command: sudo pip install coverage}
       - run: {command: make coverage}
+      - run: {command: sudo pip install python-coveralls}
+      - run: {command: coveralls}
 
 workflows:
   version: 2
