@@ -12,3 +12,4 @@ docs/_build
 docs/_themes/
 tests/media
 htmlcov/
+node_modules/

@@ -1,0 +1,49 @@
+{
+  "name": "djedi-react",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "author": "Simon Lydell",
+  "repository": "5monkeys/djedi-cms",
+  "description": "Djedi CMS React client",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "cms",
+    "django",
+    "djedi",
+    "djedi-cms",
+    "react"
+  ],
+  "scripts": {
+    "start": "jest --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "jest": "jest",
+    "build": "babel src --out-dir dist --ignore \"**/*.test.js\"",
+    "test": "npm run lint && npm run jest && npm run build",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "prop-types": "15.6.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.0.0-beta.51",
+    "@babel/core": "7.0.0-beta.51",
+    "@babel/preset-env": "7.0.0-beta.51",
+    "@babel/preset-react": "7.0.0-beta.51",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "23.0.1",
+    "eslint": "4.19.1",
+    "eslint-config-lydell": "7.0.0",
+    "eslint-plugin-import": "2.12.0",
+    "eslint-plugin-prettier": "2.6.0",
+    "eslint-plugin-react": "7.9.1",
+    "eslint-plugin-sort-imports-es6-autofix": "0.3.0",
+    "jest": "23.1.0",
+    "prettier": "1.13.5",
+    "react": "16.4.1",
+    "react-test-renderer": "16.4.1"
+  }
+}
