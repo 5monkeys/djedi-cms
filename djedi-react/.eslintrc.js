@@ -4,15 +4,18 @@ module.exports = {
   plugins: ["import", "react", "prettier", "sort-imports-es6-autofix"],
   parserOptions: {
     sourceType: "module",
+    ecmaVersion: 2018,
     ecmaFeatures: {
       jsx: true,
     },
   },
   env: { es6: true },
   globals: {
+    clearTimeout: false,
     console: false,
     document: false,
     fetch: false,
+    setTimeout: false,
     window: false,
   },
   rules: Object.assign({}, baseRules({ import: true, react: true }), {

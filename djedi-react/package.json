@@ -26,6 +26,8 @@
     "prepublishOnly": "npm test"
   },
   "dependencies": {
+    "dedent": "0.7.0",
+    "isomorphic-unfetch": "2.0.0",
     "prop-types": "15.6.1"
   },
   "devDependencies": {
