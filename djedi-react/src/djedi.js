@@ -227,9 +227,10 @@ export class Djedi {
 
   _flushBatch() {
     const { queue } = this._batch;
-    const nodes = Array.from(queue).reduce((result, [uri, data]) => {
-      result[uri] = data.node.value;
-      return result;
+
+    const nodes = {};
+    queue.forEach((data, uri) => {
+      nodes[uri] = data.node.value;
     });
 
     this._batch = makeEmptyBatch();
