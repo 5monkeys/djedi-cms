@@ -93,26 +93,20 @@ export class Djedi {
     );
   }
 
-  async loadMany(nodes) {
+  loadMany(nodes) {
     console.log("TODO: loadMany", nodes, this.options.baseUrl);
-    try {
-      const results = await Promise.resolve([]);
+    return Promise.resolve([]).then(results => {
       this.addNodes(results);
       return results;
-    } catch (passedError) {
-      const error =
-        passedError instanceof Error
-          ? passedError
-          : new Error(`Failed to load nodes: ${passedError}`);
-      throw error;
-    }
+    });
   }
 
-  async loadByPrefix(prefixes) {
-    const results = await Promise.resolve([]);
-    console.log("TODO: preloadByPrefix", prefixes, results);
-    this.addNodes(results);
-    return results;
+  loadByPrefix(prefixes) {
+    console.log("TODO: preloadByPrefix", prefixes);
+    return Promise.resolve([]).then(results => {
+      this.addNodes(results);
+      return results;
+    });
   }
 
   // Needed to pick up the results from `loadByPrefix` after server-side
@@ -231,7 +225,7 @@ export class Djedi {
     return this._stringifyUri({ ...uriObject, version: "" });
   }
 
-  async _flushBatch() {
+  _flushBatch() {
     const { queue } = this._batch;
     const nodes = Array.from(queue).reduce((result, [uri, data]) => {
       result[uri] = data.node.value;
