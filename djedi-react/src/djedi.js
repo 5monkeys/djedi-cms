@@ -64,6 +64,11 @@ export class Djedi {
   }
 
   getBatched(passedNode, callback) {
+    if (this.options.batchInterval <= 0) {
+      this.get(passedNode, callback);
+      return;
+    }
+
     const node = this._normalizeNode(passedNode);
     const existingNode = this._nodes.get(node.uri);
 
