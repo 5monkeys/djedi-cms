@@ -1,6 +1,10 @@
+/* eslint-disable prefer-promise-reject-errors */
+
 // This file does not contain anything React-specific. If need JS client for
 // another framework this file could be extracted into its own package and be
 // re-used.
+
+import unfetch from "isomorphic-unfetch";
 
 import { applyUriDefaults, parseUri, stringifyUri } from "./uri";
 
@@ -94,16 +98,14 @@ export class Djedi {
   }
 
   loadMany(nodes) {
-    console.log("TODO: loadMany", nodes, this.options.baseUrl);
-    return Promise.resolve([]).then(results => {
+    this._post("/djedi/load_many", nodes).then(results => {
       this.addNodes(results);
       return results;
     });
   }
 
   loadByPrefix(prefixes) {
-    console.log("TODO: preloadByPrefix", prefixes);
-    return Promise.resolve([]).then(results => {
+    this._post("/djedi/load_by_prefix", prefixes).then(results => {
       this.addNodes(results);
       return results;
     });
@@ -255,6 +257,47 @@ export class Djedi {
       }
     }
   }
+
+  _post(passedUrl, data) {
+    const info = { method: "POST", apiUrl: passedUrl, data };
+    const url = `${this.options.baseUrl}${passedUrl}`;
+
+    return unfetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then(response => {
+        if (response.status >= 200 && response.status < 400) {
+          return response
+            .json()
+            .catch(error => Promise.reject({ response, error }));
+        }
+        return Promise.reject({
+          response,
+          error: createStatusCodeError(response),
+        });
+      })
+      .catch(arg => {
+        const response = arg && arg.response;
+        const error = (arg && arg.error) || new Error(`Bad error: ${arg}`);
+
+        error.message = createUpdatedErrorMessage(error, info, response);
+        error.status = response == null ? -1 : response.status;
+
+        const textPromise =
+          response == null || response.bodyUsed
+            ? Promise.resolve("")
+            : response.text().then(text => text, () => "");
+
+        return textPromise.then(text => {
+          error.responseText = text;
+          return Promise.reject(error);
+        });
+      });
+  }
 }
 
 // This is a function, not a constant, since it can be mutated by the user.
@@ -296,6 +339,25 @@ function makeEmptyBatch() {
     timeoutId: undefined,
     queue: new Map(),
   };
+}
+
+function createStatusCodeError(response) {
+  return new Error(
+    `Unexpected response status code. Got ${
+      response.status
+    } but expected 200 <= status < 400.`
+  );
+}
+
+function createUpdatedErrorMessage(error, info, response) {
+  return [
+    `Djedi API error for request: ${info.method} ${info.apiUrl}`,
+    `RequestData sent: ${JSON.stringify(info.data, null, 2)}`,
+    `Response: ${
+      response ? `${response.status} ${response.statusText}` : response
+    }`,
+    String(error),
+  ].join("\n");
 }
 
 export default new Djedi();
