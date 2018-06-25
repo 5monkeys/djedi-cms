@@ -305,9 +305,18 @@ function makeDefaultOptions() {
   return {
     baseUrl: "",
     batchInterval: 50, // ms
-    defaultRender: {
-      loading: "Loading…",
-      error: "Failed to fetch content 😞",
+    defaultRender: state => {
+      switch (state.type) {
+        case "loading":
+          return "Loading…";
+        case "error":
+          return `Failed to fetch content 😞 (${state.error.status})`;
+        case "success":
+          return state.content;
+        case "missing":
+        default:
+          return null;
+      }
     },
     uri: {
       defaults: {

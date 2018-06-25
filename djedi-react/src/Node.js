@@ -15,7 +15,7 @@ const propTypes = {
 const defaultProps = {
   edit: true,
   children: undefined,
-  render: defaultRender,
+  render: undefined,
 };
 
 export default class Node extends React.Component {
@@ -78,7 +78,15 @@ export default class Node extends React.Component {
   }
 
   render() {
-    const { uri, children, edit, render, ...kwargs } = this.props;
+    const {
+      uri,
+      children,
+      edit,
+      // Using a destructuring default rather than `defaultProps` for `render`,
+      // since `djedi.options` may change.
+      render = djedi.options.defaultRender,
+      ...kwargs
+    } = this.props;
     const { node } = this.state;
 
     if (node == null) {
@@ -125,21 +133,4 @@ function interpolate(string, kwargs) {
     const value = kwargs[key];
     return typeof value === "string" ? value : match;
   });
-}
-
-function defaultRender(state) {
-  switch (state.type) {
-    case "loading":
-      return djedi.options.defaultRender.loading;
-
-    case "error":
-      return djedi.options.defaultRender.error;
-
-    case "success":
-      return state.content;
-
-    case "missing":
-    default:
-      return null;
-  }
 }
