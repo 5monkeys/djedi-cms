@@ -47,7 +47,12 @@ class BlockNode(template.Node):
             raise TemplateSyntaxError('Malformed arguments to blocknode tag')
 
         # Resolve uri variable
-        uri = args[0].resolve({})
+        try:
+            uri = args[0].resolve({})
+        except AttributeError:
+            # URI is not resolvable at this moment, which implies that it is
+            # probably a variable.
+            uri = None
 
         # Parse tag body (default content)
         tokens = parser.parse(('endblocknode',))
@@ -59,21 +64,32 @@ class BlockNode(template.Node):
         default = textwrap.dedent(default)
 
         # Get node for uri, lacks context variable lookup due to lazy loading.
-        node = cio.get(uri, default)
+        node = cio.get(uri, default) if uri is not None else None
 
-        return cls(tokens, node, kwargs)
+        return cls(tokens, node, default, args, kwargs)
 
-    def __init__(self, tokens, node, kwargs):
+    def __init__(self, tokens, node, default, args, kwargs):
         self.tokens = tokens
         self.node = node
+        self.default = default
+        self.args = args
         self.kwargs = kwargs
 
     def render(self, context):
+        # Check if the node is defined. If not, it probably was a variable
+        # and could not be resolved at that time. Resolve it now that the context
+        # is available.
+        if self.node is not None:
+            node = self.node
+        else:
+            uri = self.args[0].resolve(context)
+            node = cio.get(uri, self.default)
+
         # Resolve tag kwargs against context
         resolved_kwargs = dict((key, value.resolve(context)) for key, value in six.iteritems(self.kwargs))
         edit = resolved_kwargs.pop('edit', True)
 
-        return render_node(self.node, context=resolved_kwargs, edit=edit)
+        return render_node(node, context=resolved_kwargs, edit=edit)
 
 
 register.tag('blocknode', BlockNode.tag)
