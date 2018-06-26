@@ -12,16 +12,24 @@ export function stringifyUri(uriObject, separators) {
       ...[
         [uriObject.scheme, separators.scheme],
         [uriObject.namespace, separators.namespace],
-        [uriObject.path, separators.path],
-        [uriObject.ext, separators.ext],
-        [uriObject.version, separators.version],
-      ].filter(([part]) => part !== "")
+        [uriObject.path, ""],
+      ].filter(([part]) => part !== ""),
+      ...[
+        [separators.ext, uriObject.ext],
+        [separators.version, uriObject.version],
+      ].filter(([, part]) => part !== "")
     )
     .join("");
 }
 
 export function applyUriDefaults(uriObject, defaults, namespaceByScheme) {
-  const defaulted = { ...defaults, ...uriObject };
+  const defaulted = Object.keys(uriObject).reduce(
+    (result, key) => {
+      result[key] = uriObject[key] === "" ? defaults[key] : uriObject[key];
+      return result;
+    },
+    { ...defaults }
+  );
   const namespace = namespaceByScheme[defaulted.scheme];
   const namespaced =
     namespace != null && uriObject.namespace === ""

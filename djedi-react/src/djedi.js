@@ -59,7 +59,7 @@ export class Djedi {
 
     this.loadMany([node]).then(
       results => {
-        callback(results[uri] || new Error(`Missing result for node: ${uri}`));
+        callback(results[uri] || missingUriError(uri));
       },
       error => {
         callback(error);
@@ -86,6 +86,7 @@ export class Djedi {
       callbacks: [],
     };
     previous.callbacks.push(callback);
+    this._batch.queue.set(node.uri, previous);
 
     if (this._batch.timeoutId != null) {
       return;
@@ -98,14 +99,14 @@ export class Djedi {
   }
 
   loadMany(nodes) {
-    this._post("/djedi/load_many", nodes).then(results => {
+    return this._post("/djedi/load_many", nodes).then(results => {
       this.addNodes(results);
       return results;
     });
   }
 
   loadByPrefix(prefixes) {
-    this._post("/djedi/load_by_prefix", prefixes).then(results => {
+    return this._post("/djedi/load_by_prefix", prefixes).then(results => {
       this.addNodes(results);
       return results;
     });
@@ -114,10 +115,11 @@ export class Djedi {
   // Needed to pick up the results from `loadByPrefix` after server-side
   // rendering.
   addNodes(nodes) {
-    for (const passedNode of nodes) {
-      const node = this._normalizeNode(passedNode);
+    Object.keys(nodes).forEach(uri => {
+      const rawNode = { uri, value: nodes[uri] };
+      const node = this._normalizeNode(rawNode);
       this._nodes.set(node.uri, node);
-    }
+    });
   }
 
   injectAdmin() {
@@ -237,25 +239,24 @@ export class Djedi {
 
     this._batch = makeEmptyBatch();
 
-    try {
-      const results = this.loadMany(nodes);
-      for (const [uri, data] of queue) {
-        const value = results[uri];
-        const node =
-          value == null
-            ? new Error(`Missing result for node: ${uri}`)
-            : { uri, value };
-        for (const callback of data.callbacks) {
-          callback(node);
+    this.loadMany(nodes).then(
+      results => {
+        for (const [uri, data] of queue) {
+          const value = results[uri];
+          const node = value == null ? missingUriError(uri) : { uri, value };
+          for (const callback of data.callbacks) {
+            callback(node);
+          }
+        }
+      },
+      error => {
+        for (const [, data] of queue) {
+          for (const callback of data.callbacks) {
+            callback(error);
+          }
         }
       }
-    } catch (error) {
-      for (const [, data] of queue) {
-        for (const callback of data.callbacks) {
-          callback(error);
-        }
-      }
-    }
+    );
   }
 
   _post(passedUrl, data) {
@@ -367,6 +368,12 @@ function createUpdatedErrorMessage(error, info, response) {
     }`,
     String(error),
   ].join("\n");
+}
+
+function missingUriError(uri) {
+  const error = new Error(`Missing result for node: ${uri}`);
+  error.status = 1404;
+  return error;
 }
 
 export default new Djedi();

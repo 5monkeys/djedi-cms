@@ -37,8 +37,11 @@ module.exports = {
       env: { node: true },
     },
     {
-      files: ["*.test.js"],
-      env: { jest: true },
+      files: ["*.test.js", "{test,__mocks__}/*.js"],
+      env: { node: true, jest: true },
+      rules: {
+        "no-restricted-syntax": "off",
+      },
     },
   ],
 };

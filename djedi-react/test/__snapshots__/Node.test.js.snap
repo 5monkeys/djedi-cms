@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`it renders loading and then the node: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": "{}",
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`it renders loading and then the node: loading 1`] = `"Loading…"`;
+
+exports[`it renders loading and then the node: window.DJEDI_NODES 1`] = `
+Object {
+  "i18n://en-us@test.txt": undefined,
+}
+`;
+
+exports[`it renders loading and then the node: with value 1`] = `
+<span
+  data-i18n="en-us@test"
+>
+  returned text
+</span>
+`;

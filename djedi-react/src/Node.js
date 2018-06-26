@@ -4,6 +4,8 @@ import dedent from "dedent";
 
 import djedi from "./djedi";
 
+const POTENTIAL_HTML = /[<&]/;
+
 const propTypes = {
   uri: PropTypes.string.isRequired,
   children: PropTypes.string, // Yes, a *string*!
@@ -104,11 +106,17 @@ export default class Node extends React.Component {
     const value = interpolate(node.value, kwargs);
     const element = djedi.element(node.uri);
 
+    // This is mostly to make the test snapshots easier to read. Might be faster
+    // not using `dangerouslySetInnerHTML` unnecessarily, too.
+    const hasHtml = POTENTIAL_HTML.test(value);
+
     const content = edit ? (
       <element.tag
         {...element.attributes}
-        dangerouslySetInnerHTML={{ __html: value }}
-      />
+        dangerouslySetInnerHTML={hasHtml ? { __html: value } : undefined}
+      >
+        {hasHtml ? undefined : value}
+      </element.tag>
     ) : (
       // WARNING: It’s not possible to render HTML without a wrapper element in
       // React. So you can’t do `edit={false}` and expect the node value to be
