@@ -7,7 +7,14 @@ import { fetch, resetAll, wait } from "./helpers";
 
 jest.useFakeTimers();
 
-beforeEach(resetAll);
+console.warn = jest.fn();
+console.error = jest.fn();
+
+beforeEach(() => {
+  resetAll();
+  console.warn.mockClear();
+  console.error.mockClear();
+});
 
 test("it renders loading and then the node", async () => {
   fetch({ "i18n://en-us@test.txt": "returned text" });
@@ -40,4 +47,18 @@ test("it renders synchronously if the node is already in cache", async () => {
   );
   expect(component2.toJSON()).toMatchSnapshot("browser");
   expect(fetch.mockFn).toHaveBeenCalledTimes(0);
+});
+
+test("it warns when passing a non-string as default/children", async () => {
+  fetch({ "i18n://en-us@test.txt": "returned text" });
+  const component = renderer.create(
+    <Node uri="test">
+      A <em>mistake</em>
+    </Node>
+  );
+  expect(component.toJSON()).toMatchSnapshot("loading");
+  expect(console.error.mock.calls).toMatchSnapshot("console.error");
+  await wait();
+  expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+  expect(component.toJSON()).toMatchSnapshot("with value");
 });

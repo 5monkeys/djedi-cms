@@ -89,7 +89,7 @@ export default class Node extends React.Component {
 
   _getDefault() {
     const { children } = this.props;
-    return children == null ? undefined : dedent(children);
+    return children == null ? undefined : dedent(String(children));
   }
 
   render() {
@@ -100,6 +100,8 @@ export default class Node extends React.Component {
       // Using a destructuring default rather than `defaultProps` for `render`,
       // since `djedi.options` may change.
       render = djedi.options.defaultRender,
+      // Make sure to destructure all props above (even ones unused in this
+      // method) so that `kwargs` only contains non-props.
       ...kwargs
     } = this.props;
     const { node } = this.state;

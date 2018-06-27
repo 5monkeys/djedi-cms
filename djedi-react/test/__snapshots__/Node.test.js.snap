@@ -67,3 +67,37 @@ exports[`it renders synchronously if the node is already in cache: with value 1`
   Welcome to our amazing website!
 </span>
 `;
+
+exports[`it warns when passing a non-string as default/children: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": "{\\"i18n://en-us@test.txt\\":\\"A ,[object Object]\\"}",
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`it warns when passing a non-string as default/children: console.error 1`] = `
+Array [
+  Array [
+    "Warning: Failed prop type: Invalid prop \`children\` of type \`array\` supplied to \`Node\`, expected \`string\`.
+    in Node",
+  ],
+]
+`;
+
+exports[`it warns when passing a non-string as default/children: loading 1`] = `"Loading…"`;
+
+exports[`it warns when passing a non-string as default/children: with value 1`] = `
+<span
+  data-i18n="en-us@test"
+>
+  returned text
+</span>
+`;
