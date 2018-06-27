@@ -275,7 +275,12 @@ export class Djedi {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      // Make the body easier to read in test snapshots. It’s important to still
+      // call `JSON.stringify` so we know that `data` actually can be
+      // stringified.
+      body: window.expect
+        ? JSON.parse(JSON.stringify(data))
+        : JSON.stringify(data),
     })
       .then(response => {
         if (response.status >= 200 && response.status < 400) {

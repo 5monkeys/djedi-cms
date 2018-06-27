@@ -5,7 +5,12 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{\\"i18n://en-us@first.txt\\":\\"Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id, hendrerit euismod iaculis convallis ante tincidunt tempus bibendum metus, torquent ac egestas integer erat pharetra vehicula senectus.\\",\\"i18n://en-us@second.txt\\":\\"Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,\\\\nhendrerit euismod iaculis convallis ante tincidunt tempus bibendum\\\\nmetus, torquent ac egestas integer erat pharetra vehicula senectus.\\"}",
+      "body": Object {
+        "i18n://en-us@first.txt": "Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id, hendrerit euismod iaculis convallis ante tincidunt tempus bibendum metus, torquent ac egestas integer erat pharetra vehicula senectus.",
+        "i18n://en-us@second.txt": "Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+metus, torquent ac egestas integer erat pharetra vehicula senectus.",
+      },
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -37,7 +42,9 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{\\"i18n://en-us@first.txt\\":\\"first\\"}",
+      "body": Object {
+        "i18n://en-us@first.txt": "first",
+      },
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -47,7 +54,9 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{\\"i18n://en-us@second.txt\\":\\"second\\"}",
+      "body": Object {
+        "i18n://en-us@second.txt": "second",
+      },
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -78,7 +87,9 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{\\"i18n://en-us@first.txt\\":null}",
+      "body": Object {
+        "i18n://en-us@first.txt": null,
+      },
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -88,7 +99,9 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{\\"i18n://en-us@second.txt\\":null}",
+      "body": Object {
+        "i18n://en-us@second.txt": null,
+      },
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -127,7 +140,9 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{\\"i18n://en-us@test.txt\\":null}",
+      "body": Object {
+        "i18n://en-us@test.txt": null,
+      },
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -158,7 +173,9 @@ Array [
   Array [
     "/djedi/load_by_prefix",
     Object {
-      "body": "[\\"home/\\"]",
+      "body": Array [
+        "home/",
+      ],
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -206,7 +223,9 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{\\"i18n://en-us@test.txt\\":\\"first\\"}",
+      "body": Object {
+        "i18n://en-us@test.txt": "first",
+      },
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -249,7 +268,9 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{\\"i18n://en-us@test.txt\\":\\"A ,[object Object]\\"}",
+      "body": Object {
+        "i18n://en-us@test.txt": "A ,[object Object]",
+      },
       "headers": Object {
         "Content-Type": "application/json",
       },
