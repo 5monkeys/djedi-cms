@@ -1,5 +1,48 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`it fetches again after changing the uri prop (but not other props): api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": "{}",
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": "{}",
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`it fetches again after changing the uri prop (but not other props): first render 1`] = `
+<span
+  data-i18n="en-us@first"
+>
+  first
+</span>
+`;
+
+exports[`it fetches again after changing the uri prop (but not other props): second render 1`] = `
+<span
+  data-i18n="en-us@second"
+>
+  second
+</span>
+`;
+
+exports[`it fetches again after changing the uri prop (but not other props): third render (same uri, no edit) 1`] = `"second"`;
+
 exports[`it renders loading and then the node: api call 1`] = `
 Array [
   Array [

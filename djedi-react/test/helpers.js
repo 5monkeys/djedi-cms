@@ -1,3 +1,4 @@
+import React from "react";
 import unfetch from "isomorphic-unfetch";
 
 import { djedi } from "../src";
@@ -62,4 +63,25 @@ export function resetAll() {
   djedi.resetOptions();
   djedi.resetNodes();
   fetch.reset();
+}
+
+/*
+Returns a wrapper component that makes it easy to change props of some other
+component.
+
+    const Wrapper = withState(({ name = "Alice" }) => (
+      <SomeComponent name={name} />
+    ));
+    const component = renderer.create(<Wrapper />);
+    const instance = component.getInstance();
+    expect(component.toJSON()).toMatchSnapshot("first render");
+    instance.setState({ name: "Bob" });
+    expect(component.toJSON()).toMatchSnapshot("second render");
+*/
+export function withState(render) {
+  return class extends React.Component {
+    render() {
+      return render(this.state || {});
+    }
+  };
 }

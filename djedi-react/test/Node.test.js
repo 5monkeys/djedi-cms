@@ -3,7 +3,7 @@ import renderer from "react-test-renderer";
 
 import { Node, djedi } from "../src";
 
-import { fetch, resetAll, wait } from "./helpers";
+import { fetch, resetAll, wait, withState } from "./helpers";
 
 jest.useFakeTimers();
 
@@ -61,4 +61,24 @@ test("it warns when passing a non-string as default/children", async () => {
   await wait();
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
   expect(component.toJSON()).toMatchSnapshot("with value");
+});
+
+test("it fetches again after changing the uri prop (but not other props)", async () => {
+  fetch({ "i18n://en-us@first.txt": "first" });
+  fetch({ "i18n://en-us@second.txt": "second" });
+  const Wrapper = withState(({ uri = "first", edit = true }) => (
+    <Node uri={uri} edit={edit} />
+  ));
+  const component = renderer.create(<Wrapper />);
+  const instance = component.getInstance();
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("first render");
+  instance.setState({ uri: "second" });
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("second render");
+  instance.setState({ edit: false });
+  expect(component.toJSON()).toMatchSnapshot(
+    "third render (same uri, no edit)"
+  );
+  expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
 });
