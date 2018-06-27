@@ -333,3 +333,69 @@ test("interpolations: rendering values", async () => {
   await wait();
   expect(component.toJSON()).toMatchSnapshot("rendered");
 });
+
+test("custom render function", async () => {
+  fetch("<h1>Server error 500</h1>", { status: 500, stringify: false });
+  fetch(new Error("Network error"));
+  fetch(simpleNodeResponse("3", null));
+  fetch(simpleNodeResponse("4", "returned value"));
+
+  function render1(state) {
+    return state.type;
+  }
+
+  function render2(state) {
+    switch (state.type) {
+      case "error":
+        return (
+          <div
+            data-details={{
+              message: state.error.message,
+              status: state.error.status,
+              responseText: state.error.responseText,
+            }}
+          >
+            Error
+          </div>
+        );
+      case "success":
+        return <article>{state.content}</article>;
+      case "loading":
+        return "LOADING";
+      default:
+        return "UNKNOWN";
+    }
+  }
+
+  djedi.options.defaultRender = render1;
+
+  const Wrapper = withState(({ uri = "1" }) => (
+    <div>
+      <Node uri={uri} />
+      <hr />
+      <Node uri={uri} render={render2} />
+    </div>
+  ));
+
+  const component = renderer.create(<Wrapper />);
+  const instance = component.getInstance();
+
+  expect(component.toJSON()).toMatchSnapshot("loading");
+
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("status error");
+
+  instance.setState({ uri: "2" });
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("network error");
+
+  instance.setState({ uri: "3" });
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("missing");
+
+  instance.setState({ uri: "4" });
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("with value");
+
+  expect(fetch.mockFn.mock.calls).toMatchSnapshot("api calls");
+});

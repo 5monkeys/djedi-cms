@@ -114,11 +114,7 @@ export default class Node extends React.Component {
       return render({ type: "error", error: node });
     }
 
-    if (node.value == null) {
-      return render({ type: "missing" });
-    }
-
-    const value = interpolate(node.value, kwargs);
+    const value = interpolate(node.value || "", kwargs);
     const element = djedi.element(node.uri);
 
     // This is mostly to make the test snapshots easier to read. Might be faster

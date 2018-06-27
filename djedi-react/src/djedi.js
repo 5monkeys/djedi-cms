@@ -282,17 +282,20 @@ export class Djedi {
         ? JSON.parse(JSON.stringify(data))
         : JSON.stringify(data),
     })
-      .then(response => {
-        if (response.status >= 200 && response.status < 400) {
-          return response
-            .json()
-            .catch(error => Promise.reject({ response, error }));
-        }
-        return Promise.reject({
-          response,
-          error: createStatusCodeError(response),
-        });
-      })
+      .then(
+        response => {
+          if (response.status >= 200 && response.status < 400) {
+            return response
+              .json()
+              .catch(error => Promise.reject({ response, error }));
+          }
+          return Promise.reject({
+            response,
+            error: createStatusCodeError(response),
+          });
+        },
+        error => Promise.reject({ response: undefined, error })
+      )
       .catch(arg => {
         const response = arg && arg.response;
         const error = (arg && arg.error) || new Error(`Bad error: ${arg}`);
@@ -326,7 +329,6 @@ function makeDefaultOptions() {
           return `Failed to fetch content 😞 (${state.error.status})`;
         case "success":
           return state.content;
-        case "missing":
         default:
           return null;
       }

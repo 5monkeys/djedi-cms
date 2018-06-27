@@ -1,5 +1,144 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`custom render function: api calls 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": Object {
+        "i18n://en-us@1.txt": null,
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": Object {
+        "i18n://en-us@2.txt": null,
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": Object {
+        "i18n://en-us@3.txt": null,
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": Object {
+        "i18n://en-us@4.txt": null,
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`custom render function: loading 1`] = `
+<div>
+  loading
+  <hr />
+  LOADING
+</div>
+`;
+
+exports[`custom render function: missing 1`] = `
+<div>
+  error
+  <hr />
+  <div
+    data-details={
+      Object {
+        "message": "Missing result for node: i18n://en-us@3.txt",
+        "responseText": undefined,
+        "status": 1404,
+      }
+    }
+  >
+    Error
+  </div>
+</div>
+`;
+
+exports[`custom render function: network error 1`] = `
+<div>
+  error
+  <hr />
+  <div
+    data-details={
+      Object {
+        "message": "Djedi API error for request: POST /djedi/load_many
+RequestData sent: {
+  \\"i18n://en-us@2.txt\\": null
+}
+Response: undefined
+Error: Network error",
+        "responseText": "",
+        "status": -1,
+      }
+    }
+  >
+    Error
+  </div>
+</div>
+`;
+
+exports[`custom render function: status error 1`] = `
+<div>
+  error
+  <hr />
+  <div
+    data-details={
+      Object {
+        "message": "Djedi API error for request: POST /djedi/load_many
+RequestData sent: {
+  \\"i18n://en-us@1.txt\\": null
+}
+Response: 500 <mock.statusText>
+Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.",
+        "responseText": "<h1>Server error 500</h1>",
+        "status": 500,
+      }
+    }
+  >
+    Error
+  </div>
+</div>
+`;
+
+exports[`custom render function: with value 1`] = `
+<div>
+  success
+  <hr />
+  <article>
+    <span
+      data-i18n="en-us@4"
+    >
+      returned value
+    </span>
+  </article>
+</div>
+`;
+
 exports[`default values are dedented: api call 1`] = `
 Array [
   Array [
