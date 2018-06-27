@@ -99,7 +99,14 @@ export class Djedi {
   }
 
   loadMany(nodes) {
-    return this._post("/djedi/load_many", nodes).then(results => {
+    // `JSON.stringify` excludes keys whose values are `undefined`. Change them
+    // to `null` so that all keys are sent to the backend.
+    const nodesWithNull = Object.keys(nodes).reduce((result, key) => {
+      const value = nodes[key];
+      result[key] = value === undefined ? null : value;
+      return result;
+    }, {});
+    return this._post("/djedi/load_many", nodesWithNull).then(results => {
       this.addNodes(results);
       return results;
     });

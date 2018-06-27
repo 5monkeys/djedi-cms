@@ -5,7 +5,7 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{}",
+      "body": "{\\"i18n://en-us@first.txt\\":null}",
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -15,7 +15,7 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{}",
+      "body": "{\\"i18n://en-us@second.txt\\":null}",
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -48,7 +48,7 @@ Array [
   Array [
     "/djedi/load_many",
     Object {
-      "body": "{}",
+      "body": "{\\"i18n://en-us@test.txt\\":null}",
       "headers": Object {
         "Content-Type": "application/json",
       },
