@@ -123,8 +123,7 @@ export class Djedi {
   // rendering.
   addNodes(nodes) {
     Object.keys(nodes).forEach(uri => {
-      const rawNode = { uri, value: nodes[uri] };
-      const node = this._normalizeNode(rawNode);
+      const node = { uri: this._normalizeUri(uri), value: nodes[uri] };
       this._nodes.set(node.uri, node);
     });
   }
@@ -152,7 +151,7 @@ export class Djedi {
       return;
     }
 
-    this._renderedNodes.set({
+    this._renderedNodes.set(node.uri, {
       value: node.value,
       numInstances: 1,
     });
@@ -227,7 +226,7 @@ export class Djedi {
   _normalizeNode(node) {
     return {
       ...node,
-      uri: this._stringifyUri(this._parseUri(node.uri)),
+      uri: this._normalizeUri(node.uri),
     };
   }
 

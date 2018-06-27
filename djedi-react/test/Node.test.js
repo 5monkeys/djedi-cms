@@ -399,3 +399,57 @@ test("custom render function", async () => {
 
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api calls");
 });
+
+test("it handles window.DJEDI_NODES", async () => {
+  fetch({
+    ...simpleNodeResponse("removed", "removed"),
+    ...simpleNodeResponse("loneRemoved", "loneRemoved"),
+    ...simpleNodeResponse("changing1", "changing1"),
+    ...simpleNodeResponse("changing2", "changing2"),
+    ...simpleNodeResponse("changing3", "changing3"),
+  });
+
+  const Wrapper = withState(({ remove = false, changingUri = "changing1" }) => (
+    <div>
+      <Node uri="removed" />
+      {!remove && <Node uri="removed" />}
+
+      {!remove && <Node uri="loneRemoved">loneRemoved</Node>}
+
+      <Node uri="changing1" />
+      <Node uri={changingUri} />
+    </div>
+  ));
+
+  expect(window.DJEDI_NODES).toMatchSnapshot("before render");
+
+  const component = renderer.create(<Wrapper />);
+  const instance = component.getInstance();
+
+  await wait();
+
+  expect(window.DJEDI_NODES).toMatchSnapshot("first render");
+  instance.setState({ remove: true, changingUri: "changing2" });
+  expect(window.DJEDI_NODES).toMatchSnapshot("second render");
+  instance.setState({ changingUri: "changing3" });
+  expect(window.DJEDI_NODES).toMatchSnapshot("third render");
+  component.unmount();
+  expect(window.DJEDI_NODES).toMatchSnapshot("after unmount");
+});
+
+test("it warns about rendering nodes with different defaults", async () => {
+  fetch(simpleNodeResponse("test", "test"));
+
+  renderer.create(
+    <div>
+      <Node uri="test">default</Node>
+      <Node uri="en-us@test">other default</Node>
+      <Node uri="i18n://test.txt" />
+    </div>
+  );
+
+  expect(console.warn.mock.calls).toMatchSnapshot("console.warn");
+  expect(window.DJEDI_NODES).toMatchSnapshot("window.DJEDI_NODES");
+  await wait();
+  expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+});
