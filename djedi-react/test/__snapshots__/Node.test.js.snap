@@ -208,14 +208,24 @@ exports[`it renders synchronously if the node is already in cache: with value 1`
 `;
 
 exports[`it treats node values as HTML: with value 1`] = `
-<span
-  dangerouslySetInnerHTML={
-    Object {
-      "__html": "A <a href=\\"http://example.com\\">link</a>.",
+<div>
+  <span
+    dangerouslySetInnerHTML={
+      Object {
+        "__html": "A <a href=\\"http://example.com\\">link</a>.",
+      }
     }
-  }
-  data-i18n="en-us@test"
-/>
+    data-i18n="en-us@first"
+  />
+  <span
+    dangerouslySetInnerHTML={
+      Object {
+        "__html": "A &amp; B",
+      }
+    }
+    data-i18n="en-us@second"
+  />
+</div>
 `;
 
 exports[`it warns if changing the default/children: api call 1`] = `
