@@ -57,6 +57,11 @@ export function simpleNodeResponse(path, value) {
 // Wait for `setTimeout` and (mocked) `Promise`s.
 export function wait() {
   jest.runAllTimers();
+  return waitForPromises();
+}
+
+// Wait for (mocked) `Promise`s.
+export function waitForPromises() {
   return new Promise(resolve => {
     setImmediate(resolve);
   });

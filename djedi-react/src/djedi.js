@@ -59,7 +59,10 @@ export class Djedi {
 
     this.loadMany([node]).then(
       results => {
-        callback(results[uri] || missingUriError(uri));
+        const value = results[uri];
+        const resultNode =
+          value == null ? missingUriError(uri) : { uri, value };
+        callback(resultNode);
       },
       error => {
         callback(error);
@@ -129,6 +132,7 @@ export class Djedi {
   }
 
   injectAdmin() {
+    // istanbul ignore next
     console.log("TODO: injectAdmin (maybe)");
   }
 
@@ -277,6 +281,7 @@ export class Djedi {
       // Make the body easier to read in test snapshots. It’s important to still
       // call `JSON.stringify` so we know that `data` actually can be
       // stringified.
+      // istanbul ignore next
       body: window.expect
         ? JSON.parse(JSON.stringify(data))
         : JSON.stringify(data),
@@ -329,6 +334,7 @@ function makeDefaultOptions() {
         case "success":
           return state.content;
         default:
+          // istanbul ignore next
           return null;
       }
     },
