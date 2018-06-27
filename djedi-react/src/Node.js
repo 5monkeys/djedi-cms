@@ -28,12 +28,15 @@ export default class Node extends React.Component {
       node: undefined,
     };
 
+    this.mounted = false;
+
     // Must be done in the constructor rather than `componentDidMount` because
     // of server-side rendering.
     this._get();
   }
 
   componentDidMount() {
+    this.mounted = true;
     djedi.reportRenderedNode({
       uri: this.props.uri,
       value: this._getDefault(),
@@ -62,6 +65,7 @@ export default class Node extends React.Component {
   }
 
   componentWillUnmount() {
+    this.mounted = false;
     djedi.reportRemovedNode(this.props.uri);
   }
 
@@ -69,7 +73,16 @@ export default class Node extends React.Component {
     djedi.getBatched(
       { uri: this.props.uri, value: this._getDefault() },
       node => {
-        this.setState({ node });
+        if (this.mounted) {
+          this.setState({ node });
+        } else {
+          // If the node already exists in cache, this callback is called
+          // immediately (synchronously). If this happens in the `_get()` call in
+          // `constructor`, where it is not allowed to call `setState`, mutate
+          // `this.state` directly instead (which is fine in the `constructor`).
+          // eslint-disable-next-line react/no-direct-mutation-state
+          this.state.node = node;
+        }
       }
     );
   }

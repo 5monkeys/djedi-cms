@@ -30,3 +30,32 @@ exports[`it renders loading and then the node: with value 1`] = `
   returned text
 </span>
 `;
+
+exports[`it renders synchronously if the node is already in cache: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_by_prefix",
+    Object {
+      "body": "[\\"home/\\"]",
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`it renders synchronously if the node is already in cache: loadByPrefix result 1`] = `
+Object {
+  "i18n://en-us@home/intro.txt": "Welcome to our amazing website!",
+}
+`;
+
+exports[`it renders synchronously if the node is already in cache: with value 1`] = `
+<span
+  data-i18n="en-us@home/intro"
+>
+  Welcome to our amazing website!
+</span>
+`;
