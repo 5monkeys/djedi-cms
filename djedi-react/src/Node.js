@@ -146,14 +146,28 @@ export default class Node extends React.Component {
 Node.propTypes = propTypes;
 Node.defaultProps = defaultProps;
 
-// This intentionally only supports `{key}`, not any of the fancy Python string
-// formatting extras. If `key` maps to a string in `kwargs`, that string is
-// inserted. Otherwise it is kept as-is. No escaping, no nothing. KISS and
-// YAGNI. If somebody does want fancy extras, they can do it themselves before
-// putting the value in `kwargs`.
+const INNER = /[^{}[\]\s]+/.source;
+const INTERPOLATION_REGEX = RegExp(`\\{${INNER}\\}|\\[${INNER}\\]`, "g");
+
+/*
+This intentionally only supports `{key}`, not any of the fancy Python string
+formatting extras. If `key` maps to a string in `kwargs`, that string is
+inserted. Otherwise it is kept as-is. No escaping, no nothing. KISS and
+YAGNI. If somebody does want fancy extras, they can do it themselves before
+putting the value in `kwargs`.
+
+Also support `[key]`, since `{foo}` is already used in JSX syntax:
+
+    const user = "Bob"
+    <Node uri="test">Hello, {user}!</Node>
+    <Node uri="test">Hello, [user]!</Node>
+    <Node uri="test">{`Hello, {user}!`}</Node>
+*/
 function interpolate(string, kwargs) {
-  return string.replace(/\{([^{}\s]+)\}/g, (match, key) => {
-    const value = kwargs[key];
-    return typeof value === "string" ? value : match;
+  return string.replace(INTERPOLATION_REGEX, match => {
+    const key = match.slice(1, -1);
+    return Object.prototype.hasOwnProperty.call(kwargs, key)
+      ? kwargs[key]
+      : match;
   });
 }

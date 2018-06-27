@@ -37,6 +37,88 @@ exports[`default values are dedented: with value 1`] = `
 
 exports[`edit=false: with value 1`] = `"test"`;
 
+exports[`interpolations: passing values to backend: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": Object {
+        "i18n://en-us@1.txt": "Hello, ,Bob,!",
+        "i18n://en-us@2.txt": "Hello, {user}!",
+        "i18n://en-us@3.txt": "Hello, [user]!",
+        "i18n://en-us@4.txt": "Hello, {user}!",
+        "i18n://en-us@5.txt": "Hello, [user]!",
+        "i18n://en-us@6.txt": "Hello,
+{user}!",
+        "i18n://en-us@7.txt": "Hello,
+[user]!",
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`interpolations: passing values to backend: console.error (for uri \`1\`) 1`] = `
+Array [
+  Array [
+    "Warning: Failed prop type: Invalid prop \`children\` of type \`array\` supplied to \`NodeInterpolationMistake\`, expected \`string\`.
+    in NodeInterpolationMistake",
+  ],
+]
+`;
+
+exports[`interpolations: rendering values: rendered 1`] = `
+<span
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "Hello Bob!
+Hello Bob!
+Number: 3.141592653589793
+Number: 3.141592653589793
+Formatted number: 3.14
+Formatted number: 3.14
+Date: Wed Jun 27 2018 02:00:00 GMT+0200 (CEST)
+Date: Wed Jun 27 2018 02:00:00 GMT+0200 (CEST)
+hasOwnProperty: Asking for trouble
+hasOwnProperty: Asking for trouble
+undefined: undefined
+undefined: undefined
+null: null
+null: null
+Unusual key: slash
+Unusual key: slash
+Whitespace in key not interpolated: {a b}
+Whitespace in key not interpolated: [a b]
+Delimiter in key not interpolated: {a{b}
+Delimiter in key not interpolated: {a}b}
+Delimiter in key not interpolated: [a[b]
+Delimiter in key not interpolated: [a]b]
+Empty key not interpolated: {}
+Empty key not interpolated: []
+edit not interpolated: {edit}
+edit not interpolated: [edit]
+children not interpolated: {children}
+children not interpolated: [children]
+toString not interpolated: {toString}
+toString not interpolated: [toString]
+Unknown key left alone: {unknown}
+Unknown key left alone: [unknown]
+Escaped: &#x7b;name&#x7d;
+Escaped: &#x5b;name&#x5d;
+Double brackets OK: {Bob}
+Double brackets OK: [Bob]
+Double brackets OK: [Bob]
+Double brackets OK: {Bob}",
+    }
+  }
+  data-i18n="en-us@test"
+/>
+`;
+
 exports[`it allows changing the default/children if also changing the uri: api call 1`] = `
 Array [
   Array [
@@ -293,8 +375,8 @@ Array [
 exports[`it warns when passing a non-string as default/children: console.error 1`] = `
 Array [
   Array [
-    "Warning: Failed prop type: Invalid prop \`children\` of type \`array\` supplied to \`Node\`, expected \`string\`.
-    in Node",
+    "Warning: Failed prop type: Invalid prop \`children\` of type \`array\` supplied to \`NodeChildrenMistake\`, expected \`string\`.
+    in NodeChildrenMistake",
   ],
 ]
 `;
@@ -329,7 +411,7 @@ Array [
 exports[`the md tag ignores interpolations and warns about them: console.warn 1`] = `
 Array [
   Array [
-    "djedi-react: Using \`\${foo}\` in a node default value is an anti-pattern: it won't work if the user edits the node. For consistency, your interpolations will be ignored. Did you mean to use \`{foo}\` (without the \`$\`)?",
+    "djedi-react: Using \`\${foo}\` in a node default value is an anti-pattern: it won't work if the user edits the node. For consistency, your interpolations will be ignored. Did you mean to use \`{foo}\` (without the \`$\`) or \`[foo]\`?",
   ],
 ]
 `;
