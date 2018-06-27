@@ -460,3 +460,35 @@ test("edge case: if node.value is missing somehow, it doesn’t crash", () => {
   instance.setState({ node: { uri: "test", value: null } });
   expect(component.toJSON()).toMatchSnapshot();
 });
+
+test("batching", async () => {
+  fetch({});
+  fetch({});
+
+  djedi.options.batchInterval = 30;
+
+  const Wrapper = withState(({ level = 0 }) => (
+    <div>
+      <Node uri="1" />
+      <Node uri="1.txt" />
+      {level >= 1 && <Node uri="en-us@1" />}
+      {level >= 2 && <Node uri="2" />}
+      {level >= 3 && <Node uri="3" />}
+    </div>
+  ));
+
+  const component = renderer.create(<Wrapper />);
+  const instance = component.getInstance();
+
+  jest.advanceTimersByTime(10);
+  instance.setState({ level: 1 });
+  jest.advanceTimersByTime(10);
+  instance.setState({ level: 2 });
+  jest.advanceTimersByTime(10);
+  instance.setState({ level: 3 });
+
+  await wait();
+  expect(fetch.mockFn.mock.calls).toMatchSnapshot(
+    "api calls (one request for 1 & 2, one for 3)"
+  );
+});
