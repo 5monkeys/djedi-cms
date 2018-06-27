@@ -84,6 +84,12 @@ exports[`it fetches again after changing the uri prop (but not other props): sec
 
 exports[`it fetches again after changing the uri prop (but not other props): third render (same uri, no edit) 1`] = `"second"`;
 
+exports[`it handles error status codes: error 1`] = `"Failed to fetch content 😞 (500)"`;
+
+exports[`it handles missing nodes in response: missing 1`] = `"Failed to fetch content 😞 (1404)"`;
+
+exports[`it handles rejected requests: error 1`] = `"Failed to fetch content 😞 (-1)"`;
+
 exports[`it renders loading and then the node: api call 1`] = `
 Array [
   Array [

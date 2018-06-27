@@ -124,3 +124,24 @@ test("it allows changing the default/children if also changing the uri", async (
   await wait();
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
 });
+
+test("it handles error status codes", async () => {
+  fetch("<h1>Server error 500</h1>", { status: 500, stringify: false });
+  const component = renderer.create(<Node uri="test" />);
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("error");
+});
+
+test("it handles rejected requests", async () => {
+  fetch(new Error("Network error"));
+  const component = renderer.create(<Node uri="test" />);
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("error");
+});
+
+test("it handles missing nodes in response", async () => {
+  fetch({});
+  const component = renderer.create(<Node uri="test" />);
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("missing");
+});
