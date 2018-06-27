@@ -174,6 +174,14 @@ exports[`default values are dedented: with value 1`] = `
 </div>
 `;
 
+exports[`edge case: if node.value is missing somehow, it doesn’t crash 1`] = `
+<span
+  data-i18n="en-us@test"
+>
+  
+</span>
+`;
+
 exports[`edit=false: with value 1`] = `"test"`;
 
 exports[`interpolations: passing values to backend: api call 1`] = `

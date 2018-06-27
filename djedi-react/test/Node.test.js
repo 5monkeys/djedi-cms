@@ -453,3 +453,10 @@ test("it warns about rendering nodes with different defaults", async () => {
   await wait();
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
 });
+
+test("edge case: if node.value is missing somehow, it doesn’t crash", () => {
+  const component = renderer.create(<Node uri="test" />);
+  const instance = component.getInstance();
+  instance.setState({ node: { uri: "test", value: null } });
+  expect(component.toJSON()).toMatchSnapshot();
+});
