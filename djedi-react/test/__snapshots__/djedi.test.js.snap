@@ -200,3 +200,54 @@ Array [
   ],
 ]
 `;
+
+exports[`reportRenderedNode and reportRemovedNode reportRenderedNode warns about rendering nodes with different defaults: console.warn 1`] = `
+Array [
+  Array [
+    "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
+    Object {
+      "next": "other default",
+      "prev": "default",
+      "uri": "i18n://en-us@test.txt",
+    },
+  ],
+  Array [
+    "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
+    Object {
+      "next": undefined,
+      "prev": "default",
+      "uri": "i18n://en-us@test.txt",
+    },
+  ],
+]
+`;
+
+exports[`reportRenderedNode and reportRemovedNode reportRenderedNode warns about rendering nodes with different defaults: window.DJEDI_NODES 1`] = `
+Object {
+  "i18n://en-us@test.txt": "default",
+}
+`;
+
+exports[`reportRenderedNode and reportRemovedNode they work 1`] = `Object {}`;
+
+exports[`reportRenderedNode and reportRemovedNode they work 2`] = `
+Object {
+  "i18n://en-us@first.txt": "first",
+  "i18n://en-us@second.txt": "second",
+}
+`;
+
+exports[`reportRenderedNode and reportRemovedNode they work 3`] = `
+Object {
+  "i18n://en-us@first.txt": "first",
+  "i18n://en-us@second.txt": "second",
+}
+`;
+
+exports[`reportRenderedNode and reportRemovedNode they work 4`] = `
+Object {
+  "i18n://en-us@second.txt": "second",
+}
+`;
+
+exports[`reportRenderedNode and reportRemovedNode they work 5`] = `Object {}`;

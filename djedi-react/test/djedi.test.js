@@ -10,8 +10,13 @@ import {
 
 jest.useFakeTimers();
 
+console.warn = jest.fn();
+console.error = jest.fn();
+
 beforeEach(() => {
   resetAll();
+  console.warn.mockClear();
+  console.error.mockClear();
 });
 
 describe("get", () => {
@@ -125,8 +130,31 @@ describe("getBatched", () => {
   });
 });
 
-describe("reportRemovedNode", () => {
-  test("it handles trying to remove a non-existing node", () => {
+describe("reportRenderedNode and reportRemovedNode", () => {
+  test("they work", () => {
+    expect(window.DJEDI_NODES).toMatchSnapshot();
+    djedi.reportRenderedNode({ uri: "first", value: "first" });
+    djedi.reportRenderedNode({ uri: "first", value: "first" });
+    djedi.reportRenderedNode({ uri: "second", value: "second" });
+    expect(window.DJEDI_NODES).toMatchSnapshot();
+    djedi.reportRemovedNode("first");
+    expect(window.DJEDI_NODES).toMatchSnapshot();
+    djedi.reportRemovedNode("first");
+    expect(window.DJEDI_NODES).toMatchSnapshot();
+    djedi.reportRemovedNode("second");
+    expect(window.DJEDI_NODES).toMatchSnapshot();
+  });
+
+  test("reportRenderedNode warns about rendering nodes with different defaults", () => {
+    djedi.reportRenderedNode({ uri: "test", value: "default" });
+    djedi.reportRenderedNode({ uri: "en-us@test", value: "other default" });
+    djedi.reportRenderedNode({ uri: "i18n://test.txt", value: undefined });
+
+    expect(console.warn.mock.calls).toMatchSnapshot("console.warn");
+    expect(window.DJEDI_NODES).toMatchSnapshot("window.DJEDI_NODES");
+  });
+
+  test("reportRemovedNode handles trying to remove a non-existing node", () => {
     expect(() => {
       djedi.reportRemovedNode("test");
     }).not.toThrow();
