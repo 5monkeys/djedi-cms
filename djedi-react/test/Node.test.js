@@ -145,3 +145,41 @@ test("it handles missing nodes in response", async () => {
   await wait();
   expect(component.toJSON()).toMatchSnapshot("missing");
 });
+
+test("it treats node values as HTML", async () => {
+  fetch(simpleNodeResponse("test", 'A <a href="http://example.com">link</a>.'));
+  const component = renderer.create(<Node uri="test" />);
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("with value");
+});
+
+test("edit=false", async () => {
+  fetch(simpleNodeResponse("test", "test"));
+  const component = renderer.create(<Node uri="test" edit={false} />);
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("with value");
+});
+
+test("default values are dedented", async () => {
+  fetch({
+    ...simpleNodeResponse("first", "first"),
+    ...simpleNodeResponse("second", "second"),
+  });
+  const component = renderer.create(
+    <div>
+      <Node uri="first">
+        Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+        hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+        metus, torquent ac egestas integer erat pharetra vehicula senectus.
+      </Node>
+      <Node uri="second">{`
+        Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+        hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+        metus, torquent ac egestas integer erat pharetra vehicula senectus.
+      `}</Node>
+    </div>
+  );
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("with value");
+  expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+});

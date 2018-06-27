@@ -1,5 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`default values are dedented: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": "{\\"i18n://en-us@first.txt\\":\\"Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id, hendrerit euismod iaculis convallis ante tincidunt tempus bibendum metus, torquent ac egestas integer erat pharetra vehicula senectus.\\",\\"i18n://en-us@second.txt\\":\\"Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,\\\\nhendrerit euismod iaculis convallis ante tincidunt tempus bibendum\\\\nmetus, torquent ac egestas integer erat pharetra vehicula senectus.\\"}",
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`default values are dedented: with value 1`] = `
+<div>
+  <span
+    data-i18n="en-us@first"
+  >
+    first
+  </span>
+  <span
+    data-i18n="en-us@second"
+  >
+    second
+  </span>
+</div>
+`;
+
+exports[`edit=false: with value 1`] = `"test"`;
+
 exports[`it allows changing the default/children if also changing the uri: api call 1`] = `
 Array [
   Array [
@@ -156,6 +188,17 @@ exports[`it renders synchronously if the node is already in cache: with value 1`
 >
   Welcome to our amazing website!
 </span>
+`;
+
+exports[`it treats node values as HTML: with value 1`] = `
+<span
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "A <a href=\\"http://example.com\\">link</a>.",
+    }
+  }
+  data-i18n="en-us@test"
+/>
 `;
 
 exports[`it warns if changing the default/children: api call 1`] = `
