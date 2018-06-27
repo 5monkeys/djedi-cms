@@ -1,5 +1,46 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`it allows changing the default/children if also changing the uri: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": "{\\"i18n://en-us@first.txt\\":\\"first\\"}",
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": "{\\"i18n://en-us@second.txt\\":\\"second\\"}",
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`it allows changing the default/children if also changing the uri: first render 1`] = `
+<span
+  data-i18n="en-us@first"
+>
+  first
+</span>
+`;
+
+exports[`it allows changing the default/children if also changing the uri: second render 1`] = `
+<span
+  data-i18n="en-us@second"
+>
+  second
+</span>
+`;
+
 exports[`it fetches again after changing the uri prop (but not other props): api call 1`] = `
 Array [
   Array [
@@ -108,6 +149,49 @@ exports[`it renders synchronously if the node is already in cache: with value 1`
   data-i18n="en-us@home/intro"
 >
   Welcome to our amazing website!
+</span>
+`;
+
+exports[`it warns if changing the default/children: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": "{\\"i18n://en-us@test.txt\\":\\"first\\"}",
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`it warns if changing the default/children: console.error 1`] = `
+Array [
+  Array [
+    "djedi-react: Changing the default value of a node is not supported.",
+    Object {
+      "next": "second",
+      "prev": "first",
+    },
+  ],
+]
+`;
+
+exports[`it warns if changing the default/children: first render 1`] = `
+<span
+  data-i18n="en-us@test"
+>
+  test value
+</span>
+`;
+
+exports[`it warns if changing the default/children: second render (same as first render) 1`] = `
+<span
+  data-i18n="en-us@test"
+>
+  test value
 </span>
 `;
 

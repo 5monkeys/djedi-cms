@@ -86,5 +86,41 @@ test("it fetches again after changing the uri prop (but not other props)", async
   expect(component.toJSON()).toMatchSnapshot(
     "third render (same uri, no edit)"
   );
+  await wait();
+  expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+});
+
+test("it warns if changing the default/children", async () => {
+  fetch(simpleNodeResponse("test", "test value"));
+  const Wrapper = withState(({ defaultValue = "first" }) => (
+    <Node uri="test">{defaultValue}</Node>
+  ));
+  const component = renderer.create(<Wrapper />);
+  const instance = component.getInstance();
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("first render");
+  instance.setState({ defaultValue: "second" });
+  expect(console.error.mock.calls).toMatchSnapshot("console.error");
+  expect(component.toJSON()).toMatchSnapshot(
+    "second render (same as first render)"
+  );
+  await wait();
+  expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+});
+
+test("it allows changing the default/children if also changing the uri", async () => {
+  fetch(simpleNodeResponse("first", "first"));
+  fetch(simpleNodeResponse("second", "second"));
+  const Wrapper = withState(({ uri = "first", defaultValue = "first" }) => (
+    <Node uri={uri}>{defaultValue}</Node>
+  ));
+  const component = renderer.create(<Wrapper />);
+  const instance = component.getInstance();
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("first render");
+  instance.setState({ uri: "second", defaultValue: "second" });
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("second render");
+  await wait();
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
 });
