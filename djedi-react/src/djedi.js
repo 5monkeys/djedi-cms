@@ -39,6 +39,7 @@ export class Djedi {
     this._batch = makeEmptyBatch();
     this._DJEDI_NODES = {};
 
+    // istanbul ignore next
     if (typeof window !== "undefined") {
       if (window.DJEDI_NODES == null) {
         window.DJEDI_NODES = {};
@@ -131,10 +132,9 @@ export class Djedi {
     });
   }
 
-  injectAdmin() {
-    // istanbul ignore next
-    console.log("TODO: injectAdmin (maybe)");
-  }
+  // injectAdmin() {
+  //   console.log("TODO: injectAdmin (maybe)");
+  // }
 
   reportRenderedNode(passedNode) {
     const node = this._normalizeNode(passedNode);
@@ -193,6 +193,7 @@ export class Djedi {
     this._batch = makeEmptyBatch();
     this._DJEDI_NODES = {};
 
+    // istanbul ignore next
     if (typeof window !== "undefined") {
       window.DJEDI_NODES = this._DJEDI_NODES;
     }
@@ -281,10 +282,9 @@ export class Djedi {
       // Make the body easier to read in test snapshots. It’s important to still
       // call `JSON.stringify` so we know that `data` actually can be
       // stringified.
-      // istanbul ignore next
-      body: window.expect
-        ? JSON.parse(JSON.stringify(data))
-        : JSON.stringify(data),
+      body:
+        // istanbul ignore next
+        window.expect ? JSON.parse(JSON.stringify(data)) : JSON.stringify(data),
     })
       .then(
         response => {
@@ -301,7 +301,9 @@ export class Djedi {
         error => Promise.reject({ response: undefined, error })
       )
       .catch(arg => {
+        // istanbul ignore next
         const response = arg && arg.response;
+        // istanbul ignore next
         const error = (arg && arg.error) || new Error(`Bad error: ${arg}`);
 
         error.message = createUpdatedErrorMessage(error, info, response);
@@ -310,7 +312,11 @@ export class Djedi {
         const textPromise =
           response == null || response.bodyUsed
             ? Promise.resolve("")
-            : response.text().then(text => text, () => "");
+            : response.text().then(
+                text => text,
+                // istanbul ignore next
+                () => ""
+              );
 
         return textPromise.then(text => {
           error.responseText = text;
@@ -333,8 +339,8 @@ function makeDefaultOptions() {
           return `Failed to fetch content 😞 (${state.error.status})`;
         case "success":
           return state.content;
+        // istanbul ignore next
         default:
-          // istanbul ignore next
           return null;
       }
     },
