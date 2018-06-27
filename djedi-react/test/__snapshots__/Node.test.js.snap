@@ -298,3 +298,69 @@ exports[`it warns when passing a non-string as default/children: with value 1`] 
   returned text
 </span>
 `;
+
+exports[`the md tag ignores interpolations and warns about them: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": Object {
+        "i18n://en-us@test.txt": "Hello, !",
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`the md tag ignores interpolations and warns about them: console.warn 1`] = `
+Array [
+  Array [
+    "djedi-react: Using \`\${foo}\` in a node default value is an anti-pattern: it won't work if the user edits the node. For consistency, your interpolations will be ignored. Did you mean to use \`{foo}\` (without the \`$\`)?",
+  ],
+]
+`;
+
+exports[`the md tag ignores interpolations and warns about them: with value 1`] = `
+<span
+  data-i18n="en-us@test"
+>
+  test
+</span>
+`;
+
+exports[`using the md tag: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": Object {
+        "i18n://en-us@test.txt": "# A heading
+
+Some text with a [link](http://example.com)
+
+> Blockquote
+
+    function codeBlock() {
+      return \\"with indentation\\"
+    }",
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`using the md tag: with value 1`] = `
+<span
+  data-i18n="en-us@test"
+>
+  test
+</span>
+`;

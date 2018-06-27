@@ -1,7 +1,7 @@
 import React from "react";
 import renderer from "react-test-renderer";
 
-import { Node, djedi } from "../src";
+import { Node, djedi, md } from "../src";
 
 import {
   fetch,
@@ -179,6 +179,40 @@ test("default values are dedented", async () => {
       `}</Node>
     </div>
   );
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("with value");
+  expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+});
+
+test("using the md tag", async () => {
+  fetch(simpleNodeResponse("test", "test"));
+  const component = renderer.create(
+    <Node uri="test">{md`
+      # A heading
+
+      Some text with a [link](http://example.com)
+
+      > Blockquote
+
+          function codeBlock() {
+            return "with indentation"
+          }
+    `}</Node>
+  );
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("with value");
+  expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+});
+
+test("the md tag ignores interpolations and warns about them", async () => {
+  fetch(simpleNodeResponse("test", "test"));
+  const user = "Bob";
+  const component = renderer.create(
+    <Node uri="test">{md`
+      Hello, ${user}!
+    `}</Node>
+  );
+  expect(console.warn.mock.calls).toMatchSnapshot("console.warn");
   await wait();
   expect(component.toJSON()).toMatchSnapshot("with value");
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
