@@ -64,6 +64,16 @@ describe("get", () => {
     });
     expect(called).toBe(true);
   });
+
+  test("it respects options.baseUrl", async () => {
+    fetch({});
+    djedi.options.baseUrl = "http://example.com/interal";
+    const callback = jest.fn();
+    djedi.get({ uri: "test", value: "default" }, callback);
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+    await wait();
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("getBatched", () => {

@@ -45,6 +45,26 @@ Response: undefined
 Error: Network error]
 `;
 
+exports[`get it respects options.baseUrl: api call 1`] = `
+Array [
+  Array [
+    "http://example.com/interal/djedi/load_many",
+    Object {
+      "body": Object {
+        "0": Object {
+          "uri": "i18n://en-us@test.txt",
+          "value": "default",
+        },
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
 exports[`get it works 1`] = `
 Object {
   "uri": "i18n://en-us@test.txt",
