@@ -50,6 +50,10 @@ fetch.reset = () => {
 
 fetch.mockFn = unfetch;
 
+export function simpleNodeResponse(path, value) {
+  return { [`i18n://en-us@${path}.txt`]: value };
+}
+
 // Wait for `setTimeout` and (mocked) `Promise`s.
 export function wait() {
   jest.runAllTimers();

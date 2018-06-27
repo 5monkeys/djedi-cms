@@ -3,7 +3,13 @@ import renderer from "react-test-renderer";
 
 import { Node, djedi } from "../src";
 
-import { fetch, resetAll, wait, withState } from "./helpers";
+import {
+  fetch,
+  resetAll,
+  simpleNodeResponse,
+  wait,
+  withState,
+} from "./helpers";
 
 jest.useFakeTimers();
 
@@ -17,7 +23,7 @@ beforeEach(() => {
 });
 
 test("it renders loading and then the node", async () => {
-  fetch({ "i18n://en-us@test.txt": "returned text" });
+  fetch(simpleNodeResponse("test", "returned text"));
   const component = renderer.create(<Node uri="test" />);
   expect(component.toJSON()).toMatchSnapshot("loading");
   await wait();
@@ -27,7 +33,7 @@ test("it renders loading and then the node", async () => {
 });
 
 test("it renders synchronously if the node is already in cache", async () => {
-  fetch({ "i18n://en-us@home/intro.txt": "Welcome to our amazing website!" });
+  fetch(simpleNodeResponse("home/intro", "Welcome to our amazing website!"));
   const nodes = await djedi.loadByPrefix(["home/"]);
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
   expect(nodes).toMatchSnapshot("loadByPrefix result");
@@ -50,7 +56,7 @@ test("it renders synchronously if the node is already in cache", async () => {
 });
 
 test("it warns when passing a non-string as default/children", async () => {
-  fetch({ "i18n://en-us@test.txt": "returned text" });
+  fetch(simpleNodeResponse("test", "returned text"));
   const component = renderer.create(
     <Node uri="test">
       A <em>mistake</em>
@@ -64,8 +70,8 @@ test("it warns when passing a non-string as default/children", async () => {
 });
 
 test("it fetches again after changing the uri prop (but not other props)", async () => {
-  fetch({ "i18n://en-us@first.txt": "first" });
-  fetch({ "i18n://en-us@second.txt": "second" });
+  fetch(simpleNodeResponse("first", "first"));
+  fetch(simpleNodeResponse("second", "second"));
   const Wrapper = withState(({ uri = "first", edit = true }) => (
     <Node uri={uri} edit={edit} />
   ));
