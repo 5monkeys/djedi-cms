@@ -58,7 +58,7 @@ export class Djedi {
       return;
     }
 
-    this.loadMany([node]).then(
+    this.loadMany({ [node.uri]: node.value }).then(
       results => {
         const value = results[uri];
         const resultNode =

@@ -10,10 +10,7 @@ Object {
 exports[`get it handles error status codes 1`] = `
 [Error: Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "0": {
-    "uri": "i18n://en-us@test.txt",
-    "value": "default"
-  }
+  "i18n://en-us@test.txt": "default"
 }
 Response: 500 <mock.statusText>
 Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.]
@@ -22,10 +19,7 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
 exports[`get it handles invalid JSON 1`] = `
 [SyntaxError: Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "0": {
-    "uri": "i18n://en-us@test.txt",
-    "value": "default"
-  }
+  "i18n://en-us@test.txt": "default"
 }
 Response: 200 <mock.statusText>
 SyntaxError: Unexpected end of JSON input]
@@ -36,10 +30,7 @@ exports[`get it handles missing node in response 1`] = `[Error: Missing result f
 exports[`get it handles rejected requests 1`] = `
 [Error: Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "0": {
-    "uri": "i18n://en-us@test.txt",
-    "value": "default"
-  }
+  "i18n://en-us@test.txt": "default"
 }
 Response: undefined
 Error: Network error]
@@ -51,10 +42,7 @@ Array [
     "http://example.com/interal/djedi/load_many",
     Object {
       "body": Object {
-        "0": Object {
-          "uri": "i18n://en-us@test.txt",
-          "value": "default",
-        },
+        "i18n://en-us@test.txt": "default",
       },
       "headers": Object {
         "Content-Type": "application/json",
@@ -85,9 +73,7 @@ Array [
     "/djedi/load_many",
     Object {
       "body": Object {
-        "0": Object {
-          "uri": "i18n://en-us@test.txt",
-        },
+        "i18n://en-us@test.txt": null,
       },
       "headers": Object {
         "Content-Type": "application/json",
