@@ -103,6 +103,16 @@ describe("getBatched", () => {
     expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
     expect(callback.mock.calls).toMatchSnapshot("callback call");
   });
+
+  test("it calls the callback synchronously if the node already exists", () => {
+    djedi.addNodes(simpleNodeResponse("test", "test"));
+    let called = false;
+    djedi.getBatched({ uri: "test", value: "default" }, node => {
+      expect(node).toMatchSnapshot();
+      called = true;
+    });
+    expect(called).toBe(true);
+  });
 });
 
 describe("reportRemovedNode", () => {
@@ -112,3 +122,6 @@ describe("reportRemovedNode", () => {
     }).not.toThrow();
   });
 });
+
+// `addNodes` is tested together with `get` and `getBatched`.
+// `resetNodes` and `resetOptions` are run in `beforeEach`.

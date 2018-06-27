@@ -52,6 +52,13 @@ Object {
 }
 `;
 
+exports[`getBatched it calls the callback synchronously if the node already exists 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt",
+  "value": "test",
+}
+`;
+
 exports[`getBatched it uses no timeout if batchInterval=0: api call 1`] = `
 Array [
   Array [
