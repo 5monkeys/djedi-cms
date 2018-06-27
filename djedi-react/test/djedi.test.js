@@ -123,5 +123,64 @@ describe("reportRemovedNode", () => {
   });
 });
 
+describe("options.uri", () => {
+  test("it works", async () => {
+    djedi.options.uri = {
+      defaults: {
+        scheme: "scheme",
+        namespace: "namespace",
+        path: "",
+        ext: "ext",
+        version: "version",
+      },
+      namespaceByScheme: {
+        scheme2: "namespace2",
+      },
+      separators: {
+        scheme: "<SCHEME>",
+        namespace: "<NAMESPACE>",
+        path: "<PATH>",
+        ext: "<EXT>",
+        version: "<VERSION>",
+      },
+    };
+
+    djedi.addNodes({
+      test: "text1",
+      "test<EXT>md": "text2",
+      "scheme2<SCHEME>test": "text3",
+      "scheme2<SCHEME>namespace3<NAMESPACE>home<PATH>test<EXT>html<VERSION>5":
+        "text4",
+    });
+
+    const callback = jest.fn();
+
+    djedi.getBatched({ uri: "test", value: undefined }, callback);
+    djedi.getBatched({ uri: "test<EXT>ext", value: undefined }, callback);
+
+    djedi.getBatched({ uri: "test<EXT>md", value: undefined }, callback);
+    djedi.getBatched(
+      { uri: "scheme<SCHEME>test<EXT>md", value: undefined },
+      callback
+    );
+
+    djedi.getBatched(
+      { uri: "scheme2<SCHEME>test", value: undefined },
+      callback
+    );
+
+    djedi.getBatched(
+      {
+        uri:
+          "scheme2<SCHEME>namespace3<NAMESPACE>home<PATH>test<EXT>html<VERSION>5",
+        value: undefined,
+      },
+      callback
+    );
+
+    expect(callback.mock.calls).toMatchSnapshot("callback calls");
+  });
+});
+
 // `addNodes` is tested together with `get` and `getBatched`.
 // `resetNodes` and `resetOptions` are run in `beforeEach`.

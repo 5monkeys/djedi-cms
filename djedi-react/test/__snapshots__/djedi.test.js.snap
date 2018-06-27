@@ -153,3 +153,44 @@ Array [
   ],
 ]
 `;
+
+exports[`options.uri it works: callback calls 1`] = `
+Array [
+  Array [
+    Object {
+      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>ext<VERSION>version",
+      "value": "text1",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>ext<VERSION>version",
+      "value": "text1",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>md<VERSION>version",
+      "value": "text2",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>md<VERSION>version",
+      "value": "text2",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "scheme2<SCHEME>namespace2<NAMESPACE>test<EXT>ext<VERSION>version",
+      "value": "text3",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "scheme2<SCHEME>namespace3<NAMESPACE>home<PATH>test<EXT>html<VERSION>5",
+      "value": "text4",
+    },
+  ],
+]
+`;
