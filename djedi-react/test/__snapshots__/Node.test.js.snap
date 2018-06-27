@@ -46,6 +46,14 @@ Array [
 ]
 `;
 
+exports[`it renders synchronously if the node is already in cache: browser 1`] = `
+<span
+  data-i18n="en-us@home/intro"
+>
+  Welcome to our amazing website!
+</span>
+`;
+
 exports[`it renders synchronously if the node is already in cache: loadByPrefix result 1`] = `
 Object {
   "i18n://en-us@home/intro.txt": "Welcome to our amazing website!",

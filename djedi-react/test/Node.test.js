@@ -28,4 +28,16 @@ test("it renders synchronously if the node is already in cache", async () => {
     <Node uri="home/intro">Hello, World!</Node>
   );
   expect(component.toJSON()).toMatchSnapshot("with value");
+
+  // Imagine the above being done on the server (server-side rendering). Now,
+  // simulate sending everything down to the browser. This means the `djedi`
+  // instance in the browser has an empty cache, but we can send down `nodes` to
+  // the browser and let the frontend add those before rendering.
+  resetAll();
+  djedi.addNodes(nodes);
+  const component2 = renderer.create(
+    <Node uri="home/intro">Hello, World!</Node>
+  );
+  expect(component2.toJSON()).toMatchSnapshot("browser");
+  expect(fetch.mockFn).toHaveBeenCalledTimes(0);
 });
