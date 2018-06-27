@@ -161,6 +161,13 @@ describe("reportRenderedNode and reportRemovedNode", () => {
   });
 });
 
+describe("element", () => {
+  test("it works", () => {
+    expect(djedi.element("test")).toMatchSnapshot();
+    expect(djedi.element("i18n://sv-se@home/intro.md#5")).toMatchSnapshot();
+  });
+});
+
 describe("options.uri", () => {
   test("it works", async () => {
     djedi.options.uri = {

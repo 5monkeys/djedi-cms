@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`element it works 1`] = `
+Object {
+  "attributes": Object {
+    "data-i18n": "en-us@test",
+  },
+  "tag": "span",
+}
+`;
+
+exports[`element it works 2`] = `
+Object {
+  "attributes": Object {
+    "data-i18n": "sv-se@home/intro",
+  },
+  "tag": "span",
+}
+`;
+
 exports[`get it calls the callback synchronously if the node already exists 1`] = `
 Object {
   "uri": "i18n://en-us@test.txt",
