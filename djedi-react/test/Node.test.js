@@ -124,10 +124,10 @@ test("it allows changing the default/children if also changing the uri", async (
   const component = renderer.create(<Wrapper />);
   const instance = component.getInstance();
   await wait();
-  expect(component.toJSON()).toMatchSnapshot("first render");
+  expect(component.toJSON()).toMatchSnapshot("render");
   instance.setState({ uri: "second", defaultValue: "second" });
   await wait();
-  expect(component.toJSON()).toMatchSnapshot("second render");
+  expect(component.toJSON()).toMatchSnapshot("render");
   await wait();
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
 });
@@ -419,13 +419,13 @@ test("it handles window.DJEDI_NODES", async () => {
 
   await wait();
 
-  expect(window.DJEDI_NODES).toMatchSnapshot("first render");
+  expect(window.DJEDI_NODES).toMatchSnapshot("render");
   instance.setState({ remove: true, changingUri: "changing2" });
-  expect(window.DJEDI_NODES).toMatchSnapshot("second render");
+  expect(window.DJEDI_NODES).toMatchSnapshot("render");
   instance.setState({ changingUri: "changing3" });
-  expect(window.DJEDI_NODES).toMatchSnapshot("third render");
+  expect(window.DJEDI_NODES).toMatchSnapshot("render");
   component.unmount();
-  expect(window.DJEDI_NODES).toMatchSnapshot("after unmount");
+  expect(window.DJEDI_NODES).toMatchSnapshot("unmounted");
 });
 
 test("it warns about rendering nodes with different defaults", async () => {

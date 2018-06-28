@@ -325,7 +325,7 @@ Array [
 ]
 `;
 
-exports[`it allows changing the default/children if also changing the uri: first render 1`] = `
+exports[`it allows changing the default/children if also changing the uri: render 1`] = `
 <span
   data-i18n="en-us@first"
 >
@@ -333,7 +333,7 @@ exports[`it allows changing the default/children if also changing the uri: first
 </span>
 `;
 
-exports[`it allows changing the default/children if also changing the uri: second render 1`] = `
+exports[`it allows changing the default/children if also changing the uri: render 2`] = `
 <span
   data-i18n="en-us@second"
 >
@@ -394,11 +394,9 @@ exports[`it handles missing nodes in response: missing 1`] = `"Failed to fetch c
 
 exports[`it handles rejected requests: error 1`] = `"Failed to fetch content 😞 (-1)"`;
 
-exports[`it handles window.DJEDI_NODES: after unmount 1`] = `Object {}`;
-
 exports[`it handles window.DJEDI_NODES: before render 1`] = `Object {}`;
 
-exports[`it handles window.DJEDI_NODES: first render 1`] = `
+exports[`it handles window.DJEDI_NODES: render 1`] = `
 Object {
   "i18n://en-us@changing1.txt": undefined,
   "i18n://en-us@loneRemoved.txt": "loneRemoved",
@@ -406,7 +404,7 @@ Object {
 }
 `;
 
-exports[`it handles window.DJEDI_NODES: second render 1`] = `
+exports[`it handles window.DJEDI_NODES: render 2`] = `
 Object {
   "i18n://en-us@changing1.txt": undefined,
   "i18n://en-us@changing2.txt": undefined,
@@ -414,13 +412,15 @@ Object {
 }
 `;
 
-exports[`it handles window.DJEDI_NODES: third render 1`] = `
+exports[`it handles window.DJEDI_NODES: render 3`] = `
 Object {
   "i18n://en-us@changing1.txt": undefined,
   "i18n://en-us@changing3.txt": undefined,
   "i18n://en-us@removed.txt": undefined,
 }
 `;
+
+exports[`it handles window.DJEDI_NODES: unmounted 1`] = `Object {}`;
 
 exports[`it renders loading and then the node: api call 1`] = `
 Array [
