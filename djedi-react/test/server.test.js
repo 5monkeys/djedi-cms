@@ -27,7 +27,7 @@ test("it renders loading and then the node", async () => {
     )
   );
   const component = renderer.create(
-    <Node uri="test" url="http://example.com/">{md`
+    <Node uri="test" url="https://example.com/">{md`
       # Heading
 
       And a [link]({url}).

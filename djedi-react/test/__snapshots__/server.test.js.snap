@@ -26,7 +26,7 @@ exports[`it renders loading and then the node: with value 1`] = `
   dangerouslySetInnerHTML={
     Object {
       "__html": "<h1>Heading</h1>
-<p>And a <a href=\\"http://example.com/\\">link</a>.</p>",
+<p>And a <a href=\\"https://example.com/\\">link</a>.</p>",
     }
   }
   data-i18n="en-us@test"

@@ -168,7 +168,7 @@ test("it handles missing nodes in response", async () => {
 
 test("it treats node values as HTML", async () => {
   fetch({
-    ...simpleNodeResponse("first", 'A <a href="http://example.com">link</a>.'),
+    ...simpleNodeResponse("first", 'A <a href="https://example.com">link</a>.'),
     ...simpleNodeResponse("second", "A &amp; B"),
   });
   const component = renderer.create(
@@ -218,7 +218,7 @@ test("using the md tag", async () => {
     <Node uri="test">{md`
       # A heading
 
-      Some text with a [link](http://example.com)
+      Some text with a [link](https://example.com)
 
       > Blockquote
 

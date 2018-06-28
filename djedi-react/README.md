@@ -45,7 +45,7 @@ function Home() {
       </h1>
 
       {/* Markdown node with variable interpolation. */}
-      <Node uri="home/text.md" url="http://example.com">{md`
+      <Node uri="home/text.md" url="https://example.com">{md`
         ## Using markdown
 
         Some text and a [link]({url}).
@@ -580,11 +580,11 @@ Directories:
 
 [BSD-3-Clause](LICENSE)
 
-[babel]: http://babeljs.io/
-[djedi cms]: http://djedi-cms.org/
+[babel]: https://babeljs.io/
+[djedi cms]: https://djedi-cms.org/
 [docker]: https://www.docker.com/community-edition
 [eslint]: https://eslint.org/
-[jest]: http://jestjs.io/
+[jest]: https://jestjs.io/
 [next.js]: https://nextjs.org/
 [node.js]: https://nodejs.org/en/
 [npm]: https://www.npmjs.com/

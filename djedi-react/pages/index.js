@@ -37,7 +37,7 @@ export default class Home extends React.Component {
       "i18n://en-us@home/text.md":
         '<h2>Using markdown</h2><p>Some text and a <a href="{url}">link</a>.</p>',
       "i18n://en-us@home/image.img":
-        '<img src="http://djedi-cms.org/_static/djedi-portrait.svg" width="144">',
+        '<img src="https://djedi-cms.org/_static/djedi-portrait.svg" width="144">',
       "i18n://en-us@home/footer.txt": "© [year]. This node is not editable.",
       "i18n://en-us@Search/placeholder.txt": "Search",
     };
@@ -63,7 +63,7 @@ export default class Home extends React.Component {
         </h1>
 
         {/* Markdown node with variable interpolation. */}
-        <Node uri="home/text.md" url="http://example.com">{md`
+        <Node uri="home/text.md" url="https://example.com">{md`
           ## Using markdown
 
           Some text and a [link]({url}).

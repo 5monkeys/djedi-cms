@@ -497,7 +497,7 @@ exports[`it treats node values as HTML: with value 1`] = `
   <span
     dangerouslySetInnerHTML={
       Object {
-        "__html": "A <a href=\\"http://example.com\\">link</a>.",
+        "__html": "A <a href=\\"https://example.com\\">link</a>.",
       }
     }
     data-i18n="en-us@first"
@@ -679,7 +679,7 @@ Array [
       "body": Object {
         "i18n://en-us@test.txt": "# A heading
 
-Some text with a [link](http://example.com)
+Some text with a [link](https://example.com)
 
 > Blockquote
 

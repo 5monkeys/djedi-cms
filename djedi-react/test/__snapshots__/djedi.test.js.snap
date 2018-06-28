@@ -75,7 +75,7 @@ Error: Network error",
 exports[`get it respects options.baseUrl: api call 1`] = `
 Array [
   Array [
-    "http://example.com/interal/djedi/load_many",
+    "https://example.com/interal/djedi/load_many",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "default",
@@ -159,7 +159,7 @@ Error: Network error",
 exports[`getBatched it respects options.baseUrl: api call 1`] = `
 Array [
   Array [
-    "http://example.com/interal/djedi/load_many",
+    "https://example.com/interal/djedi/load_many",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "default",
@@ -308,7 +308,7 @@ Error: Network error",
 exports[`loadByPrefix it respects options.baseUrl: api call 1`] = `
 Array [
   Array [
-    "http://example.com/interal/djedi/load_by_prefix",
+    "https://example.com/interal/djedi/load_by_prefix",
     Object {
       "body": Array [
         "test/",
@@ -400,7 +400,7 @@ Error: Network error",
 exports[`loadMany it respects options.baseUrl: api call 1`] = `
 Array [
   Array [
-    "http://example.com/interal/djedi/load_many",
+    "https://example.com/interal/djedi/load_many",
     Object {
       "body": Object {
         "test": "default",
