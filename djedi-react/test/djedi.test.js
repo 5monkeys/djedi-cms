@@ -19,41 +19,12 @@ beforeEach(() => {
   console.error.mockClear();
 });
 
+// `addNodes` is tested together with `get` and `getBatched`.
+// `resetNodes` and `resetOptions` are run in `beforeEach`.
+
 describe("get", () => {
   test("it works", done => {
     fetch(simpleNodeResponse("test", "test"));
-    djedi.get({ uri: "test", value: "default" }, node => {
-      expect(node).toMatchSnapshot();
-      done();
-    });
-  });
-
-  test("it handles error status codes", done => {
-    fetch("<h1>Server error 500</h1>", { status: 500, stringify: false });
-    djedi.get({ uri: "test", value: "default" }, node => {
-      expect(node).toMatchSnapshot();
-      done();
-    });
-  });
-
-  test("it handles rejected requests", done => {
-    fetch(new Error("Network error"));
-    djedi.get({ uri: "test", value: "default" }, node => {
-      expect(node).toMatchSnapshot();
-      done();
-    });
-  });
-
-  test("it handles missing node in response", done => {
-    fetch({});
-    djedi.get({ uri: "test", value: "default" }, node => {
-      expect(node).toMatchSnapshot();
-      done();
-    });
-  });
-
-  test("it handles invalid JSON", done => {
-    fetch('{ "invalid": true', { status: 200, stringify: false });
     djedi.get({ uri: "test", value: "default" }, node => {
       expect(node).toMatchSnapshot();
       done();
@@ -70,14 +41,16 @@ describe("get", () => {
     expect(called).toBe(true);
   });
 
-  test("it respects options.baseUrl", async () => {
+  test("it handles missing node in response", done => {
     fetch({});
-    djedi.options.baseUrl = "http://example.com/interal";
-    const callback = jest.fn();
+    djedi.get({ uri: "test", value: "default" }, node => {
+      expect(node).toMatchSnapshot();
+      done();
+    });
+  });
+
+  networkTests(callback => {
     djedi.get({ uri: "test", value: "default" }, callback);
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
-    await wait();
-    expect(callback).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -227,5 +200,38 @@ describe("options.uri", () => {
   });
 });
 
-// `addNodes` is tested together with `get` and `getBatched`.
-// `resetNodes` and `resetOptions` are run in `beforeEach`.
+function networkTests(fn) {
+  test("it handles error status codes", done => {
+    fetch("<h1>Server error 500</h1>", { status: 500, stringify: false });
+    fn(result => {
+      expect(result).toMatchSnapshot();
+      done();
+    });
+  });
+
+  test("it handles rejected requests", done => {
+    fetch(new Error("Network error"));
+    fn(result => {
+      expect(result).toMatchSnapshot();
+      done();
+    });
+  });
+
+  test("it handles invalid JSON", done => {
+    fetch('{ "invalid": true', { status: 200, stringify: false });
+    fn(result => {
+      expect(result).toMatchSnapshot();
+      done();
+    });
+  });
+
+  test("it respects options.baseUrl", async () => {
+    fetch({});
+    djedi.options.baseUrl = "http://example.com/interal";
+    const callback = jest.fn();
+    fn(callback);
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+    await wait();
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+}
