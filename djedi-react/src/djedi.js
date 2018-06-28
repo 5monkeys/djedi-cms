@@ -300,12 +300,7 @@ export class Djedi {
         },
         error => Promise.reject({ response: undefined, error })
       )
-      .catch(arg => {
-        // istanbul ignore next
-        const response = arg && arg.response;
-        // istanbul ignore next
-        const error = (arg && arg.error) || new Error(`Bad error: ${arg}`);
-
+      .catch(({ response, error }) => {
         error.message = createUpdatedErrorMessage(error, info, response);
         error.status = response == null ? -1 : response.status;
 
