@@ -56,18 +56,22 @@ export default class Home extends React.Component {
         <Head>
           <title>djedi-react example</title>
         </Head>
+
         <h1>
           {/* Simple node. */}
           <Node uri="home/title">Welcome!</Node>
         </h1>
+
         {/* Markdown node with variable interpolation. */}
         <Node uri="home/text.md" url="http://example.com">{md`
           ## Using markdown
 
           Some text and a [link]({url}).
         `}</Node>
+
         {/* Image node. */}
         <Node uri="home/image.img" />
+
         <footer>
           <p>
             {/* Alternate interpolation syntax for convenience. */}
@@ -79,6 +83,7 @@ export default class Home extends React.Component {
           {/* This component shows how to use a node in an HTML attribute. */}
           <Search />
         </footer>
+
         {/* The nodes for this component were not pre-loaded, to show that stuff
         doesn’t break if you forget to. In this case, server-side rendering
         "Loading…" instead of a cookie warning is acceptable. */}
