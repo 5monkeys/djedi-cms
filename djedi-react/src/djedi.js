@@ -47,6 +47,25 @@ export class Djedi {
     }
   }
 
+  resetOptions() {
+    this.options = makeDefaultOptions();
+  }
+
+  resetNodes() {
+    if (this._batch.timeoutId != null) {
+      clearTimeout(this._batch.timeoutId);
+    }
+
+    this._nodes = new Map();
+    this._renderedNodes = new Map();
+    this._batch = makeEmptyBatch();
+    this._DJEDI_NODES = {};
+
+    if (typeof window !== "undefined") {
+      window.DJEDI_NODES = this._DJEDI_NODES;
+    }
+  }
+
   get(passedNode, callback) {
     const node = this._normalizeNode(passedNode);
     const { uri } = node;
@@ -175,25 +194,6 @@ export class Djedi {
     if (previous.numInstances <= 0) {
       this._renderedNodes.delete(uri);
       delete this._DJEDI_NODES[this._djediNodesUri(uri)];
-    }
-  }
-
-  resetOptions() {
-    this.options = makeDefaultOptions();
-  }
-
-  resetNodes() {
-    if (this._batch.timeoutId != null) {
-      clearTimeout(this._batch.timeoutId);
-    }
-
-    this._nodes = new Map();
-    this._renderedNodes = new Map();
-    this._batch = makeEmptyBatch();
-    this._DJEDI_NODES = {};
-
-    if (typeof window !== "undefined") {
-      window.DJEDI_NODES = this._DJEDI_NODES;
     }
   }
 
