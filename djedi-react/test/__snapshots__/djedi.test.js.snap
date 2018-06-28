@@ -222,6 +222,94 @@ Array [
 ]
 `;
 
+exports[`loadByPrefix it handles error status codes 1`] = `
+[Error: Djedi API error for request: POST /djedi/load_by_prefix
+RequestData sent: [
+  "test/"
+]
+Response: 500 <mock.statusText>
+Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.]
+`;
+
+exports[`loadByPrefix it handles invalid JSON 1`] = `
+[SyntaxError: Djedi API error for request: POST /djedi/load_by_prefix
+RequestData sent: [
+  "test/"
+]
+Response: 200 <mock.statusText>
+SyntaxError: Unexpected end of JSON input]
+`;
+
+exports[`loadByPrefix it handles rejected requests 1`] = `
+[Error: Djedi API error for request: POST /djedi/load_by_prefix
+RequestData sent: [
+  "test/"
+]
+Response: undefined
+Error: Network error]
+`;
+
+exports[`loadByPrefix it respects options.baseUrl: api call 1`] = `
+Array [
+  Array [
+    "http://example.com/interal/djedi/load_by_prefix",
+    Object {
+      "body": Array [
+        "test/",
+      ],
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`loadMany it handles error status codes 1`] = `
+[Error: Djedi API error for request: POST /djedi/load_many
+RequestData sent: {
+  "test": "default"
+}
+Response: 500 <mock.statusText>
+Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.]
+`;
+
+exports[`loadMany it handles invalid JSON 1`] = `
+[SyntaxError: Djedi API error for request: POST /djedi/load_many
+RequestData sent: {
+  "test": "default"
+}
+Response: 200 <mock.statusText>
+SyntaxError: Unexpected end of JSON input]
+`;
+
+exports[`loadMany it handles rejected requests 1`] = `
+[Error: Djedi API error for request: POST /djedi/load_many
+RequestData sent: {
+  "test": "default"
+}
+Response: undefined
+Error: Network error]
+`;
+
+exports[`loadMany it respects options.baseUrl: api call 1`] = `
+Array [
+  Array [
+    "http://example.com/interal/djedi/load_many",
+    Object {
+      "body": Object {
+        "test": "default",
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
 exports[`options.uri it works: callback calls 1`] = `
 Array [
   Array [

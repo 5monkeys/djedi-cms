@@ -107,6 +107,18 @@ describe("getBatched", () => {
   });
 });
 
+describe("loadMany", () => {
+  networkTests(callback => {
+    djedi.loadMany({ test: "default" }).then(callback, callback);
+  });
+});
+
+describe("loadByPrefix", () => {
+  networkTests(callback => {
+    djedi.loadByPrefix(["test/"]).then(callback, callback);
+  });
+});
+
 describe("reportRenderedNode and reportRemovedNode", () => {
   test("they work", () => {
     expect(window.DJEDI_NODES).toMatchSnapshot();
