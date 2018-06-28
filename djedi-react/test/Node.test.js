@@ -79,38 +79,47 @@ test("it warns when passing a non-string as default/children", async () => {
 test("it fetches again after changing the uri prop (but not other props)", async () => {
   fetch(simpleNodeResponse("first", "first"));
   fetch(simpleNodeResponse("second", "second"));
+
   const Wrapper = withState(({ uri = "first", edit = true }) => (
     <Node uri={uri} edit={edit} />
   ));
   const component = renderer.create(<Wrapper />);
   const instance = component.getInstance();
+
   await wait();
   expect(component.toJSON()).toMatchSnapshot("first render");
+
   instance.setState({ uri: "second" });
   await wait();
   expect(component.toJSON()).toMatchSnapshot("second render");
+
   instance.setState({ edit: false });
   expect(component.toJSON()).toMatchSnapshot(
     "third render (same uri, no edit)"
   );
+
   await wait();
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
 });
 
 test("it warns if changing the default/children", async () => {
   fetch(simpleNodeResponse("test", "test value"));
+
   const Wrapper = withState(({ defaultValue = "first" }) => (
     <Node uri="test">{defaultValue}</Node>
   ));
   const component = renderer.create(<Wrapper />);
   const instance = component.getInstance();
+
   await wait();
   expect(component.toJSON()).toMatchSnapshot("first render");
+
   instance.setState({ defaultValue: "second" });
   expect(console.error.mock.calls).toMatchSnapshot("console.error");
   expect(component.toJSON()).toMatchSnapshot(
     "second render (same as first render)"
   );
+
   await wait();
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
 });
@@ -118,16 +127,20 @@ test("it warns if changing the default/children", async () => {
 test("it allows changing the default/children if also changing the uri", async () => {
   fetch(simpleNodeResponse("first", "first"));
   fetch(simpleNodeResponse("second", "second"));
+
   const Wrapper = withState(({ uri = "first", defaultValue = "first" }) => (
     <Node uri={uri}>{defaultValue}</Node>
   ));
   const component = renderer.create(<Wrapper />);
   const instance = component.getInstance();
+
   await wait();
   expect(component.toJSON()).toMatchSnapshot("render");
+
   instance.setState({ uri: "second", defaultValue: "second" });
   await wait();
   expect(component.toJSON()).toMatchSnapshot("render");
+
   await wait();
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
 });
@@ -307,6 +320,7 @@ test("interpolations: rendering values", async () => {
       `
     )
   );
+
   const unusualKwargs = {
     "a/b": "slash",
     "a b": "ignored",
@@ -316,6 +330,7 @@ test("interpolations: rendering values", async () => {
     "a]b": "ignored",
     "": "ignored",
   };
+
   const component = renderer.create(
     <Node
       uri="test"
@@ -331,6 +346,7 @@ test("interpolations: rendering values", async () => {
       Default value
     </Node>
   );
+
   await wait();
   expect(component.toJSON()).toMatchSnapshot("rendered");
 });
@@ -418,19 +434,20 @@ test("it handles window.DJEDI_NODES", async () => {
   const instance = component.getInstance();
 
   await wait();
-
   expect(window.DJEDI_NODES).toMatchSnapshot("render");
+
   instance.setState({ remove: true, changingUri: "changing2" });
   expect(window.DJEDI_NODES).toMatchSnapshot("render");
+
   instance.setState({ changingUri: "changing3" });
   expect(window.DJEDI_NODES).toMatchSnapshot("render");
+
   component.unmount();
   expect(window.DJEDI_NODES).toMatchSnapshot("unmounted");
 });
 
 test("it warns about rendering nodes with different defaults", async () => {
   fetch(simpleNodeResponse("test", "test"));
-
   renderer.create(
     <div>
       <Node uri="test">default</Node>
@@ -438,7 +455,6 @@ test("it warns about rendering nodes with different defaults", async () => {
       <Node uri="i18n://test.txt" />
     </div>
   );
-
   expect(console.warn.mock.calls).toMatchSnapshot("console.warn");
   expect(window.DJEDI_NODES).toMatchSnapshot("window.DJEDI_NODES");
   await wait();
@@ -467,14 +483,15 @@ test("batching", async () => {
       {level >= 3 && <Node uri="3" />}
     </div>
   ));
-
   const component = renderer.create(<Wrapper />);
   const instance = component.getInstance();
 
   jest.advanceTimersByTime(10);
   instance.setState({ level: 1 });
+
   jest.advanceTimersByTime(10);
   instance.setState({ level: 2 });
+
   jest.advanceTimersByTime(10);
   instance.setState({ level: 3 });
 

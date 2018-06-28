@@ -69,10 +69,13 @@ describe("getBatched", () => {
 
     djedi.getBatched({ uri: "1", value: undefined }, callback);
     djedi.getBatched({ uri: "1.txt", value: undefined }, callback);
+
     jest.advanceTimersByTime(10);
     djedi.getBatched({ uri: "en-us@1", value: undefined }, callback);
+
     jest.advanceTimersByTime(10);
     djedi.getBatched({ uri: "2", value: undefined }, callback);
+
     jest.advanceTimersByTime(10);
     djedi.getBatched({ uri: "3", value: undefined }, callback);
 
@@ -164,14 +167,18 @@ describe("loadByPrefix", () => {
 describe("reportRenderedNode and reportRemovedNode", () => {
   test("they work", () => {
     expect(window.DJEDI_NODES).toMatchSnapshot();
+
     djedi.reportRenderedNode({ uri: "first", value: "first" });
     djedi.reportRenderedNode({ uri: "first", value: "first" });
     djedi.reportRenderedNode({ uri: "second", value: "second" });
     expect(window.DJEDI_NODES).toMatchSnapshot();
+
     djedi.reportRemovedNode("first");
     expect(window.DJEDI_NODES).toMatchSnapshot();
+
     djedi.reportRemovedNode("first");
     expect(window.DJEDI_NODES).toMatchSnapshot();
+
     djedi.reportRemovedNode("second");
     expect(window.DJEDI_NODES).toMatchSnapshot();
   });
@@ -180,7 +187,6 @@ describe("reportRenderedNode and reportRemovedNode", () => {
     djedi.reportRenderedNode({ uri: "test", value: "default" });
     djedi.reportRenderedNode({ uri: "en-us@test", value: "other default" });
     djedi.reportRenderedNode({ uri: "i18n://test.txt", value: undefined });
-
     expect(console.warn.mock.calls).toMatchSnapshot("console.warn");
     expect(window.DJEDI_NODES).toMatchSnapshot("window.DJEDI_NODES");
   });
