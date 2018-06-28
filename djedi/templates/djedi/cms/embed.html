@@ -1,4 +1,6 @@
+{% if not exclude_json_nodes %}
 <script>window.DJEDI_NODES = {{ json_nodes|safe }};</script>
+{% endif %}
 <style type="text/css">
 #djedi-cms{position:fixed;top:0;right:-400px;width:400px;height:100%;border:0;z-index:30000}#djedi-cms.fullscreen{width:100%}
 #djedi-cms.closed{opacity:.5}
