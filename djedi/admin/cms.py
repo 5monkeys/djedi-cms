@@ -36,3 +36,12 @@ class DjediCMS(DjediContextMixin, View):
             return render(request, 'djedi/cms/cms.html', self.get_context_data())
         else:
             raise PermissionDenied
+
+
+class Embed(View):
+
+    def get(self, request):
+        if has_permission(request):
+            return render(request, 'djedi/cms/embed.html', {'exclude_json_nodes': True})
+        else:
+            raise PermissionDenied
