@@ -10,6 +10,8 @@
 npm install djedi-react react react-dom
 ```
 
+Requires djedi-cms version TODO or later.
+
 ## Browser support
 
 All the latest browsers plus Internet Explorer 11 (which requires a `Promise`
