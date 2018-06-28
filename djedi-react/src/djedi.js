@@ -39,7 +39,6 @@ export class Djedi {
     this._batch = makeEmptyBatch();
     this._DJEDI_NODES = {};
 
-    // istanbul ignore next
     if (typeof window !== "undefined") {
       if (window.DJEDI_NODES == null) {
         window.DJEDI_NODES = {};
@@ -193,7 +192,6 @@ export class Djedi {
     this._batch = makeEmptyBatch();
     this._DJEDI_NODES = {};
 
-    // istanbul ignore next
     if (typeof window !== "undefined") {
       window.DJEDI_NODES = this._DJEDI_NODES;
     }
@@ -284,7 +282,10 @@ export class Djedi {
       // stringified.
       body:
         // istanbul ignore next
-        window.expect ? JSON.parse(JSON.stringify(data)) : JSON.stringify(data),
+        // eslint-disable-next-line no-undef
+        typeof process !== "undefined" && process.env.NODE_ENV === "test"
+          ? JSON.parse(JSON.stringify(data))
+          : JSON.stringify(data),
     })
       .then(
         response => {

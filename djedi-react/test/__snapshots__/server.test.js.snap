@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`it renders loading and then the node: api call 1`] = `
+Array [
+  Array [
+    "http://internal:3210/djedi/load_many",
+    Object {
+      "body": Object {
+        "i18n://en-us@test.txt": "# Heading
+
+And a [link]({url}).",
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`it renders loading and then the node: loading 1`] = `"Loading…"`;
+
+exports[`it renders loading and then the node: with value 1`] = `
+<span
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "<h1>Heading</h1>
+<p>And a <a href=\\"http://example.com/\\">link</a>.</p>",
+    }
+  }
+  data-i18n="en-us@test"
+/>
+`;

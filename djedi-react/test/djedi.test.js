@@ -183,6 +183,18 @@ describe("reportRenderedNode and reportRemovedNode", () => {
     expect(window.DJEDI_NODES).toMatchSnapshot();
   });
 
+  test("they handle an already present window.DJEDI_NODES", () => {
+    window.DJEDI_NODES = simpleNodeResponse("already", "existing");
+    expect(window.DJEDI_NODES).toMatchSnapshot();
+
+    djedi.constructor();
+    djedi.reportRenderedNode({ uri: "test", value: "test" });
+    expect(window.DJEDI_NODES).toMatchSnapshot();
+
+    djedi.reportRemovedNode("test");
+    expect(window.DJEDI_NODES).toMatchSnapshot();
+  });
+
   test("reportRenderedNode warns about rendering nodes with different defaults", () => {
     djedi.reportRenderedNode({ uri: "test", value: "default" });
     djedi.reportRenderedNode({ uri: "en-us@test", value: "other default" });

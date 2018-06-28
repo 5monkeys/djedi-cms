@@ -519,6 +519,25 @@ Object {
 }
 `;
 
+exports[`reportRenderedNode and reportRemovedNode they handle an already present window.DJEDI_NODES 1`] = `
+Object {
+  "i18n://en-us@already.txt": "existing",
+}
+`;
+
+exports[`reportRenderedNode and reportRemovedNode they handle an already present window.DJEDI_NODES 2`] = `
+Object {
+  "i18n://en-us@already.txt": "existing",
+  "i18n://en-us@test.txt": "test",
+}
+`;
+
+exports[`reportRenderedNode and reportRemovedNode they handle an already present window.DJEDI_NODES 3`] = `
+Object {
+  "i18n://en-us@already.txt": "existing",
+}
+`;
+
 exports[`reportRenderedNode and reportRemovedNode they work 1`] = `Object {}`;
 
 exports[`reportRenderedNode and reportRemovedNode they work 2`] = `
