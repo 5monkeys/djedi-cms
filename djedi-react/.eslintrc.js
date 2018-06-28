@@ -36,6 +36,11 @@ module.exports = {
             message:
               "async functions and generators are not allowed, because it requires a big runtime in older browsers, which we don’t want to force on all package consumers. Use `.then()` instead.",
           },
+          {
+            selector: "ForOfStatement",
+            message:
+              "for-of loops are not allowed, because they are harder to get working cheaply for non-arrays in older browsers. Use `.forEach()` or similar instead.",
+          },
         ],
       },
     },

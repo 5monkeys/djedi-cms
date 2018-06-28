@@ -250,20 +250,20 @@ export class Djedi {
 
     this.loadMany(nodes).then(
       results => {
-        for (const [uri, data] of queue) {
+        queue.forEach((data, uri) => {
           const value = results[uri];
           const node = value == null ? missingUriError(uri) : { uri, value };
-          for (const callback of data.callbacks) {
+          data.callbacks.forEach(callback => {
             callback(node);
-          }
-        }
+          });
+        });
       },
       error => {
-        for (const [, data] of queue) {
-          for (const callback of data.callbacks) {
+        queue.forEach(data => {
+          data.callbacks.forEach(callback => {
             callback(error);
-          }
-        }
+          });
+        });
       }
     );
   }
@@ -299,7 +299,16 @@ export class Djedi {
             error: createStatusCodeError(response),
           });
         },
-        error => Promise.reject({ response: undefined, error })
+        passedError => {
+          // In IE11 the error can be a `ProgressEvent` (I guess it’s due to how
+          // the `unfetch` “polyfill” is implemented). Make sure to always
+          // return `Error`s so `foo instanceof Error` checks can be used.
+          const error =
+            passedError instanceof Error
+              ? passedError
+              : new Error("fetch error");
+          return Promise.reject({ response: undefined, error });
+        }
       )
       .catch(({ response, error }) => {
         error.message = createUpdatedErrorMessage(error, info, response);
