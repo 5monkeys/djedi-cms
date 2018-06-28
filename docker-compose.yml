@@ -13,8 +13,10 @@ services:
 
   node:
     build: ./djedi-react
-    stdin_open: true
+    image: djedi-react
     tty: true
+    ports:
+      - "3000:3000"
     volumes:
       - ./djedi-react/:/code
       - /code/node_modules

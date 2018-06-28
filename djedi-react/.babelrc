@@ -1,6 +1,6 @@
 {
   "presets": [
-    ["@babel/env", { "loose": false }],
+    ["@babel/env", { "loose": true }],
     "@babel/react"
   ]
 }

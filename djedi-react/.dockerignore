@@ -1,0 +1,15 @@
+*.log
+*.md
+*cache
+.dockerignore
+.git/
+.gitignore
+.next/
+.stuff/
+.travis.yml
+Dockerfile
+dist/
+docker-compose.yml
+node_modules/
+out/
+static/

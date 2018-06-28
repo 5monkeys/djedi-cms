@@ -18,8 +18,9 @@ Not yet.
 
 You can either install [Node.js] 10 (with npm 6) or use [docker].
 
-* `npm start`: Start [Jest] in watch mode.
-  You can also run `npm run jest -- --watch`.
+* `npm start`: Start the [Next.js] example dev server.
+* `npm run watch`: Start [Jest] in watch mode.
+  Outside docker you can use `npm run jest -- --watch` instead.
 * `npm run lint`: Run [ESLint] \(including [Prettier]).
 * `npm run lint:fix`: Autofix [ESLint] errors.
 * `npm run jest`: Run unit tests.
@@ -31,13 +32,26 @@ You can either install [Node.js] 10 (with npm 6) or use [docker].
 For docker:
 
 ```bash
+# Build:
+docker-compse build
+
+# Start containers:
 docker-compose up -d
-docker attach --detach-keys="ctrl-d" "$(docker-compose ps -q node)"
-# Now press `a`.
-# Press ctrl-d to exit.
-# To run some npm script:
+
+# Run some npm script:
 docker-compose exec node npm test
+
+# Run Jest in watch mode:
+docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/node_modules djedi-react run watch
 ```
+
+Directories:
+
+* `src/`: Source code.
+* `test/` and `__mocks__/`: Tests and mocks.
+* `dist/`: Compiled code, built by `npm run build`. This is what’s published in
+  the npm package.
+* `pages/` and `components/`: [Next.js] example app.
 
 [babel]: http://babeljs.io/
 [djedi cms]: http://djedi-cms.org/

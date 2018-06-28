@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+RUN npm run build
+
 ENV PATH /code/node_modules/.bin:$PATH
 ENTRYPOINT ["npm"]
 CMD ["start"]

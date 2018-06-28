@@ -2,4 +2,6 @@
 !/**/.eslintrc.js
 coverage
 dist
+node_modules
+.next
 *.snap
