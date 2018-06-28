@@ -11,7 +11,7 @@ const propTypes = {
   children: PropTypes.string, // Yes, a *string*!
   edit: PropTypes.bool,
   render: PropTypes.func,
-  // ...kwargs: {[key: string]: string}.
+  // ...variables: {[string]: string}.
 };
 
 const defaultProps = {
@@ -101,8 +101,8 @@ export default class Node extends React.Component {
       // since `djedi.options` may change.
       render = djedi.options.defaultRender,
       // Make sure to destructure all props above (even ones unused in this
-      // method) so that `kwargs` only contains non-props.
-      ...kwargs
+      // method) so that `variables` only contains non-props.
+      ...variables
     } = this.props;
     const { node } = this.state;
 
@@ -114,7 +114,7 @@ export default class Node extends React.Component {
       return render({ type: "error", error: node });
     }
 
-    const value = interpolate(node.value || "", kwargs);
+    const value = interpolate(node.value || "", variables);
     const element = djedi.element(node.uri);
 
     // This is mostly to make the test snapshots easier to read. Might be faster
@@ -149,10 +149,10 @@ const INTERPOLATION_REGEX = RegExp(`\\{${INNER}\\}|\\[${INNER}\\]`, "g");
 
 /*
 This intentionally only supports `{key}`, not any of the fancy Python string
-formatting extras. If `key` maps to a string in `kwargs`, that string is
+formatting extras. If `key` maps to a string in `variables`, that string is
 inserted. Otherwise it is kept as-is. No escaping, no nothing. KISS and
 YAGNI. If somebody does want fancy extras, they can do it themselves before
-putting the value in `kwargs`.
+putting the value in `variables`.
 
 Also support `[key]`, since `{foo}` is already used in JSX syntax:
 
@@ -161,11 +161,11 @@ Also support `[key]`, since `{foo}` is already used in JSX syntax:
     <Node uri="test">Hello, [user]!</Node>
     <Node uri="test">{`Hello, {user}!`}</Node>
 */
-function interpolate(string, kwargs) {
+function interpolate(string, variables) {
   return string.replace(INTERPOLATION_REGEX, match => {
     const key = match.slice(1, -1);
-    return Object.prototype.hasOwnProperty.call(kwargs, key)
-      ? kwargs[key]
+    return Object.prototype.hasOwnProperty.call(variables, key)
+      ? variables[key]
       : match;
   });
 }
