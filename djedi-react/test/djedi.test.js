@@ -101,6 +101,10 @@ describe("getBatched", () => {
     });
     expect(called).toBe(true);
   });
+
+  networkTests(callback => {
+    djedi.getBatched({ uri: "test", value: "default" }, callback);
+  });
 });
 
 describe("reportRenderedNode and reportRemovedNode", () => {
@@ -201,28 +205,31 @@ describe("options.uri", () => {
 });
 
 function networkTests(fn) {
-  test("it handles error status codes", done => {
+  test("it handles error status codes", async done => {
     fetch("<h1>Server error 500</h1>", { status: 500, stringify: false });
     fn(result => {
       expect(result).toMatchSnapshot();
       done();
     });
+    await wait();
   });
 
-  test("it handles rejected requests", done => {
+  test("it handles rejected requests", async done => {
     fetch(new Error("Network error"));
     fn(result => {
       expect(result).toMatchSnapshot();
       done();
     });
+    await wait();
   });
 
-  test("it handles invalid JSON", done => {
+  test("it handles invalid JSON", async done => {
     fetch('{ "invalid": true', { status: 200, stringify: false });
     fn(result => {
       expect(result).toMatchSnapshot();
       done();
     });
+    await wait();
   });
 
   test("it respects options.baseUrl", async () => {
@@ -230,8 +237,8 @@ function networkTests(fn) {
     djedi.options.baseUrl = "http://example.com/interal";
     const callback = jest.fn();
     fn(callback);
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
     await wait();
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
     expect(callback).toHaveBeenCalledTimes(1);
   });
 }

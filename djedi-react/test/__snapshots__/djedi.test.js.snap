@@ -85,6 +85,50 @@ Object {
 }
 `;
 
+exports[`getBatched it handles error status codes 1`] = `
+[Error: Djedi API error for request: POST /djedi/load_many
+RequestData sent: {
+  "i18n://en-us@test.txt": "default"
+}
+Response: 500 <mock.statusText>
+Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.]
+`;
+
+exports[`getBatched it handles invalid JSON 1`] = `
+[SyntaxError: Djedi API error for request: POST /djedi/load_many
+RequestData sent: {
+  "i18n://en-us@test.txt": "default"
+}
+Response: 200 <mock.statusText>
+SyntaxError: Unexpected end of JSON input]
+`;
+
+exports[`getBatched it handles rejected requests 1`] = `
+[Error: Djedi API error for request: POST /djedi/load_many
+RequestData sent: {
+  "i18n://en-us@test.txt": "default"
+}
+Response: undefined
+Error: Network error]
+`;
+
+exports[`getBatched it respects options.baseUrl: api call 1`] = `
+Array [
+  Array [
+    "http://example.com/interal/djedi/load_many",
+    Object {
+      "body": Object {
+        "i18n://en-us@test.txt": "default",
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
 exports[`getBatched it uses no timeout if batchInterval=0: api call 1`] = `
 Array [
   Array [
