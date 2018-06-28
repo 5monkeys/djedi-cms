@@ -322,6 +322,42 @@ Array [
 ]
 `;
 
+exports[`loadByPrefix it works: addNodes call 1`] = `
+Array [
+  Array [
+    Object {
+      "i18n://en-us@other.txt": "other",
+      "i18n://en-us@test.txt": "test",
+    },
+  ],
+]
+`;
+
+exports[`loadByPrefix it works: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_by_prefix",
+    Object {
+      "body": Array [
+        "test",
+        "other",
+      ],
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`loadByPrefix it works: nodes 1`] = `
+Object {
+  "i18n://en-us@other.txt": "other",
+  "i18n://en-us@test.txt": "test",
+}
+`;
+
 exports[`loadMany it handles error status codes 1`] = `
 Object {
   "message": "Djedi API error for request: POST /djedi/load_many
