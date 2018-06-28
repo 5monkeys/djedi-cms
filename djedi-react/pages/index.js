@@ -1,16 +1,15 @@
-import { Node, djedi, md } from "djedi-react";
+import {
+  Node,
+  // djedi,
+  md,
+} from "djedi-react";
 import Head from "next/head";
-import PropTypes from "prop-types";
 import React from "react";
 
 import CookieWarning from "../components/CookieWarning";
 import Search from "../components/Search";
 
 export default class Home extends React.Component {
-  static propTypes = {
-    nodes: PropTypes.object.isRequired,
-  };
-
   static async getInitialProps() {
     // Simply rendering <Node>s automatically causes request for the node
     // contents, but for server-side rendering it is required to pre-load them.
@@ -46,13 +45,9 @@ export default class Home extends React.Component {
     // Next.js will save the stuff returned here when server-side rendering and
     // pass it to the browser. This way the browser won’t have to make a request
     // for the nodes again (which also would cause “server and client did not
-    // match” warnings from React)
+    // match” warnings from React). You need to call `djedi.addNodes(nodes)`; in
+    // this example that is done in _app.js.
     return { nodes };
-  }
-
-  constructor(props) {
-    super(props);
-    djedi.addNodes(props.nodes);
   }
 
   render() {
