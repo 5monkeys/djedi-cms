@@ -129,6 +129,20 @@ SyntaxError: Unexpected end of JSON input",
 }
 `;
 
+exports[`getBatched it handles missing node in response 1`] = `
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "test",
+    },
+  ],
+  Array [
+    [Error: Missing result for node: i18n://en-us@missing.txt],
+  ],
+]
+`;
+
 exports[`getBatched it handles rejected requests 1`] = `
 Object {
   "message": "Djedi API error for request: POST /djedi/load_many

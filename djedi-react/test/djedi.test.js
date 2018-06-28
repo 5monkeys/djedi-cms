@@ -103,6 +103,15 @@ describe("getBatched", () => {
     expect(called).toBe(true);
   });
 
+  test("it handles missing node in response", async () => {
+    fetch(simpleNodeResponse("test", "test"));
+    const callback = jest.fn();
+    djedi.getBatched({ uri: "test", value: "default" }, callback);
+    djedi.getBatched({ uri: "missing", value: "default" }, callback);
+    await wait();
+    expect(callback.mock.calls).toMatchSnapshot();
+  });
+
   networkTests(callback => {
     djedi.getBatched({ uri: "test", value: "default" }, callback);
   });
