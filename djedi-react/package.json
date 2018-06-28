@@ -17,7 +17,7 @@
     "react"
   ],
   "scripts": {
-    "start": "jest --watch",
+    "start": "jest --watchAll",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "jest": "jest",

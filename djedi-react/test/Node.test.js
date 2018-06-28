@@ -285,8 +285,6 @@ test("interpolations: rendering values", async () => {
         Number: [pi]
         Formatted number: {pi2}
         Formatted number: [pi2]
-        Date: {date}
-        Date: [date]
         hasOwnProperty: {hasOwnProperty}
         hasOwnProperty: [hasOwnProperty]
         undefined: {undefined}
@@ -337,7 +335,6 @@ test("interpolations: rendering values", async () => {
       name="Bob"
       pi={Math.PI}
       pi2={Math.PI.toFixed(2)}
-      date={new Date("2018-06-27")}
       hasOwnProperty="Asking for trouble"
       undefined={undefined}
       null={null}

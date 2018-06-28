@@ -10,3 +10,11 @@ services:
       - "8000:8000"
     volumes:
       - .:/djedi-cms
+
+  node:
+    build: ./djedi-react
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./djedi-react/:/code
+      - /code/node_modules
