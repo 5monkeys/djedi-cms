@@ -378,6 +378,43 @@ Array [
 ]
 `;
 
+exports[`loadMany it works: addNodes call 1`] = `
+Array [
+  Array [
+    Object {
+      "i18n://en-us@other.txt": "other",
+      "i18n://en-us@test.txt": "test",
+    },
+  ],
+]
+`;
+
+exports[`loadMany it works: api call 1`] = `
+Array [
+  Array [
+    "/djedi/load_many",
+    Object {
+      "body": Object {
+        "other": "default",
+        "test": null,
+        "test.txt": null,
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`loadMany it works: nodes 1`] = `
+Object {
+  "i18n://en-us@other.txt": "other",
+  "i18n://en-us@test.txt": "test",
+}
+`;
+
 exports[`options.uri it works: callback calls 1`] = `
 Array [
   Array [

@@ -118,6 +118,24 @@ describe("getBatched", () => {
 });
 
 describe("loadMany", () => {
+  test("it works", async () => {
+    fetch({
+      ...simpleNodeResponse("test", "test"),
+      ...simpleNodeResponse("other", "other"),
+    });
+    const spy = jest.spyOn(djedi, "addNodes");
+    const nodes = await djedi.loadMany({
+      test: undefined,
+      "test.txt": undefined,
+      other: "default",
+    });
+    expect(nodes).toMatchSnapshot("nodes");
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+    expect(spy.mock.calls).toMatchSnapshot("addNodes call");
+    spy.mockReset();
+    spy.mockRestore();
+  });
+
   networkTests(callback => {
     djedi.loadMany({ test: "default" }).then(callback, callback);
   });
