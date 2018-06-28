@@ -9,20 +9,8 @@ import unfetch from "isomorphic-unfetch";
 import { applyUriDefaults, parseUri, stringifyUri } from "./uri";
 
 /*
-This class fetches and caches nodes, and keeps `window.DJEDI_NODES` up-todate.
-
-Central interface:
-
-    type Node = {
-      // Input nodes: Possibly non-absolute URI.
-      // Output nodes: Absolute, normalized URI.
-      uri: string,
-      // Input nodes: The default value, if any.
-      // Output nodes: The final value, if any. The final value can be the
-      // default value, or a new value entered by the user. In both cases the
-      // backend might have rendered the value (such as markdown -> HTML).
-      value: string | undefined,
-    }
+This class fetches and caches nodes, provides global options, and keeps
+`window.DJEDI_NODES` up-to-date. See the docs for more information.
 
 The admin sidebar expects the following mapping of all rendered nodes on the page:
 

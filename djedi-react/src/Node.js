@@ -11,7 +11,7 @@ const propTypes = {
   children: PropTypes.string, // Yes, a *string*!
   edit: PropTypes.bool,
   render: PropTypes.func,
-  // ...variables: {[string]: string}.
+  // ...variables: {[string]: any}.
 };
 
 const defaultProps = {
@@ -131,7 +131,7 @@ export default class Node extends React.Component {
         <element.tag {...element.attributes}>{value}</element.tag>
       )
     ) : (
-      // WARNING: It’s not possible to render HTML without a wrapper element in
+      // NOTE: It’s not possible to render HTML without a wrapper element in
       // React. So you can’t do `edit={false}` and expect the node value to be
       // treated as HTML.
       value
