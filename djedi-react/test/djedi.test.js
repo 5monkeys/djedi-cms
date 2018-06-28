@@ -1,6 +1,7 @@
 import { djedi } from "../src";
 
 import {
+  errorDetails,
   fetch,
   resetAll,
   simpleNodeResponse,
@@ -44,7 +45,7 @@ describe("get", () => {
   test("it handles missing node in response", done => {
     fetch({});
     djedi.get({ uri: "test", value: "default" }, node => {
-      expect(node).toMatchSnapshot();
+      expect(errorDetails(node)).toMatchSnapshot();
       done();
     });
   });
@@ -220,7 +221,7 @@ function networkTests(fn) {
   test("it handles error status codes", async done => {
     fetch("<h1>Server error 500</h1>", { status: 500, stringify: false });
     fn(result => {
-      expect(result).toMatchSnapshot();
+      expect(errorDetails(result)).toMatchSnapshot();
       done();
     });
     await wait();
@@ -229,7 +230,7 @@ function networkTests(fn) {
   test("it handles rejected requests", async done => {
     fetch(new Error("Network error"));
     fn(result => {
-      expect(result).toMatchSnapshot();
+      expect(errorDetails(result)).toMatchSnapshot();
       done();
     });
     await wait();
@@ -238,7 +239,7 @@ function networkTests(fn) {
   test("it handles invalid JSON", async done => {
     fetch('{ "invalid": true', { status: 200, stringify: false });
     fn(result => {
-      expect(result).toMatchSnapshot();
+      expect(errorDetails(result)).toMatchSnapshot();
       done();
     });
     await wait();

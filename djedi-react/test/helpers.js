@@ -94,3 +94,11 @@ export function withState(render) {
     }
   };
 }
+
+export function errorDetails(error) {
+  return {
+    message: error.message,
+    status: error.status,
+    responseText: error.responseText,
+  };
+}

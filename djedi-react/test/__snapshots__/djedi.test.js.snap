@@ -26,32 +26,50 @@ Object {
 `;
 
 exports[`get it handles error status codes 1`] = `
-[Error: Djedi API error for request: POST /djedi/load_many
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "i18n://en-us@test.txt": "default"
+  \\"i18n://en-us@test.txt\\": \\"default\\"
 }
 Response: 500 <mock.statusText>
-Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.]
+Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.",
+  "responseText": "<h1>Server error 500</h1>",
+  "status": 500,
+}
 `;
 
 exports[`get it handles invalid JSON 1`] = `
-[SyntaxError: Djedi API error for request: POST /djedi/load_many
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "i18n://en-us@test.txt": "default"
+  \\"i18n://en-us@test.txt\\": \\"default\\"
 }
 Response: 200 <mock.statusText>
-SyntaxError: Unexpected end of JSON input]
+SyntaxError: Unexpected end of JSON input",
+  "responseText": "{ \\"invalid\\": true",
+  "status": 200,
+}
 `;
 
-exports[`get it handles missing node in response 1`] = `[Error: Missing result for node: i18n://en-us@test.txt]`;
+exports[`get it handles missing node in response 1`] = `
+Object {
+  "message": "Missing result for node: i18n://en-us@test.txt",
+  "responseText": undefined,
+  "status": 1404,
+}
+`;
 
 exports[`get it handles rejected requests 1`] = `
-[Error: Djedi API error for request: POST /djedi/load_many
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "i18n://en-us@test.txt": "default"
+  \\"i18n://en-us@test.txt\\": \\"default\\"
 }
 Response: undefined
-Error: Network error]
+Error: Network error",
+  "responseText": "",
+  "status": -1,
+}
 `;
 
 exports[`get it respects options.baseUrl: api call 1`] = `
@@ -86,30 +104,42 @@ Object {
 `;
 
 exports[`getBatched it handles error status codes 1`] = `
-[Error: Djedi API error for request: POST /djedi/load_many
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "i18n://en-us@test.txt": "default"
+  \\"i18n://en-us@test.txt\\": \\"default\\"
 }
 Response: 500 <mock.statusText>
-Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.]
+Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.",
+  "responseText": "<h1>Server error 500</h1>",
+  "status": 500,
+}
 `;
 
 exports[`getBatched it handles invalid JSON 1`] = `
-[SyntaxError: Djedi API error for request: POST /djedi/load_many
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "i18n://en-us@test.txt": "default"
+  \\"i18n://en-us@test.txt\\": \\"default\\"
 }
 Response: 200 <mock.statusText>
-SyntaxError: Unexpected end of JSON input]
+SyntaxError: Unexpected end of JSON input",
+  "responseText": "{ \\"invalid\\": true",
+  "status": 200,
+}
 `;
 
 exports[`getBatched it handles rejected requests 1`] = `
-[Error: Djedi API error for request: POST /djedi/load_many
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "i18n://en-us@test.txt": "default"
+  \\"i18n://en-us@test.txt\\": \\"default\\"
 }
 Response: undefined
-Error: Network error]
+Error: Network error",
+  "responseText": "",
+  "status": -1,
+}
 `;
 
 exports[`getBatched it respects options.baseUrl: api call 1`] = `
@@ -223,30 +253,42 @@ Array [
 `;
 
 exports[`loadByPrefix it handles error status codes 1`] = `
-[Error: Djedi API error for request: POST /djedi/load_by_prefix
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_by_prefix
 RequestData sent: [
-  "test/"
+  \\"test/\\"
 ]
 Response: 500 <mock.statusText>
-Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.]
+Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.",
+  "responseText": "<h1>Server error 500</h1>",
+  "status": 500,
+}
 `;
 
 exports[`loadByPrefix it handles invalid JSON 1`] = `
-[SyntaxError: Djedi API error for request: POST /djedi/load_by_prefix
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_by_prefix
 RequestData sent: [
-  "test/"
+  \\"test/\\"
 ]
 Response: 200 <mock.statusText>
-SyntaxError: Unexpected end of JSON input]
+SyntaxError: Unexpected end of JSON input",
+  "responseText": "{ \\"invalid\\": true",
+  "status": 200,
+}
 `;
 
 exports[`loadByPrefix it handles rejected requests 1`] = `
-[Error: Djedi API error for request: POST /djedi/load_by_prefix
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_by_prefix
 RequestData sent: [
-  "test/"
+  \\"test/\\"
 ]
 Response: undefined
-Error: Network error]
+Error: Network error",
+  "responseText": "",
+  "status": -1,
+}
 `;
 
 exports[`loadByPrefix it respects options.baseUrl: api call 1`] = `
@@ -267,30 +309,42 @@ Array [
 `;
 
 exports[`loadMany it handles error status codes 1`] = `
-[Error: Djedi API error for request: POST /djedi/load_many
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "test": "default"
+  \\"test\\": \\"default\\"
 }
 Response: 500 <mock.statusText>
-Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.]
+Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.",
+  "responseText": "<h1>Server error 500</h1>",
+  "status": 500,
+}
 `;
 
 exports[`loadMany it handles invalid JSON 1`] = `
-[SyntaxError: Djedi API error for request: POST /djedi/load_many
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "test": "default"
+  \\"test\\": \\"default\\"
 }
 Response: 200 <mock.statusText>
-SyntaxError: Unexpected end of JSON input]
+SyntaxError: Unexpected end of JSON input",
+  "responseText": "{ \\"invalid\\": true",
+  "status": 200,
+}
 `;
 
 exports[`loadMany it handles rejected requests 1`] = `
-[Error: Djedi API error for request: POST /djedi/load_many
+Object {
+  "message": "Djedi API error for request: POST /djedi/load_many
 RequestData sent: {
-  "test": "default"
+  \\"test\\": \\"default\\"
 }
 Response: undefined
-Error: Network error]
+Error: Network error",
+  "responseText": "",
+  "status": -1,
+}
 `;
 
 exports[`loadMany it respects options.baseUrl: api call 1`] = `

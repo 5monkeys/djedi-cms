@@ -5,6 +5,7 @@ import renderer from "react-test-renderer";
 import { Node, djedi, md } from "../src";
 
 import {
+  errorDetails,
   fetch,
   resetAll,
   simpleNodeResponse,
@@ -347,17 +348,7 @@ test("custom render function", async () => {
   function render2(state) {
     switch (state.type) {
       case "error":
-        return (
-          <div
-            data-details={{
-              message: state.error.message,
-              status: state.error.status,
-              responseText: state.error.responseText,
-            }}
-          >
-            Error
-          </div>
-        );
+        return <div data-details={errorDetails(state.error)}>Error</div>;
       case "success":
         return <article>{state.content}</article>;
       case "loading":
