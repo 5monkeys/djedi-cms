@@ -138,7 +138,7 @@ fetched at most once per `djedi.options.batchInterval` ms.
 | [uri](#uri)                | `string`            | **required**                                  |
 | [children](#children)      | `string`            | `undefined`                                   |
 | [edit](#edit)              | `boolean`           | `true`                                        |
-| [render](#render)          | `function`          | [djedi.options.defaultRender](#defaultRender) |
+| [render](#render)          | `function`          | [djedi.options.defaultRender](#defaultrender) |
 | [...variables](#variables) | `{ [string]: any }` | `{}`                                          |
 
 ##### `uri`
@@ -228,12 +228,12 @@ do that in React.
 
 ##### `render`
 
-`function` Default: [djedi.options.defaultRender](#defaultRender)
+`function` Default: [djedi.options.defaultRender](#defaultrender)
 
 The function receives one argument (the current state) and must return a React
 node (in other words, anything that you can return from a React component).
 
-See [djedi.options.defaultRender](#defaultRender) for how to implement this
+See [djedi.options.defaultRender](#defaultrender) for how to implement this
 function.
 
 See the [Search](components/Search.js) example component for a use case for this
@@ -287,7 +287,7 @@ toplevel keys:
 
 * [baseUrl](#baseUrl)
 * [batchInterval](#batchInterval)
-* [defaultRender](#defaultRender)
+* [defaultRender](#defaultrender)
 * [uri](#uri)
 
 ##### `baseUrl`
@@ -310,13 +310,13 @@ milliseconds are batched together into a single request. This is to cut down on
 the number of requests made to the backend, and to allow the backend to do more
 efficient batch database lookups.
 
-Behind the scenes, `<Node>` uses [djedi.getBatched](#djedi-getbatchedTODO), so
+Behind the scenes, `<Node>` uses [djedi.getBatched](#djedigetbatchednode-node-callback-node--error--void-void), so
 technically speaking this option only configures that method, not `<Node>` by
 itself.
 
 Setting `batchInterval: 0` disables batching altogeher, making
-[djedi.getBatched](#djedi-getbatchedTODO) behave just like
-[djedi.get](#djedi-getTODO).
+[djedi.getBatched](#djedigetbatchednode-node-callback-node--error--void-void) behave just like
+[djedi.get](#djedigetnode-node-callback-node--error--void-void).
 
 ##### `defaultRender`
 
@@ -584,7 +584,7 @@ Directories:
 [djedi cms]: http://djedi-cms.org/
 [docker]: https://www.docker.com/community-edition
 [eslint]: https://eslint.org/
-[jest]: https://facebook.github.io/
+[jest]: http://jestjs.io/
 [next.js]: https://nextjs.org/
 [node.js]: https://nodejs.org/en/
 [npm]: https://www.npmjs.com/
