@@ -291,6 +291,7 @@ export class Djedi {
           // In IE11 the error can be a `ProgressEvent` (I guess it’s due to how
           // the `unfetch` “polyfill” is implemented). Make sure to always
           // return `Error`s so `foo instanceof Error` checks can be used.
+          // istanbul ignore next
           const error =
             passedError instanceof Error
               ? passedError
