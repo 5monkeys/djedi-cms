@@ -29,7 +29,7 @@
   "dependencies": {
     "dedent": "^0.7.0",
     "isomorphic-unfetch": "^2.0.0",
-    "prop-types": "15.6.2"
+    "prop-types": "^15.5.7"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0-beta.51",
