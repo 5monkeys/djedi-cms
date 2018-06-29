@@ -14,9 +14,9 @@ export default class Home extends React.Component {
     // Simply rendering <Node>s automatically causes request for the node
     // contents, but for server-side rendering it is required to pre-load them.
     // (That can also be useful for non-server rendered cases to avoid excessive
-    // "Loading…"/spinners to be displayed.)
+    // loading indicators to be displayed.)
     // You are encouraged to prefix all nodes so that pre-loading becomes easy.
-    // This is a low-tech way to solve server-side rendering good enough.
+    // This is a low-tech way to solve the problem in a good-enough manner.
     /*
     const nodes = await djedi.loadByPrefix([
       // Load all nodes used by this page.
@@ -45,8 +45,8 @@ export default class Home extends React.Component {
     // Next.js will save the stuff returned here when server-side rendering and
     // pass it to the browser. This way the browser won’t have to make a request
     // for the nodes again (which also would cause “server and client did not
-    // match” warnings from React). You need to call `djedi.addNodes(nodes)`; in
-    // this example that is done in _app.js.
+    // match” warnings from React). You need to call `djedi.addNodes(nodes)`
+    // somewhere. In this example that is done in _app.js.
     return { nodes };
   }
 

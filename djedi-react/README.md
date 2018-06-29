@@ -26,13 +26,13 @@ possible. In Django world there are two tags, `node` and `blocknode`:
 {% node 'page/title.txt' default='Djedi' %}
 
 {% blocknode 'page/body.md' %}
-    ## I'm a djedi apprentice
+    ## I’m a djedi apprentice
     This is fun!
 {% endblocknode %}
 ```
 
 In React world, there’s no need for two tags. (`blocknode` can do everything
-that `node` can do. `node` is just a shortcut for simple nodes.) So
+that `node` can do – `node` is just a shortcut for simple nodes.) So
 `djedi-react` only has `<Node>`, which closely mimics `blocknode`.
 
 ```js
@@ -68,10 +68,11 @@ function Home() {
   );
 }
 
-// For server-side rendering (Next.js example).
+// Optional: For server-side rendering (Next.js example).
 Page.getInitialProps = async () => {
   const nodes = await djedi.loadByPrefix(["home/"]);
   return { nodes };
+  // (You also need to call `djedi.addNodes(nodes)` somewhere.)
 };
 ```
 
@@ -91,7 +92,7 @@ server-side rendering solution exploits this fact.
 
 The idea is to call `await djedi.loadByPrefix(["home/"])` before rendering. That
 will fetch all nodes starting with `home/` and put them in the cache. Then, when
-rendering, they’ll all be available to render straight away.
+rendering, they’ll all be available straight away.
 
 This is a low-tech way to solve the problem in a good-enough manner.
 
@@ -110,9 +111,9 @@ the browser (during the initial render).
 import { Node, djedi, md } from "djedi-react";
 ```
 
-* [Node](#node)
-* [djedi](#djedi)
-* [md](#md)
+- [Node](#node)
+- [djedi](#djedi)
+- [md](#md)
 
 ### `Node`
 
@@ -124,14 +125,14 @@ This is the main part of the library.
 </Node>
 ```
 
-When rendered, it automatically makes a request to fetch the node content. To
-avoid excessive requests batching and caching are used.
+When rendered, it automatically makes a request to fetch the node content.
+Batching and caching are used to avoid excessive requests.
 
 If the node already exists in the cache, it is immediately rendered. Otherwise,
 `setTimeout` is used to make a request in a couple of milliseconds (see
 [djedi.options.batchInterval](#batchinterval)). Requests for other nodes
 rendered during that time are batched together. In other words, nodes will be
-fetched at most once per `djedi.options.batchInterval` ms.
+fetched at most once per `djedi.options.batchInterval` milliseconds.
 
 #### Props
 
@@ -188,15 +189,18 @@ Escaping also works, but might not be very readable:
 <!-- prettier-ignore -->
 ```js
 <Node uri="uri">
-  This is &lt;em&gt;not&lt;/em&gt; OK!
+  This &lt;em&gt;is&lt;/em&gt; OK!
 </Node>
 ```
 
-Finally, the default value is dedented, so that you can format it nicely without worrying about extraneous whitespace.
+Finally, the default value is dedented, so that you can format it nicely without
+worrying about extraneous whitespace.
 
 ```js
 <Node uri="uri">{md`
   Some text.
+
+  Some more text.
 
       function some(code) {
         return code;
@@ -207,6 +211,8 @@ Finally, the default value is dedented, so that you can format it nicely without
 
 <Node uri="uri">{md`Some text.
 
+Some more text.
+
     function some(code) {
       return code;
     }`}</Node>
@@ -216,15 +222,16 @@ Finally, the default value is dedented, so that you can format it nicely without
 
 `boolean` Default: `true`
 
-Whether or not the node should be editable in the admin sidebar. Editable nodes
-are wrapped in a `<span>` while non-editable nodes are rendered without any
-enclosing tag.
+Whether or not the node should be auto-updated after editing it in the admin
+sidebar. Editable nodes are wrapped in a `<span>` while non-editable nodes are
+rendered without any enclosing tag. (The name “edit” might be a bit confusing,
+but it is inherited from the Djano template tags.)
 
 **Note:** It’s not possible to render HTML without a wrapper element in React.
 So you can’t do `edit={false}` and expect the node value to be treated as HTML.
 
 A common use-case for using `{% node 'uri' edit=False %}` in Django templates is
-to put a node somewhere where you can't use HTML, such in a `placeholder`
+to put a node somewhere where you can’t use HTML, such in a `placeholder`
 attribute. See the [Search](components/Search.js) example component for how to
 do that in React.
 
@@ -239,7 +246,7 @@ See [djedi.options.defaultRender](#defaultrender) for how to implement this
 function.
 
 See the [Search](components/Search.js) example component for a use case for this
-prop. You probably won't need this most of the time.
+prop. You probably won’t need this most of the time.
 
 ##### `...variables`
 
@@ -274,23 +281,33 @@ escaping or using strings. For example:
 `}</Node>
 ```
 
+`{name}` and `[name]` chunks that you did not pass any value for are left as-is.
+
 ### `djedi`
 
 The `djedi` object is not React specific and lets you:
 
-* Configure options.
-* Load nodes manually, mostly for server-side rendering.
-* Make integrations with other frameworks than React.
+- Configure options.
+- Load nodes manually, mostly for server-side rendering.
+- Make integrations with other frameworks than React.
+
+This could be extracted into its own package if other framework integrations are
+made in the future.
 
 #### Options
 
-You can configure djedi-react by mutating `djedi.options`. It has the following
-toplevel keys:
+You can configure djedi-react by mutating `djedi.options`.
 
-* [baseUrl](#baseUrl)
-* [batchInterval](#batchInterval)
-* [defaultRender](#defaultrender)
-* [uri](#uri)
+```js
+djedi.options.baseUrl = "/cms";
+```
+
+These are the toplevel keys:
+
+- [baseUrl](#baseUrl)
+- [batchInterval](#batchInterval)
+- [defaultRender](#defaultrender)
+- [uri](#uri)
 
 ##### `baseUrl`
 
@@ -301,7 +318,7 @@ The base URL to make requests to. By default, requests go to for example
 requests would go to `https://api.example.com/internal/djedi/load_many` instead.
 
 You probably want to set the `baseUrl` conditionally based on whether the code
-runs on the server (an internal network URL) on in the browser (a public URL).
+runs on the server (an internal network URL) or in the browser (a public URL).
 
 ##### `batchInterval`
 
@@ -312,12 +329,14 @@ milliseconds are batched together into a single request. This is to cut down on
 the number of requests made to the backend, and to allow the backend to do more
 efficient batch database lookups.
 
-Behind the scenes, `<Node>` uses [djedi.getBatched](#djedigetbatchednode-node-callback-node--error--void-void), so
-technically speaking this option only configures that method, not `<Node>` by
+Behind the scenes, `<Node>` uses
+[djedi.getBatched](#djedigetbatchednode-node-callback-node--error--void-void),
+so technically speaking this option only configures that method, not `<Node>` by
 itself.
 
 Setting `batchInterval: 0` disables batching altogeher, making
-[djedi.getBatched](#djedigetbatchednode-node-callback-node--error--void-void) behave just like
+[djedi.getBatched](#djedigetbatchednode-node-callback-node--error--void-void)
+behave just like
 [djedi.get](#djedigetnode-node-callback-node--error--void-void).
 
 ##### `defaultRender`
@@ -333,7 +352,7 @@ the node content failed) or `success` (if fetching the node content succeeded).
 If a node was already in the cache, the `loading` state is skipped, going
 straight to `success`.
 
-The function receives the current state and decides what to render. Here's the
+The function receives the current state and decides what to render. Here’s the
 default implementation:
 
 ```js
@@ -353,22 +372,22 @@ state => {
 
 These are the possible states:
 
-* `{ type: "loading" }`: The node is loading.
+- `{ type: "loading" }`: The node is loading.
 
-* `{ type: "error", error: Error }`: Fetching the node failed. The `error`
+- `{ type: "error", error: Error }`: Fetching the node failed. The `error`
   property contains an `Error` instance with the following extra properties:
 
-  * `status`: number. The status code of the response. If there was no response,
-    it's `-1`. If the response didn't contain the requested node, it's `1404`.
-  * `responseText`: string. The response as text if available, otherwise the
+  - `status`: number. The status code of the response. If there was no response,
+    it’s `-1`. If the response didn’t contain the requested node, it’s `1404`.
+  - `responseText`: string. The response as text if available, otherwise the
     empty string.
 
-* `{ type: "success", content: string | React.Node }`: Fetching the node
+- `{ type: "success", content: string | React.Node }`: Fetching the node
   succeeded. The `content` property is a string containing the fetched value if
   `edit=false` and a React node (a `<span>`) otherwise.
 
-You can use this option to translate the default "Loading" and "Error" messages
-to another language, or perhaps render a spinner instead of "Loading" (maybe
+You can use this option to translate the default “Loading” and “Error” messages
+to another language, or perhaps render a spinner instead of “Loading…” (maybe
 even after a small timeout).
 
 ##### `uri`
@@ -376,7 +395,7 @@ even after a small timeout).
 `object` Default: See below.
 
 The backend allows customizing defaults and separators for the node URIs. If you
-do, you need to make the same customizations in djedi-react.
+do that, you need to make the same customizations in djedi-react.
 
 This is the default value:
 
@@ -427,18 +446,27 @@ URI→value mapping).
 
 When `Node` or `Nodes` is used as _input:_
 
-* `uri` may be partial URI, such as `home/title`.
-* `value` is the default value, if any.
+- `uri` may be a partial URI, such as `home/title`.
+- `value` is the default value, if any.
 
 When `Node` or `Nodes` is used as _output:_
 
-* `uri` is an absolute URI, such as `i18n://en-us@home/title.txt`.
-* `value` is the final value, and supposed to always exist.
+- `uri` is an absolute URI, such as `i18n://en-us@home/title.txt`.
+- `value` is the final value, and supposed to always exist. The final value can
+  be the default value, or a value entered by the user in the admin sidebar. It
+  can also be transformed (such as markdown→HTML).
 
 ##### `djedi.loadByPrefix(prefixes: Array<string>): Promise<Nodes>`
 
-Returns all nodes that match the given prefixes, such as `["home/", "en-us@about/"]`. Useful for server-side rendering, or for avoiding excessive
-loading indicators.
+Returns all nodes that match the given prefixes, such as
+`["home/", "en-us@about/"]`. It also automatically adds the nodes to the cache.
+Useful for server-side rendering, and for avoiding excessive loading indicators.
+
+By calling this before rendering, node contents will be available straight away.
+No loading indicators. No re-renders.
+
+This assumes that you’ve structured your nodes in a logical way so that you can
+catch most of the ones you need with simple prefixes.
 
 ##### `djedi.addNodes(nodes: Nodes): void`
 
@@ -453,14 +481,17 @@ the `<Node>` component). (Don’t forget that you also can use the
 
 ##### `djedi.get(node: Node, callback: (Node | Error) => void): void`
 
-Fetch a single node. This takes a callback instead of a `Promise`, so the callback can be invoked synchronously if the node already exists in cache (`Promise`s are always asynchronous). This is crucial for server-side rendering support.
+Fetch a single node. This takes a callback instead of a `Promise`, so the
+callback can be invoked synchronously if the node already exists in cache
+(`Promise`s are always asynchronous). This is crucial for server-side rendering
+support.
 
 Note that the callback is called with either a `Node` or an `Error`. You can use
 `node instanceof Error` as a check.
 
 ##### `djedi.getBatched(node: Node, callback: (Node | Error) => void): void`
 
-Like `djedi.get`, but doesn't make a network request straight away, batching up
+Like `djedi.get`, but doesn’t make a network request straight away, batching up
 with other `djedi.getBatched` requests made during
 [djedi.options.batchInterval](#batchinterval)).
 
@@ -488,7 +519,9 @@ up-to-date.
 
 ##### `djedi.element(uri: string): object`
 
-Returns an object containing the tag name and attributes for the wrapping element of an editable node. It is then up to the rendering implementation to use this information in some way.
+Returns an object containing the tag name and attributes for the wrapping
+element of an editable node. It is then up to the rendering implementation to
+use this information in some way.
 
 ```js
 ({
@@ -501,7 +534,7 @@ Returns an object containing the tag name and attributes for the wrapping elemen
 
 #### Other methods
 
-Might be useful for unit tests, but otherwise you'll probably won't need these.
+Might be useful for unit tests, but otherwise you’ll probably won’t need these.
 
 ##### `djedi.resetOptions(): void`
 
@@ -513,10 +546,11 @@ Resets the nodes cache.
 
 ### `md`
 
-This is a template literal tag. It's meant to be used for the `children` of `<Node>` in some cases:
+This is a template literal tag. It’s meant to be used for the `children` of
+`<Node>` in some cases:
 
-* When your default text contains characters that are annoying to escape in JSX.
-* When your default is markdown.
+- When your default text contains characters that are annoying to escape in JSX.
+- When your default is markdown.
 
 ```js
 <Node uri="home/text.md">{md`
@@ -531,11 +565,11 @@ This is a template literal tag. It's meant to be used for the `children` of `<No
 Now, what does the tag actually do? Not much to be honest. The above example
 works exactly the same without the `md` tag. But there are some benefits:
 
-* The `md` tag warns you if you use interpolation (`${variable}`) in the
-  template literal. That's an anti-pattern, since it won't work if the user
+- The `md` tag warns you if you use interpolation (`${variable}`) in the
+  template literal. That’s an anti-pattern, since it won’t work if the user
   edits the node. Use [variables](#variables) instead.
 
-* If you use [Prettier], it will automatically format the contents of the
+- If you use [Prettier], it will automatically format the contents of the
   template literal as markdown, which is very convenient. This is useful even if
   the value is plain text (markdown formatting usually works well there too).
 
@@ -543,16 +577,16 @@ works exactly the same without the `md` tag. But there are some benefits:
 
 You can either install [Node.js] 10 (with npm 6) or use [docker].
 
-* `npm start`: Start the [Next.js] example dev server. <http://localhost:3000>
-* `npm run watch`: Start [Jest] in watch mode.
-  Outside docker you can use `npm run jest -- --watch` instead.
-* `npm run lint`: Run [ESLint] \(including [Prettier]).
-* `npm run lint:fix`: Autofix [ESLint] errors.
-* `npm run jest`: Run unit tests.
-* `npm run coverage`: Run unit tests with code coverage.
-* `npm build`: Compile with [Babel].
-* `npm test`: Check that everything works.
-* `npm publish`: Publish to [npm], but only if `npm test` passes.
+- `npm start`: Start the [Next.js] example dev server. <http://localhost:3000>
+- `npm run watch`: Start [Jest] in watch mode. Outside docker you can use
+  `npm run jest -- --watch` instead.
+- `npm run lint`: Run [ESLint] \(including [Prettier]).
+- `npm run lint:fix`: Autofix [ESLint] errors.
+- `npm run jest`: Run unit tests.
+- `npm run coverage`: Run unit tests with code coverage.
+- `npm build`: Compile with [Babel].
+- `npm test`: Check that everything works.
+- `npm publish`: Publish to [npm], but only if `npm test` passes.
 
 For docker:
 
@@ -572,11 +606,11 @@ docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/no
 
 Directories:
 
-* `src/`: Source code.
-* `test/` and `__mocks__/`: Tests and mocks.
-* `dist/`: Compiled code, built by `npm run build`. This is what is published in
+- `src/`: Source code.
+- `test/` and `__mocks__/`: Tests and mocks.
+- `dist/`: Compiled code, built by `npm run build`. This is what is published in
   the npm package.
-* `pages/` and `components/`: [Next.js] example app.
+- `pages/` and `components/`: [Next.js] example app.
 
 ## License
 
