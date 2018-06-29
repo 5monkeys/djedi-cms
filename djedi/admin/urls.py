@@ -1,13 +1,11 @@
 from ..compat import patterns, url
-
-from .api import NodeApi, LoadApi, PublishApi, RevisionsApi, RenderApi, NodeEditor
-from .cms import DjediCMS, Embed
+from .api import LoadApi, NodeApi, NodeEditor, PublishApi, RenderApi, RevisionsApi
+from .cms import DjediCMS
 
 app_name = 'djedi'
 
 urlpatterns = patterns(
     url(r'^$', DjediCMS.as_view(), name='cms'),
-    url(r'^embed/$', Embed.as_view(), name='cms.embed'),
     url(r'^node/(?P<uri>.+)/editor$', NodeEditor.as_view(), name='cms.editor'),
     url(r'^node/(?P<uri>.+)/load$', LoadApi.as_view(), name='api.load'),
     url(r'^node/(?P<uri>.+)/publish$', PublishApi.as_view(), name='api.publish'),

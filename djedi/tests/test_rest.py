@@ -1,15 +1,18 @@
-import cio
 import os
+
 import simplejson as json
 from django.core.files import File
 from django.test import Client
 from django.utils.http import urlquote
-from cio.plugins import plugins
+
+import cio
 from cio.backends import storage
-from cio.backends.exceptions import PersistenceError, NodeDoesNotExist
+from cio.backends.exceptions import NodeDoesNotExist, PersistenceError
+from cio.plugins import plugins
 from cio.utils.uri import URI
-from djedi.tests.base import DjediTest, UserMixin, ClientTest
+from djedi.tests.base import ClientTest, DjediTest, UserMixin
 from djedi.utils.encoding import smart_unicode
+
 from ..compat import reverse
 
 
@@ -46,7 +49,7 @@ class PermissionTest(DjediTest, UserMixin):
         self.assertEqual(response.status_code, 404)
 
 
-class RestTest(ClientTest):
+class PrivateRestTest(ClientTest):
 
     def get_api_url(self, url_name, uri):
         return reverse('admin:djedi:' + url_name, args=[urlquote(urlquote(uri, ''), '')])
@@ -260,3 +263,30 @@ class RestTest(ClientTest):
 
             response = self.post('api', 'i18n://sv-se@header/logo.img', form)
             self.assertEqual(response.status_code, 200)
+
+
+class PublicRestTest(ClientTest):
+
+    def test_embed(self):
+        url = reverse('djedi:api.embed')
+        response = self.client.get(url)
+
+        self.assertIn(b'iframe id="djedi-cms"', response.content)
+        self.assertNotIn(b'window.DJEDI_NODES', response.content)
+
+    def test_nodes(self):
+        cio.set('sv-se@label/email', 'E-post')
+
+        with self.assertDB(calls=1):
+            url = reverse('djedi:api.nodes')
+            response = self.client.post(url, {
+                'page/body.md': u'#Foo Bar',
+                'label/email': u'E-mail',
+            })
+
+        data = response.json()
+
+        self.assertIn('i18n://sv-se@page/body.md', data.keys())
+        self.assertEqual(data['i18n://sv-se@page/body.md'], u'<h1>Foo Bar</h1>')
+        self.assertIn('i18n://sv-se@label/email.txt#1', data.keys())
+        self.assertEqual(data['i18n://sv-se@label/email.txt#1'], u'E-post')

@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.shortcuts import render_to_response
-from django.urls import path
+from django.urls import path, include
 
 urlpatterns = [
     path('', lambda r: render_to_response('index.html', {'request': r}),
         name='index'),
+    path('djedi/', include('djedi.rest.urls')),
     path('admin/', admin.site.urls),
 ]
