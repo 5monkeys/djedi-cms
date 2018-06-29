@@ -225,10 +225,8 @@ Array [
         "i18n://en-us@3.txt": "Hello, [user]!",
         "i18n://en-us@4.txt": "Hello, {user}!",
         "i18n://en-us@5.txt": "Hello, [user]!",
-        "i18n://en-us@6.txt": "Hello,
-{user}!",
-        "i18n://en-us@7.txt": "Hello,
-[user]!",
+        "i18n://en-us@6.txt": "Hello, {user}!",
+        "i18n://en-us@7.txt": "Hello, [user]!",
       },
       "headers": Object {
         "Content-Type": "application/json",
