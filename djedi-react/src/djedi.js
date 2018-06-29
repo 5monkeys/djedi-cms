@@ -23,6 +23,7 @@ export class Djedi {
     this.options = makeDefaultOptions();
 
     this._nodes = new Map();
+    this._prefetchableNodes = new Map();
     this._renderedNodes = new Map();
     this._batch = makeEmptyBatch();
     this._DJEDI_NODES = {};
@@ -45,6 +46,7 @@ export class Djedi {
     }
 
     this._nodes = new Map();
+    this._prefetchableNodes = new Map();
     this._renderedNodes = new Map();
     this._batch = makeEmptyBatch();
     this._DJEDI_NODES = {};
@@ -64,7 +66,7 @@ export class Djedi {
       return;
     }
 
-    this.loadMany({ [node.uri]: node.value }).then(
+    this.fetchMany({ [node.uri]: node.value }).then(
       results => {
         const value = results[uri];
         const resultNode =
@@ -108,7 +110,7 @@ export class Djedi {
     );
   }
 
-  loadMany(nodes) {
+  fetchMany(nodes) {
     // `JSON.stringify` excludes keys whose values are `undefined`. Change them
     // to `null` so that all keys are sent to the backend.
     const nodesWithNull = Object.keys(nodes).reduce((result, key) => {
@@ -122,15 +124,40 @@ export class Djedi {
     });
   }
 
-  loadByPrefix(prefixes) {
-    return this._post("/djedi/load_by_prefix", prefixes).then(results => {
-      this.addNodes(results);
-      return results;
-    });
+  reportPrefetchableNode(passedNode) {
+    const node = this._normalizeNode(passedNode);
+    const previous = this._prefetchableNodes.get(node.uri);
+    if (previous != null && previous.value !== node.value) {
+      console.warn(
+        "djedi-react: Encountered two nodes with the same URI but with different default values. Using the previous value and ignoring the next.",
+        {
+          uri: node.uri,
+          prev: previous.value,
+          next: node.value,
+        }
+      );
+      return;
+    }
+    this._prefetchableNodes.set(node.uri, node);
   }
 
-  // Needed to pick up the results from `loadByPrefix` after server-side
-  // rendering.
+  prefetch(filter = undefined) {
+    const { separators } = this.options.uri;
+    const nodes = {};
+    this._prefetchableNodes.forEach(node => {
+      if (
+        !this._nodes.has(node.uri) &&
+        (filter == null || filter(parseUri(node.uri, separators)))
+      ) {
+        nodes[node.uri] = node.value;
+      }
+    });
+    return Object.keys(nodes).length === 0
+      ? Promise.resolve({})
+      : this.fetchMany(nodes);
+  }
+
+  // Needed to pick up the results from `prefetch` after server-side rendering.
   addNodes(nodes) {
     Object.keys(nodes).forEach(uri => {
       const node = { uri: this._normalizeUri(uri), value: nodes[uri] };
@@ -236,7 +263,7 @@ export class Djedi {
 
     this._batch = makeEmptyBatch();
 
-    this.loadMany(nodes).then(
+    this.fetchMany(nodes).then(
       results => {
         queue.forEach((data, uri) => {
           const value = results[uri];

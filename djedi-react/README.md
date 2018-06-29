@@ -4,13 +4,26 @@
 
 [React] client for [Djedi CMS].
 
+Requires djedi-cms version TODO or later.
+
 ## Installation
 
 ```
 npm install djedi-react react react-dom
 ```
 
-Requires djedi-cms version TODO or later.
+```js
+import { Node, djedi, md } from "djedi-react";
+```
+
+Optional [Babel] plugin (for [server-side rendering]):
+
+```json5
+// .babelrc
+{
+  plugins: ["djedi-react/babel-plugin"],
+}
+```
 
 ## Browser support
 
@@ -70,7 +83,7 @@ function Home() {
 
 // Optional: For server-side rendering (Next.js example).
 Page.getInitialProps = async () => {
-  const nodes = await djedi.loadByPrefix(["home/"]);
+  const nodes = await djedi.prefetch();
   return { nodes };
   // (You also need to call `djedi.addNodes(nodes)` somewhere.)
 };
@@ -86,24 +99,82 @@ great in the browser, it’s not so good for server-side rendering where you
 typically only do an initial render. You’d end up with rendering “Loading…” for
 all nodes.
 
+The idea is to call `await djedi.prefetch()` before rendering. That will fetch
+needed nodes and put them in the cache. Then, when rendering, they’ll all be
+available straight away.
+
+`djedi.prefetch` also returns the nodes it fetched:
+`const nodes = await djedi.prefetch()`. You need to serialize those and pass
+them along in the HTML response. Then, in the browser, you need to call
+`djedi.addNodes(nodes)` to put them into cache again. Otherwise you’d end up
+fetching all the nodes again from the browser. You’d also get “server and client
+did not match” warnings from React since the actual node contents would be
+rendered on the server, but “Loading…” would be rendered in the browser (during
+the initial render).
+
+So, how exactly does `djedi.prefetch` know what to fetch? It’s all thanks to the
+[Babel] plugin mentioned in [Installation](#installation).
+
+For example, it does the following transformation:
+
+```js
+import React from "react";
+import { Node } from "djedi-react";
+
+export default function SomeComponent() {
+  return <Node uri="uri">default</Node>;
+}
+```
+
+⬇
+
+```js
+var _djedi_uri = "uri",
+  _djedi_default = "default";
+import { djedi as _djedi } from "djedi-react";
+
+_djedi.reportPrefetchableNode({
+  uri: _djedi_uri,
+  value: _djedi_default,
+});
+
+import React from "react";
+import { Node } from "djedi-react";
+export default function SomeComponent() {
+  return <Node uri={_djedi_uri}>{_djedi_default}</Node>;
+}
+```
+
+So just by `import`ing that file, djedi-react will know about the node (via the
+`djedi.reportPrefetchableNode` call) – even before `<SomeComponent>` is actually
+rendered!
+
+The Babel plugin has some constraints, though:
+
+- Nodes with dynamic `uri` (such as `` uri={`store/${storeId}/intro`} ``) are
+  not supported. They still work in the browser, but will render “Loading…” on
+  the server (unless you load the nodes manually somehow).
+- Nodes with dynamic `children` are not supported either. That’s a
+  [bad idea](#md) anyway.
+- You cannot rename `Node` to something else when importing it. It must be
+  called exactly `Node`.
+
+There’s one final detail to keep in mind. Remember how `import`ing a file is
+enough to let djedi-react know about the nodes in there? For an SPA you might
+end up `import`ing every page and component of you whole site at startup. That
+means that calling `djedi.prefetch()` will try to load every single node of the
+whole site just to render a single page. The best way to solve this is to use
+code splitting ([Next.js] does that by default), which is good for performance
+anyway. If that’s not possible for you, you can pass a filter function to
+`djedi.prefetch`. For example:
+
+```js
+djedi.prefetch(uri => uri.path.startsWith("home/"));
+```
+
 Using Djedi, it is common practice to group nodes by page. For example,
-`home/title.txt`, `home/text.md`, `about/title.txt`, `about/text.md`, etc. The
-server-side rendering solution exploits this fact.
-
-The idea is to call `await djedi.loadByPrefix(["home/"])` before rendering. That
-will fetch all nodes starting with `home/` and put them in the cache. Then, when
-rendering, they’ll all be available straight away.
-
-This is a low-tech way to solve the problem in a good-enough manner.
-
-There’s one piece of the puzzle left, though. `djedi.loadByPrefix` also returns
-the nodes it fetched: `const nodes = await djedi.loadByPrefix(["home/"])`. You
-need to serialize those and pass them along in the HTML response. Then, in the
-browser, you need to call `djedi.addNodes(nodes)` to put them into cache again.
-Otherwise you’d end up fetching all the nodes again from the browser. You’d also
-get “server and client did not match” warnings from React since the actual node
-contents would be rendered on the server, but “Loading…” would be rendered in
-the browser (during the initial render).
+`home/title.txt`, `home/text.md`, `about/title.txt`, `about/text.md`, etc. So
+loading all nodes starting with for example `home/` might work out.
 
 ## Reference
 
@@ -287,9 +358,9 @@ escaping or using strings. For example:
 
 The `djedi` object is not React specific and lets you:
 
-- Configure options.
-- Load nodes manually, mostly for server-side rendering.
-- Make integrations with other frameworks than React.
+* Configure options.
+* Load nodes manually, mostly for [server-side rendering].
+* Make integrations with other frameworks than React.
 
 This could be extracted into its own package if other framework integrations are
 made in the future.
@@ -425,8 +496,8 @@ This is the default value:
 
 #### Common methods
 
-These methods are commonly used in server-side rendering scenarios, but are also
-useful for avoiding excessive loading indicators.
+These methods are commonly used in [server-side rendering] scenarios, but are
+also useful for avoiding excessive loading indicators.
 
 Interfaces used by several methods:
 
@@ -456,22 +527,33 @@ When `Node` or `Nodes` is used as _output:_
   be the default value, or a value entered by the user in the admin sidebar. It
   can also be transformed (such as markdown→HTML).
 
-##### `djedi.loadByPrefix(prefixes: Array<string>): Promise<Nodes>`
+##### `djedi.prefetch(filter?: Uri => boolean): Promise<Nodes>`
 
-Returns all nodes that match the given prefixes, such as
-`["home/", "en-us@about/"]`. It also automatically adds the nodes to the cache.
-Useful for server-side rendering, and for avoiding excessive loading indicators.
+Fetches and returns all nodes that
+[djedi.reportPrefetchableNode](#djedireportprefetchablenodenode-node-void) has
+reported. It also automatically adds the nodes to the cache. Useful for
+[server-side rendering], and for avoiding excessive loading indicators.
 
 By calling this before rendering, node contents will be available straight away.
 No loading indicators. No re-renders.
 
-This assumes that you’ve structured your nodes in a logical way so that you can
-catch most of the ones you need with simple prefixes.
+You may optionally pass a filter function, that decides which URIs to fetch (by
+returning `true` or `false`). The passed URI can look like this:
+
+```js
+({
+  scheme: "i18n",
+  namespace: "en-us",
+  path: "some/path/text",
+  ext: "txt",
+  version: "",
+});
+```
 
 ##### `djedi.addNodes(nodes: Nodes): void`
 
-Adds the given nodes to the cache. Usually comes from `djedi.loadByPrefix` and
-done in the browser after server-side rendering.
+Adds the given nodes to the cache. Usually comes from `djedi.prefetch` and done
+in the browser after [server-side rendering].
 
 #### Less common methods
 
@@ -483,8 +565,8 @@ the `<Node>` component). (Don’t forget that you also can use the
 
 Fetch a single node. This takes a callback instead of a `Promise`, so the
 callback can be invoked synchronously if the node already exists in cache
-(`Promise`s are always asynchronous). This is crucial for server-side rendering
-support.
+(`Promise`s are always asynchronous). This is crucial for [server-side
+rendering] support.
 
 Note that the callback is called with either a `Node` or an `Error`. You can use
 `node instanceof Error` as a check.
@@ -495,11 +577,18 @@ Like `djedi.get`, but doesn’t make a network request straight away, batching u
 with other `djedi.getBatched` requests made during
 [djedi.options.batchInterval](#batchinterval)).
 
-##### `djedi.loadMany(nodes: Nodes): Promise<Nodes>`
+##### `djedi.fetchMany(nodes: Nodes): Promise<Nodes>`
 
 Fetches many nodes at once. Mainly used internally by other methods.
 
 Note that this never hits the cache – it makes a network request straight away.
+
+##### `djedi.reportPrefetchableNode(node: Node): void`
+
+Registers the passed node as available for
+[prefetching](#djediprefetchfilter-uri--boolean): Promise<Nodes>). You most
+likely won’t use this method directly. Instead, it will be automatically
+inserted into your code by a [Babel] plugin. See [server-side rendering].
 
 #### Methods for rendering implementations
 
@@ -626,3 +715,4 @@ Directories:
 [npm]: https://www.npmjs.com/
 [prettier]: https://prettier.io/
 [react]: https://reactjs.org/
+[server-side rendering]: #server-side-rendering

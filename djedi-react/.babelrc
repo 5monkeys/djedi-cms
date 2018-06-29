@@ -1,6 +1,18 @@
 {
-  "presets": [
-    ["@babel/env", { "loose": true }],
-    "@babel/react"
-  ]
+  "env": {
+    "development": {
+      "presets": ["next/babel"],
+      "plugins": ["djedi-react/babel-plugin"]
+    },
+    "production": {
+      "presets": ["next/babel"],
+      "plugins": ["djedi-react/babel-plugin"]
+    },
+    "test": {
+      "presets": [
+        ["@babel/env", { "loose": true }],
+        "@babel/react"
+      ]
+    }
+  }
 }

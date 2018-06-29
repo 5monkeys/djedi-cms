@@ -6,32 +6,20 @@ import {
 import Head from "next/head";
 import React from "react";
 
-import CookieWarning from "../components/CookieWarning";
 import Search from "../components/Search";
 
 export default class Home extends React.Component {
   static async getInitialProps() {
     // Simply rendering <Node>s automatically causes request for the node
-    // contents, but for server-side rendering it is required to pre-load them.
+    // contents, but for server-side rendering it is required to prefetch them.
     // (That can also be useful for non-server rendered cases to avoid excessive
     // loading indicators to be displayed.)
-    // You are encouraged to prefix all nodes so that pre-loading becomes easy.
-    // This is a low-tech way to solve the problem in a good-enough manner.
-    /*
-    const nodes = await djedi.loadByPrefix([
-      // Load all nodes used by this page.
-      "home/",
-      // Also load all nodes used by the <Search> component, since it is
-      // considered important to be server-side rendered.
-      "Search/",
-    ]);
-    */
-    // If `djedi.loadByPrefix` fails (for example if the API is down), Next.js
-    // will show its 500 page (in production mode). You can also choose to catch
-    // the error and render something else.
+    // const nodes = await djedi.prefetch();
+    // If `djedi.prefetch` fails (for example if the API is down), Next.js will
+    // show its 500 page (in production mode). You can also choose to catch the
+    // error and render something else.
 
-    // Using hard-coded nodes rather than `djedi.loadByPrefix` until the API is
-    // done.
+    // Using hard-coded nodes rather than `djedi.prefetch` until the API is done.
     const nodes = {
       "i18n://en-us@home/title.txt": "Welcome to the djedi-react example!",
       "i18n://en-us@home/text.md":
@@ -51,6 +39,8 @@ export default class Home extends React.Component {
   }
 
   render() {
+    const storeId = 5;
+
     return (
       <div>
         <Head>
@@ -80,14 +70,19 @@ export default class Home extends React.Component {
             </Node>
           </p>
 
-          {/* This component shows how to use a node in an HTML attribute. */}
+          {/* This component shows how to use a node in an HTML attribute. Even
+          though this node is defined in another file, it is still prefetched. */}
           <Search />
         </footer>
 
-        {/* The nodes for this component were not pre-loaded, to show that stuff
-        doesn’t break if you forget to. In this case, server-side rendering
-        "Loading…" instead of a cookie warning is acceptable. */}
-        <CookieWarning />
+        {/* This node has a dynamic URI and therfore isn‘t prefetched. In this
+        case, server-side rendering "Loading…" instead of a cookie warning is
+        acceptable. */}
+        <p>
+          <Node uri={`store/${storeId}/cookie-warning/text`}>
+            This site uses cookies.
+          </Node>
+        </p>
       </div>
     );
   }

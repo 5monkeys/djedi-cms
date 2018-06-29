@@ -1,0 +1,163 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`it does not affect files with no <Node>s 1`] = `console.log('<Node uri="uri">value</Node>');`;
+
+exports[`it works 1`] = `
+var _djedi_uri = "intro",
+    _djedi_default = "[project] is a cool CMS",
+    _djedi_uri2 = "en-us@link.txt",
+    _djedi_default2 = "[text]",
+    _djedi_uri3 = "simple",
+    _djedi_uri4 = "string literal",
+    _djedi_uri5 = "single quotes \\"",
+    _djedi_uri6 = "simple template literal",
+    _djedi_uri7 = "ok 1",
+    _djedi_default3 = "simple",
+    _djedi_uri8 = "ok 2",
+    _djedi_default4 = "string literal",
+    _djedi_uri9 = "ok 3",
+    _djedi_default5 = "single quotes \\"",
+    _djedi_uri10 = "ok 4",
+    _djedi_default6 = "simple template literal",
+    _djedi_uri11 = "ok 5",
+    _djedi_default7 = "# markdown\\n\\nexample",
+    _djedi_uri12 = "nope 1",
+    _djedi_uri13 = "nope 3",
+    _djedi_uri14 = "nope 4",
+    _djedi_uri15 = "nope 5";
+import { djedi as _djedi2 } from "djedi-react";
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri,
+  value: _djedi_default
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri2,
+  value: _djedi_default2
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri3,
+  value: undefined
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri4,
+  value: undefined
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri5,
+  value: undefined
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri6,
+  value: undefined
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri7,
+  value: _djedi_default3
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri8,
+  value: _djedi_default4
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri9,
+  value: _djedi_default5
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri10,
+  value: _djedi_default6
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri11,
+  value: _djedi_default7
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri12,
+  value: undefined
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri13,
+  value: undefined
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri14,
+  value: undefined
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri15,
+  value: undefined
+});
+
+/* global nope */
+import { Node, djedi, md } from "djedi-react";
+import React from "react";
+djedi.options.baseUrl = "/api";
+const _djedi = "djedi";
+const intro = <Node uri={_djedi_uri} project={_djedi}>{_djedi_default}</Node>;
+export default function Home() {
+  // eslint-disable-next-line func-style
+  const link = text => <a href={\`?page=\${text}\`}>
+      <Node uri={_djedi_uri2} text={text}>{_djedi_default2}</Node>
+    </a>;
+
+  return <div>
+      {intro}
+
+      <h2>ok uri</h2>
+      <Node uri={_djedi_uri3} />
+      <Node uri={_djedi_uri4} />
+      <Node uri={_djedi_uri5} />
+      <Node uri={_djedi_uri6} />
+
+      <h2>nope uri</h2>
+      {
+      /* eslint-disable-next-line react/jsx-no-duplicate-props */
+    }
+      <Node uri="overwritten uri" uri />
+      <Node uri={"nope".toUpperCase()} />
+      <Node uri={\`template literal with interpolation \${nope}\`} />
+      <Node uri={nope\`tagged template literal\`} />
+      <Node uri={nope} />
+
+      <h2>ok children</h2>
+      <Node uri={_djedi_uri7}>{_djedi_default3}</Node>
+      <Node uri={_djedi_uri8}>{_djedi_default4}</Node>
+      <Node uri={_djedi_uri9}>{_djedi_default5}</Node>
+      <Node uri={_djedi_uri10}>{_djedi_default6}</Node>
+      <Node uri={_djedi_uri11}>{_djedi_default7}</Node>
+
+      <h2>nope children</h2>
+      <Node uri={_djedi_uri12} children="children prop not supported" />
+      <Node uri="nope 2">JSX interpolation {nope}</Node>
+      <Node uri={_djedi_uri13}>{\`template literal with interpolation \${nope}\`}</Node>
+      <Node uri={_djedi_uri14}>{nope\`non-md tagged template literal\`}</Node>
+      <Node uri={_djedi_uri15}>{nope}</Node>
+
+      <div>
+        {link("previous")}
+        {link("next")}
+      </div>
+
+      <h2>non-Nodes</h2>
+      <node uri="simple" />
+      {
+      /* eslint-disable-next-line react/jsx-no-undef */
+    }
+      <TreeNode uri="simple" />
+    </div>;
+}
+`;

@@ -454,11 +454,11 @@ exports[`it renders loading and then the node: with value 1`] = `
 exports[`it renders synchronously if the node is already in cache: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_by_prefix",
+    "/djedi/load_many",
     Object {
-      "body": Array [
-        "home/",
-      ],
+      "body": Object {
+        "i18n://en-us@home/intro.txt": "Welcome",
+      },
       "headers": Object {
         "Content-Type": "application/json",
       },
@@ -476,7 +476,7 @@ exports[`it renders synchronously if the node is already in cache: browser 1`] =
 </span>
 `;
 
-exports[`it renders synchronously if the node is already in cache: loadByPrefix result 1`] = `
+exports[`it renders synchronously if the node is already in cache: prefetch result 1`] = `
 Object {
   "i18n://en-us@home/intro.txt": "Welcome to our amazing website!",
 }

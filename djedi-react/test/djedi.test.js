@@ -21,6 +21,7 @@ beforeEach(() => {
 });
 
 // `addNodes` is tested together with `get` and `getBatched`.
+// `reportPrefetchableNode` is tested together with `prefetch`.
 // `resetNodes` and `resetOptions` are run in `beforeEach`.
 
 describe("get", () => {
@@ -120,14 +121,14 @@ describe("getBatched", () => {
   });
 });
 
-describe("loadMany", () => {
+describe("fetchMany", () => {
   test("it works", async () => {
     fetch({
       ...simpleNodeResponse("test", "test"),
       ...simpleNodeResponse("other", "other"),
     });
     const spy = jest.spyOn(djedi, "addNodes");
-    const nodes = await djedi.loadMany({
+    const nodes = await djedi.fetchMany({
       test: undefined,
       "test.txt": undefined,
       other: "default",
@@ -140,18 +141,38 @@ describe("loadMany", () => {
   });
 
   networkTests(callback => {
-    djedi.loadMany({ test: "default" }).then(callback, callback);
+    djedi.fetchMany({ test: "default" }).then(callback, callback);
   });
 });
 
-describe("loadByPrefix", () => {
+describe("reportPrefetchableNode", () => {
+  test("it warns about reporting nodes with different defaults", async () => {
+    fetch({});
+    djedi.reportPrefetchableNode({ uri: "test", value: "default" });
+    djedi.reportPrefetchableNode({
+      uri: "en-us@test",
+      value: "other default",
+    });
+    djedi.reportPrefetchableNode({
+      uri: "i18n://test.txt",
+      value: undefined,
+    });
+    expect(console.warn.mock.calls).toMatchSnapshot("console.warn");
+    await djedi.prefetch();
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+  });
+});
+
+describe("prefetch", () => {
   test("it works", async () => {
     fetch({
       ...simpleNodeResponse("test", "test"),
       ...simpleNodeResponse("other", "other"),
     });
     const spy = jest.spyOn(djedi, "addNodes");
-    const nodes = await djedi.loadByPrefix(["test", "other"]);
+    djedi.reportPrefetchableNode({ uri: "test", value: undefined });
+    djedi.reportPrefetchableNode({ uri: "other", value: "default" });
+    const nodes = await djedi.prefetch();
     expect(nodes).toMatchSnapshot("nodes");
     expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
     expect(spy.mock.calls).toMatchSnapshot("addNodes call");
@@ -159,8 +180,33 @@ describe("loadByPrefix", () => {
     spy.mockRestore();
   });
 
+  test("it allows filtering nodes", async () => {
+    fetch({
+      ...simpleNodeResponse("test", "test"),
+    });
+    const filter = jest.fn(uri => uri.path.startsWith("test"));
+    djedi.reportPrefetchableNode({ uri: "test", value: undefined });
+    djedi.reportPrefetchableNode({ uri: "other", value: "default" });
+    const nodes = await djedi.prefetch(filter);
+    expect(nodes).toMatchSnapshot("nodes");
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+    expect(filter.mock.calls).toMatchSnapshot("filter calls");
+  });
+
+  test("it makes no request if there are no nodes to prefetch", async () => {
+    const nodes1 = await djedi.prefetch();
+    expect(nodes1).toEqual({});
+
+    djedi.reportPrefetchableNode({ uri: "test", value: undefined });
+    const nodes2 = await djedi.prefetch(() => false);
+    expect(nodes2).toEqual({});
+
+    expect(fetch.mockFn).toHaveBeenCalledTimes(0);
+  });
+
   networkTests(callback => {
-    djedi.loadByPrefix(["test/"]).then(callback, callback);
+    djedi.reportPrefetchableNode({ uri: "test", value: undefined });
+    djedi.prefetch().then(callback, callback);
   });
 });
 

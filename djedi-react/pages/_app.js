@@ -20,10 +20,9 @@ export default class MyApp extends App {
     return { pageProps };
   }
 
-  // Add in nodes loaded by `djedi.loadByPrefix` server-side. This uses a
-  // convention where `getInitialProps` of all pages return a key called
-  // `nodes`, so that we don’t have to call `djeid.addNodes` in every page
-  // component. Convenient!
+  // Add in nodes loaded by `djedi.prefetch` server-side. This uses a convention
+  // where `getInitialProps` of all pages return a key called `nodes`, so that
+  // we don’t have to call `djeid.addNodes` in every page component. Convenient!
   constructor(props) {
     super(props);
     const { nodes } = props.pageProps;

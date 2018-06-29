@@ -40,9 +40,13 @@ test("it renders loading and then the node", async () => {
 
 test("it renders synchronously if the node is already in cache", async () => {
   fetch(simpleNodeResponse("home/intro", "Welcome to our amazing website!"));
-  const nodes = await djedi.loadByPrefix(["home/"]);
+  djedi.reportPrefetchableNode({
+    uri: "home/intro",
+    value: "Welcome",
+  });
+  const nodes = await djedi.prefetch();
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
-  expect(nodes).toMatchSnapshot("loadByPrefix result");
+  expect(nodes).toMatchSnapshot("prefetch result");
   const component = renderer.create(
     <Node uri="home/intro">Hello, World!</Node>
   );
