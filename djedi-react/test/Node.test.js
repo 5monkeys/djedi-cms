@@ -257,14 +257,10 @@ test("interpolations: passing values to backend", async () => {
       <Node uri="3">Hello, [user]!</Node>
       <Node uri="4">{`Hello, {user}!`}</Node>
       <Node uri="5">{`Hello, [user]!`}</Node>
-      <Node uri="6">{md`
-        Hello,
-        {user}!
-      `}</Node>
-      <Node uri="7">{md`
-        Hello,
-        [user]!
-      `}</Node>
+      {/* prettier-ignore */}
+      <Node uri="6">{md`Hello, {user}!`}</Node>
+      {/* prettier-ignore */}
+      <Node uri="7">{md`Hello, [user]!`}</Node>
     </div>
   );
   expect(console.error.mock.calls).toMatchSnapshot(
