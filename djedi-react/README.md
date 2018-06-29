@@ -322,7 +322,7 @@ runs on the server (an internal network URL) or in the browser (a public URL).
 
 ##### `batchInterval`
 
-`number` Default: 50 (milliseconds)
+`number` Default: 10 (milliseconds)
 
 The requests for all `<Node>`s that are rendered within this number of
 milliseconds are batched together into a single request. This is to cut down on

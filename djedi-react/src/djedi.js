@@ -324,7 +324,7 @@ export class Djedi {
 function makeDefaultOptions() {
   return {
     baseUrl: "",
-    batchInterval: 50, // ms
+    batchInterval: 10, // ms
     defaultRender: state => {
       switch (state.type) {
         case "loading":
