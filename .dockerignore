@@ -9,6 +9,7 @@
 .travis.yml
 Dockerfile
 dist/
+djedi-react/
 docker-compose.yml
 node_modules/
 out/
