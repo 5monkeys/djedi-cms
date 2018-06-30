@@ -18,6 +18,7 @@ beforeEach(() => {
   resetAll();
   console.warn.mockClear();
   console.error.mockClear();
+  document.body.textContent = "";
 });
 
 // `addNodes` is tested together with `get` and `getBatched`.
@@ -247,6 +248,41 @@ describe("prefetch", () => {
   networkTests(callback => {
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.prefetch().then(callback, callback);
+  });
+});
+
+describe("injectAdmin", () => {
+  test("it works", async () => {
+    fetch("<iframe></iframe>", { stringify: false });
+    document.body.innerHTML = "<p>Some content</p>";
+    const inserted = await djedi.injectAdmin();
+    expect(inserted).toBe(true);
+    expect(document.body.innerHTML).toMatchSnapshot();
+  });
+
+  test("handles not having permission", async () => {
+    fetch("<h1>403 Forbidden</h1>", { status: 403, stringify: false });
+    document.body.innerHTML = "<p>Some content</p>";
+    const inserted = await djedi.injectAdmin();
+    expect(inserted).toBe(false);
+    expect(document.body.innerHTML).toMatchSnapshot();
+  });
+
+  test("it handles error status codes", async () => {
+    fetch("<h1>Server error 500</h1>", { status: 500, stringify: false });
+    await expect(djedi.injectAdmin()).rejects.toThrowErrorMatchingSnapshot();
+  });
+
+  test("it handles rejected requests", async () => {
+    fetch(new Error("Network error"));
+    await expect(djedi.injectAdmin()).rejects.toThrowErrorMatchingSnapshot();
+  });
+
+  test("it respects options.baseUrl", async () => {
+    fetch("", { stringify: false });
+    djedi.options.baseUrl = "https://example.com/cms";
+    await djedi.injectAdmin();
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
   });
 });
 

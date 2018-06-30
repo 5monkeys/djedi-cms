@@ -173,9 +173,26 @@ export class Djedi {
     });
   }
 
-  // injectAdmin() {
-  //   console.log("TODO: injectAdmin (maybe)");
-  // }
+  injectAdmin() {
+    const url = `${this.options.baseUrl}/embed/`;
+    return unfetch(url, { credentials: true }).then(response => {
+      if (response.status >= 200 && response.status < 400) {
+        return response.text().then(html => {
+          document.body.insertAdjacentHTML("beforeend", html);
+          return true;
+        });
+      }
+      if (response.status === 403) {
+        return false;
+      }
+      return Promise.reject(
+        createStatusCodeError(
+          response.status,
+          "200 <= status < 400 or status = 403"
+        )
+      );
+    });
+  }
 
   reportRenderedNode(passedNode) {
     const node = this._normalizeNode(passedNode);
@@ -319,7 +336,10 @@ export class Djedi {
           }
           return Promise.reject({
             response,
-            error: createStatusCodeError(response),
+            error: createStatusCodeError(
+              response.status,
+              "200 <= status < 400"
+            ),
           });
         },
         passedError => {
@@ -405,12 +425,12 @@ function makeEmptyBatch() {
   };
 }
 
-function createStatusCodeError(response) {
-  return new Error(
-    `Unexpected response status code. Got ${
-      response.status
-    } but expected 200 <= status < 400.`
+function createStatusCodeError(status, expected) {
+  const error = new Error(
+    `Unexpected response status code. Got ${status} but expected ${expected}.`
   );
+  error.status = status;
+  return error;
 }
 
 function createUpdatedErrorMessage(error, info, response) {

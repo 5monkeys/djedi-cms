@@ -87,6 +87,9 @@ Page.getInitialProps = async () => {
   return { nodes };
   // (You also need to call `djedi.addNodes(nodes)` somewhere.)
 };
+
+// Inject the admin sidebar, if the user has permission.
+djedi.injectAdmin();
 ```
 
 ## Server-side rendering
@@ -499,8 +502,8 @@ This is the default value:
 
 #### Common methods
 
-These methods are commonly used in [server-side rendering] scenarios, but are
-also useful for avoiding excessive loading indicators.
+Some of these methods are commonly used in [server-side rendering] scenarios,
+but are also useful for avoiding excessive loading indicators.
 
 Interfaces used by several methods:
 
@@ -529,6 +532,18 @@ When `Node` or `Nodes` is used as _output:_
 - `value` is the final value, and supposed to always exist. The final value can
   be the default value, or a value entered by the user in the admin sidebar. It
   can also be transformed (such as markdown→HTML).
+
+##### `djedi.injectAdmin(): Promise<boolean>`
+
+Fetches an HTML snippet for the admin sidebar and appends it to `<body>`.
+
+If the user does not have admin permissions, it does not append anything. The
+permission check is session cookie based: Cookies are sent along with the
+request, and if a 403 response is received that is treated as not having
+permission.
+
+The returned `Promise` resolves to a boolean indicating whether any HTML was
+inserted, or rejects with an error if the request fails.
 
 ##### `djedi.prefetch({ filter?: Uri => boolean, extra?: Array<Node> } = {}): Promise<Nodes>`
 

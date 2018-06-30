@@ -359,6 +359,25 @@ Array [
 ]
 `;
 
+exports[`injectAdmin handles not having permission 1`] = `"<p>Some content</p>"`;
+
+exports[`injectAdmin it handles error status codes 1`] = `"Unexpected response status code. Got 500 but expected 200 <= status < 400 or status = 403."`;
+
+exports[`injectAdmin it handles rejected requests 1`] = `"Network error"`;
+
+exports[`injectAdmin it respects options.baseUrl: api call 1`] = `
+Array [
+  Array [
+    "https://example.com/cms/embed/",
+    Object {
+      "credentials": true,
+    },
+  ],
+]
+`;
+
+exports[`injectAdmin it works 1`] = `"<p>Some content</p><iframe></iframe>"`;
+
 exports[`options.uri it works: callback calls 1`] = `
 Array [
   Array [

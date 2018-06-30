@@ -8,6 +8,9 @@ djedi.options.baseUrl =
     ? "http://django:8000"
     : "http://localhost:8000";
 
+// Inject the admin sidebar, if the user has permission.
+djedi.injectAdmin();
+
 // This is 99% the standard Next.js boilerplate for _app.js.
 export default class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
