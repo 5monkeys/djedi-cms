@@ -1,8 +1,4 @@
-import {
-  Node,
-  // djedi,
-  md,
-} from "djedi-react";
+import { Node, djedi, md } from "djedi-react";
 import Head from "next/head";
 import PropTypes from "prop-types";
 import React from "react";
@@ -22,23 +18,26 @@ export default class Home extends React.Component {
     // contents, but for server-side rendering it is required to prefetch them.
     // (That can also be useful for non-server rendered cases to avoid excessive
     // loading indicators to be displayed.)
-    // const nodes = await djedi.prefetch({extra: specialOfferNode(storeSlug)});
+    const nodes = await djedi.prefetch({
+      extra: [specialOfferNode(storeSlug)],
+    });
     // If `djedi.prefetch` fails (for example if the API is down), Next.js will
     // show its 500 page (in production mode). You can also choose to catch the
     // error and render something else.
 
     // Using hard-coded nodes rather than `djedi.prefetch` until the API is done.
-    const nodes = {
-      "i18n://en-us@home/title.txt": "Welcome to the djedi-react example!",
-      "i18n://en-us@home/text.md":
-        '<h2>Using markdown</h2><p>Some text and a <a href="{url}">link</a>.</p>',
-      "i18n://en-us@home/image.img":
-        '<img src="https://djedi-cms.org/_static/djedi-portrait.svg" width="144">',
-      "i18n://en-us@home/footer.txt": "© [year]. This node is not editable.",
-      "i18n://en-us@store/andys-tools/special-offer/text.txt":
-        "50% off on all tools!",
-      "i18n://en-us@Search/placeholder.txt": "Search",
-    };
+    // TODO: Remove this.
+    // const nodes = {
+    //   "i18n://en-us@home/title.txt": "Welcome to the djedi-react example!",
+    //   "i18n://en-us@home/text.md":
+    //     '<h2>Using markdown</h2><p>Some text and a <a href="{url}">link</a>.</p>',
+    //   "i18n://en-us@home/image.img":
+    //     '<img src="https://djedi-cms.org/_static/djedi-portrait.svg" width="144">',
+    //   "i18n://en-us@home/footer.txt": "© [year]. This node is not editable.",
+    //   "i18n://en-us@store/andys-tools/special-offer/text.txt":
+    //     "50% off on all tools!",
+    //   "i18n://en-us@Search/placeholder.txt": "Search",
+    // };
 
     // Next.js will save the stuff returned here when server-side rendering and
     // pass it to the browser. This way the browser won’t have to make a request

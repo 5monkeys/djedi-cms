@@ -370,7 +370,7 @@ Array [
   Array [
     "https://example.com/cms/embed/",
     Object {
-      "credentials": true,
+      "credentials": "include",
     },
   ],
 ]

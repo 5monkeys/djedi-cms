@@ -174,8 +174,13 @@ export class Djedi {
   }
 
   injectAdmin() {
+    if (typeof document === "undefined") {
+      return Promise.resolve(false);
+    }
+
     const url = `${this.options.baseUrl}/embed/`;
-    return unfetch(url, { credentials: true }).then(response => {
+
+    return unfetch(url, { credentials: "include" }).then(response => {
       if (response.status >= 200 && response.status < 400) {
         return response.text().then(html => {
           document.body.insertAdjacentHTML("beforeend", html);

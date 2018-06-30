@@ -5,11 +5,20 @@ import React from "react";
 // Set baseUrl differently for server and browser rendering.
 djedi.options.baseUrl =
   typeof window === "undefined"
-    ? "http://django:8000"
-    : "http://localhost:8000";
+    ? "http://django:8000/djedi"
+    : "http://localhost:8000/djedi";
 
-// Inject the admin sidebar, if the user has permission.
-djedi.injectAdmin();
+// Inject the admin sidebar, if the user has permission. Only do this in the
+// browser.
+if (typeof document !== "undefined") {
+  // First allow the iframe to set its `document.domain` to the domain of this
+  // script. Only works if this domain is a superdomain of the iframe domain.
+  // This is only needed if the iframe is served from a (different) subdomain
+  // (or, in the case of this demo, different localhost ports are used).
+  // eslint-disable-next-line no-self-assign
+  document.domain = document.domain;
+  djedi.injectAdmin();
+}
 
 // This is 99% the standard Next.js boilerplate for _app.js.
 export default class MyApp extends App {

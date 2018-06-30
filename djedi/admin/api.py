@@ -3,6 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.utils.http import urlunquote
 from django.views.decorators.cache import never_cache
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
@@ -187,6 +188,7 @@ class RenderApi(APIView):
 class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
 
     @never_cache
+    @xframe_options_exempt
     def get(self, request, uri):
         try:
             uri = self.decode_uri(uri)

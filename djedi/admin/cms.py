@@ -1,5 +1,6 @@
 from django.contrib.admin import ModelAdmin
 from django.core.exceptions import PermissionDenied
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import View
 
 from ..auth import has_permission
@@ -30,6 +31,7 @@ class Admin(ModelAdmin):
 
 class DjediCMS(DjediContextMixin, View):
 
+    @xframe_options_exempt
     def get(self, request):
         if has_permission(request):
             return render(request, 'djedi/cms/cms.html', self.get_context_data())

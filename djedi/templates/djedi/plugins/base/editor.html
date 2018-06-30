@@ -53,6 +53,8 @@
         {% block script %}
             <script>
                 window.DJEDI_ENDPOINT = '{% url 'admin:djedi:cms' %}';
+                {# TODO: Put this behind an option. #}
+                document.domain = document.domain;
             </script>
             <script src="{% static 'djedi/vendor/jquery/jquery.min.js' %}?v={{ VERSION }}"></script>
             <script src="{% static 'djedi/vendor/jquery.form/jquery.form.min.js' %}?v={{ VERSION }}"></script>

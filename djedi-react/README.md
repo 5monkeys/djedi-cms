@@ -162,8 +162,8 @@ The Babel plugin has some constraints, though:
   [bad idea](#md) anyway.
 - You cannot rename `Node` to something else when importing it. It must be
   called exactly `Node`.
-- It is assumed that your build system can handle `import { djedi } from
-  "djedi-react"`.
+- It is assumed that your build system can handle
+  `import { djedi } from "djedi-react"`.
 
 There’s one final detail to keep in mind. Remember how `import`ing a file is
 enough to let djedi-react know about the nodes in there? For an SPA you might

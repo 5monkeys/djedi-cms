@@ -40,3 +40,10 @@ test("it renders loading and then the node", async () => {
   expect(component.toJSON()).toMatchSnapshot("with value");
   expect(typeof window).toBe("undefined");
 });
+
+test("djedi.injectAdmin does not do anything", async () => {
+  const injected = await djedi.injectAdmin();
+  expect(injected).toBe(false);
+  expect(fetch.mockFn).toHaveBeenCalledTimes(0);
+  expect(typeof document).toBe("undefined");
+});
