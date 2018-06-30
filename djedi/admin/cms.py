@@ -2,10 +2,9 @@ from django.contrib.admin import ModelAdmin
 from django.core.exceptions import PermissionDenied
 from django.views.generic import View
 
-from .mixins import DjediContextMixin
 from ..auth import has_permission
-from ..compat import render
-from ..compat import patterns, url, include
+from ..compat import include, patterns, render, url
+from .mixins import DjediContextMixin
 
 
 class Admin(ModelAdmin):
@@ -34,14 +33,5 @@ class DjediCMS(DjediContextMixin, View):
     def get(self, request):
         if has_permission(request):
             return render(request, 'djedi/cms/cms.html', self.get_context_data())
-        else:
-            raise PermissionDenied
-
-
-class Embed(View):
-
-    def get(self, request):
-        if has_permission(request):
-            return render(request, 'djedi/cms/embed.html', {'exclude_json_nodes': True})
         else:
             raise PermissionDenied
