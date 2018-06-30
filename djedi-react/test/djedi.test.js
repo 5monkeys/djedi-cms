@@ -187,18 +187,58 @@ describe("prefetch", () => {
     const filter = jest.fn(uri => uri.path.startsWith("test"));
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.reportPrefetchableNode({ uri: "other", value: "default" });
-    const nodes = await djedi.prefetch(filter);
+    const nodes = await djedi.prefetch({ filter });
     expect(nodes).toMatchSnapshot("nodes");
     expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
     expect(filter.mock.calls).toMatchSnapshot("filter calls");
+  });
+
+  test("it allows passing extra nodes", async () => {
+    fetch({
+      ...simpleNodeResponse("test", "test"),
+      ...simpleNodeResponse("other", "other"),
+      ...simpleNodeResponse("extra", "extra"),
+    });
+    djedi.reportPrefetchableNode({ uri: "test", value: undefined });
+    djedi.reportPrefetchableNode({ uri: "other", value: "default" });
+    const nodes = await djedi.prefetch({
+      extra: [
+        { uri: "test.txt", value: undefined },
+        { uri: "extra", value: "extra" },
+      ],
+    });
+    expect(nodes).toMatchSnapshot("nodes");
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+  });
+
+  test("it does not filter the extra nodes", async () => {
+    fetch({
+      ...simpleNodeResponse("test", "test"),
+      ...simpleNodeResponse("extra", "extra"),
+    });
+    djedi.reportPrefetchableNode({ uri: "test", value: undefined });
+    djedi.reportPrefetchableNode({ uri: "other", value: "default" });
+    const nodes = await djedi.prefetch({
+      filter: () => false,
+      extra: [
+        { uri: "test.txt", value: undefined },
+        { uri: "extra", value: "extra" },
+      ],
+    });
+    expect(nodes).toMatchSnapshot("nodes");
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
   });
 
   test("it makes no request if there are no nodes to prefetch", async () => {
     const nodes1 = await djedi.prefetch();
     expect(nodes1).toEqual({});
 
+    djedi.addNodes({ existing: "default" });
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
-    const nodes2 = await djedi.prefetch(() => false);
+    const nodes2 = await djedi.prefetch({
+      filter: () => false,
+      extra: [{ uri: "existing.txt", value: "default" }],
+    });
     expect(nodes2).toEqual({});
 
     expect(fetch.mockFn).toHaveBeenCalledTimes(0);

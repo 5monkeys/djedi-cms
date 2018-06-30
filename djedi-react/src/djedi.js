@@ -141,8 +141,9 @@ export class Djedi {
     this._prefetchableNodes.set(node.uri, node);
   }
 
-  prefetch(filter = undefined) {
+  prefetch({ filter = undefined, extra = [] } = {}) {
     const { separators } = this.options.uri;
+
     const nodes = {};
     this._prefetchableNodes.forEach(node => {
       if (
@@ -152,6 +153,13 @@ export class Djedi {
         nodes[node.uri] = node.value;
       }
     });
+    extra.forEach(node => {
+      const uri = this._normalizeUri(node.uri);
+      if (!this._nodes.has(uri)) {
+        nodes[uri] = node.value;
+      }
+    });
+
     return Object.keys(nodes).length === 0
       ? Promise.resolve({})
       : this.fetchMany(nodes);

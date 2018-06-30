@@ -153,7 +153,8 @@ The Babel plugin has some constraints, though:
 
 - Nodes with dynamic `uri` (such as `` uri={`store/${storeId}/intro`} ``) are
   not supported. They still work in the browser, but will render “Loading…” on
-  the server (unless you load the nodes manually somehow).
+  the server. You can use `djedi.prefetch({ extra: [...] })` for this case – see
+  [djedi.prefetch](#djediprefetch-filter-uri--boolean-extra-arraynode----promisenodes).
 - Nodes with dynamic `children` are not supported either. That’s a
   [bad idea](#md) anyway.
 - You cannot rename `Node` to something else when importing it. It must be
@@ -169,7 +170,7 @@ anyway. If that’s not possible for you, you can pass a filter function to
 `djedi.prefetch`. For example:
 
 ```js
-djedi.prefetch(uri => uri.path.startsWith("home/"));
+djedi.prefetch({ filter: uri => uri.path.startsWith("home/") });
 ```
 
 Using Djedi, it is common practice to group nodes by page. For example,
@@ -358,9 +359,9 @@ escaping or using strings. For example:
 
 The `djedi` object is not React specific and lets you:
 
-* Configure options.
-* Load nodes manually, mostly for [server-side rendering].
-* Make integrations with other frameworks than React.
+- Configure options.
+- Load nodes manually, mostly for [server-side rendering].
+- Make integrations with other frameworks than React.
 
 This could be extracted into its own package if other framework integrations are
 made in the future.
@@ -527,7 +528,7 @@ When `Node` or `Nodes` is used as _output:_
   be the default value, or a value entered by the user in the admin sidebar. It
   can also be transformed (such as markdown→HTML).
 
-##### `djedi.prefetch(filter?: Uri => boolean): Promise<Nodes>`
+##### `djedi.prefetch({ filter?: Uri => boolean, extra?: Array<Node> } = {}): Promise<Nodes>`
 
 Fetches and returns all nodes that
 [djedi.reportPrefetchableNode](#djedireportprefetchablenodenode-node-void) has
@@ -547,6 +548,20 @@ returning `true` or `false`). The passed URI can look like this:
   path: "some/path/text",
   ext: "txt",
   version: "",
+});
+```
+
+You can also pass some extra nodes to be prefetched. That’s useful when you have
+nodes with dynamic URIs that the Babel plugin cannot automatically do its thing
+with. These won’t be matched against the filter function.
+
+```js
+djedi.prefetch({
+  filter: uri => uri.path.startsWith("some/path/"),
+  extra: [
+    { uri: `some/${dynamic}/path`, value: "default" },
+    makeStoreInfoNode(storeId),
+  ],
 });
 ```
 
@@ -586,9 +601,10 @@ Note that this never hits the cache – it makes a network request straight away
 ##### `djedi.reportPrefetchableNode(node: Node): void`
 
 Registers the passed node as available for
-[prefetching](#djediprefetchfilter-uri--boolean): Promise<Nodes>). You most
-likely won’t use this method directly. Instead, it will be automatically
-inserted into your code by a [Babel] plugin. See [server-side rendering].
+[prefetching](#djediprefetch-filter-uri--boolean-extra-arraynode----promisenodes).
+You most likely won’t use this method directly. Instead, it will be
+automatically inserted into your code by a [Babel] plugin. See [server-side
+rendering].
 
 #### Methods for rendering implementations
 

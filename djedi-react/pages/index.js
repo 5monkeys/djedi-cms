@@ -4,17 +4,25 @@ import {
   md,
 } from "djedi-react";
 import Head from "next/head";
+import PropTypes from "prop-types";
 import React from "react";
 
 import Search from "../components/Search";
 
 export default class Home extends React.Component {
+  static propTypes = {
+    storeSlug: PropTypes.string.isRequired,
+  };
+
   static async getInitialProps() {
+    // Imagine this coming from the URL or something.
+    const storeSlug = "andys-tools";
+
     // Simply rendering <Node>s automatically causes request for the node
     // contents, but for server-side rendering it is required to prefetch them.
     // (That can also be useful for non-server rendered cases to avoid excessive
     // loading indicators to be displayed.)
-    // const nodes = await djedi.prefetch();
+    // const nodes = await djedi.prefetch({extra: specialOfferNode(storeSlug)});
     // If `djedi.prefetch` fails (for example if the API is down), Next.js will
     // show its 500 page (in production mode). You can also choose to catch the
     // error and render something else.
@@ -27,6 +35,8 @@ export default class Home extends React.Component {
       "i18n://en-us@home/image.img":
         '<img src="https://djedi-cms.org/_static/djedi-portrait.svg" width="144">',
       "i18n://en-us@home/footer.txt": "© [year]. This node is not editable.",
+      "i18n://en-us@store/andys-tools/special-offer/text.txt":
+        "50% off on all tools!",
       "i18n://en-us@Search/placeholder.txt": "Search",
     };
 
@@ -35,11 +45,11 @@ export default class Home extends React.Component {
     // for the nodes again (which also would cause “server and client did not
     // match” warnings from React). You need to call `djedi.addNodes(nodes)`
     // somewhere. In this example that is done in _app.js.
-    return { nodes };
+    return { nodes, storeSlug };
   }
 
   render() {
-    const storeId = 5;
+    const { storeSlug } = this.props;
 
     return (
       <div>
@@ -79,11 +89,30 @@ export default class Home extends React.Component {
         case, server-side rendering "Loading…" instead of a cookie warning is
         acceptable. */}
         <p>
-          <Node uri={`store/${storeId}/cookie-warning/text`}>
+          <Node uri={`store/${storeSlug}/cookie-warning/text`}>
             This site uses cookies.
           </Node>
         </p>
+
+        {/* This node has a dynamic URI but _is_ prefetched, by calling
+        `specialOfferNode` and passing it to the `extra` array of
+        `djedi.prefetch` (see above). A bit cumbersome yes, but it works. */}
+        {(() => {
+          const node = specialOfferNode(storeSlug);
+          return (
+            <p>
+              <Node uri={node.uri}>{node.value}</Node>
+            </p>
+          );
+        })()}
       </div>
     );
   }
+}
+
+function specialOfferNode(storeSlug) {
+  return {
+    uri: `store/${storeSlug}/special-offer/text`,
+    value: "Special offer: All products on sale!",
+  };
 }
