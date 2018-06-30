@@ -20,7 +20,7 @@ Object {
 
 exports[`fetchMany it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"test\\": \\"default\\"
 }
@@ -33,7 +33,7 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
 
 exports[`fetchMany it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"test\\": \\"default\\"
 }
@@ -46,7 +46,7 @@ SyntaxError: Unexpected end of JSON input",
 
 exports[`fetchMany it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"test\\": \\"default\\"
 }
@@ -60,7 +60,7 @@ Error: Network error",
 exports[`fetchMany it respects options.baseUrl: api call 1`] = `
 Array [
   Array [
-    "https://example.com/interal/djedi/load_many",
+    "https://example.com/cms/nodes/",
     Object {
       "body": Object {
         "test": "default",
@@ -88,7 +88,7 @@ Array [
 exports[`fetchMany it works: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "other": "default",
@@ -120,7 +120,7 @@ Object {
 
 exports[`get it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -133,7 +133,7 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
 
 exports[`get it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -154,7 +154,7 @@ Object {
 
 exports[`get it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -168,7 +168,7 @@ Error: Network error",
 exports[`get it respects options.baseUrl: api call 1`] = `
 Array [
   Array [
-    "https://example.com/interal/djedi/load_many",
+    "https://example.com/cms/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "default",
@@ -198,7 +198,7 @@ Object {
 
 exports[`getBatched it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -211,7 +211,7 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
 
 exports[`getBatched it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -238,7 +238,7 @@ Array [
 
 exports[`getBatched it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -252,7 +252,7 @@ Error: Network error",
 exports[`getBatched it respects options.baseUrl: api call 1`] = `
 Array [
   Array [
-    "https://example.com/interal/djedi/load_many",
+    "https://example.com/cms/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "default",
@@ -269,7 +269,7 @@ Array [
 exports[`getBatched it uses no timeout if batchInterval=0: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": null,
@@ -297,7 +297,7 @@ Array [
 exports[`getBatched it works: api calls (one request for 1 & 2, one for 3) 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@1.txt": null,
@@ -310,7 +310,7 @@ Array [
     },
   ],
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@3.txt": null,
@@ -403,7 +403,7 @@ Array [
 exports[`prefetch it allows filtering nodes: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": null,
@@ -449,7 +449,7 @@ Object {
 exports[`prefetch it allows passing extra nodes: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@extra.txt": "extra",
@@ -476,7 +476,7 @@ Object {
 exports[`prefetch it does not filter the extra nodes: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@extra.txt": "extra",
@@ -500,7 +500,7 @@ Object {
 
 exports[`prefetch it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": null
 }
@@ -513,7 +513,7 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
 
 exports[`prefetch it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": null
 }
@@ -526,7 +526,7 @@ SyntaxError: Unexpected end of JSON input",
 
 exports[`prefetch it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/load_many
+  "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": null
 }
@@ -540,7 +540,7 @@ Error: Network error",
 exports[`prefetch it respects options.baseUrl: api call 1`] = `
 Array [
   Array [
-    "https://example.com/interal/djedi/load_many",
+    "https://example.com/cms/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": null,
@@ -568,7 +568,7 @@ Array [
 exports[`prefetch it works: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@other.txt": "default",
@@ -593,7 +593,7 @@ Object {
 exports[`reportPrefetchableNode it warns about reporting nodes with different defaults: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "default",

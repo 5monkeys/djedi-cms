@@ -385,11 +385,11 @@ These are the toplevel keys:
 
 ##### `baseUrl`
 
-`string` Default: `""`
+`string` Default: `"/djedi"`
 
 The base URL to make requests to. By default, requests go to for example
-`/djedi/load_many`. By setting `baseUrl: "https://api.example.com/internal"`,
-requests would go to `https://api.example.com/internal/djedi/load_many` instead.
+`/djedi/nodes`. By setting `baseUrl: "https://api.example.com/cms"`, requests
+would go to `https://api.example.com/cms/nodes` instead.
 
 You probably want to set the `baseUrl` conditionally based on whether the code
 runs on the server (an internal network URL) or in the browser (a public URL).

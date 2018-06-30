@@ -118,7 +118,7 @@ export class Djedi {
       result[key] = value === undefined ? null : value;
       return result;
     }, {});
-    return this._post("/djedi/load_many", nodesWithNull).then(results => {
+    return this._post("/nodes/", nodesWithNull).then(results => {
       this.addNodes(results);
       return results;
     });
@@ -358,7 +358,7 @@ export class Djedi {
 // This is a function, not a constant, since it can be mutated by the user.
 function makeDefaultOptions() {
   return {
-    baseUrl: "",
+    baseUrl: "/djedi",
     batchInterval: 10, // ms
     defaultRender: state => {
       switch (state.type) {

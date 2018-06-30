@@ -3,7 +3,7 @@
 exports[`it renders loading and then the node: api call 1`] = `
 Array [
   Array [
-    "http://internal:3210/djedi/load_many",
+    "http://internal:3210/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "# Heading

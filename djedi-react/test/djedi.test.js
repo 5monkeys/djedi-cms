@@ -392,7 +392,7 @@ function networkTests(fn) {
 
   test("it respects options.baseUrl", async () => {
     fetch({});
-    djedi.options.baseUrl = "https://example.com/interal";
+    djedi.options.baseUrl = "https://example.com/cms";
     const callback = jest.fn();
     fn(callback);
     await wait();

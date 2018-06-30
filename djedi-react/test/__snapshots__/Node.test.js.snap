@@ -3,7 +3,7 @@
 exports[`batching: api calls (one request for 1 & 2, one for 3) 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@1.txt": null,
@@ -16,7 +16,7 @@ Array [
     },
   ],
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@3.txt": null,
@@ -33,7 +33,7 @@ Array [
 exports[`custom render function: api calls 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@1.txt": null,
@@ -45,7 +45,7 @@ Array [
     },
   ],
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@2.txt": null,
@@ -57,7 +57,7 @@ Array [
     },
   ],
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@3.txt": null,
@@ -69,7 +69,7 @@ Array [
     },
   ],
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@4.txt": null,
@@ -116,7 +116,7 @@ exports[`custom render function: network error 1`] = `
   <div
     data-details={
       Object {
-        "message": "Djedi API error for request: POST /djedi/load_many
+        "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@2.txt\\": null
 }
@@ -139,7 +139,7 @@ exports[`custom render function: status error 1`] = `
   <div
     data-details={
       Object {
-        "message": "Djedi API error for request: POST /djedi/load_many
+        "message": "Djedi API error for request: POST /nodes/
 RequestData sent: {
   \\"i18n://en-us@1.txt\\": null
 }
@@ -172,7 +172,7 @@ exports[`custom render function: with value 1`] = `
 exports[`default values are dedented: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@first.txt": "Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id, hendrerit euismod iaculis convallis ante tincidunt tempus bibendum metus, torquent ac egestas integer erat pharetra vehicula senectus.",
@@ -217,7 +217,7 @@ exports[`edit=false: with value 1`] = `"test"`;
 exports[`interpolations: passing values to backend: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@1.txt": "Hello, ,Bob,!",
@@ -295,7 +295,7 @@ Double brackets OK: {Bob}",
 exports[`it allows changing the default/children if also changing the uri: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@first.txt": "first",
@@ -307,7 +307,7 @@ Array [
     },
   ],
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@second.txt": "second",
@@ -340,7 +340,7 @@ exports[`it allows changing the default/children if also changing the uri: rende
 exports[`it fetches again after changing the uri prop (but not other props): api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@first.txt": null,
@@ -352,7 +352,7 @@ Array [
     },
   ],
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@second.txt": null,
@@ -421,7 +421,7 @@ exports[`it handles window.DJEDI_NODES: unmounted 1`] = `Object {}`;
 exports[`it renders loading and then the node: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": null,
@@ -454,7 +454,7 @@ exports[`it renders loading and then the node: with value 1`] = `
 exports[`it renders synchronously if the node is already in cache: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@home/intro.txt": "Welcome",
@@ -514,7 +514,7 @@ exports[`it treats node values as HTML: with value 1`] = `
 exports[`it warns about rendering nodes with different defaults: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "default",
@@ -558,7 +558,7 @@ Object {
 exports[`it warns if changing the default/children: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "first",
@@ -603,7 +603,7 @@ exports[`it warns if changing the default/children: second render (same as first
 exports[`it warns when passing a non-string as default/children: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "A ,[object Object]",
@@ -639,7 +639,7 @@ exports[`it warns when passing a non-string as default/children: with value 1`] 
 exports[`the md tag ignores interpolations and warns about them: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "Hello, !",
@@ -672,7 +672,7 @@ exports[`the md tag ignores interpolations and warns about them: with value 1`] 
 exports[`using the md tag: api call 1`] = `
 Array [
   Array [
-    "/djedi/load_many",
+    "/djedi/nodes/",
     Object {
       "body": Object {
         "i18n://en-us@test.txt": "# A heading
