@@ -1,41 +1,43 @@
 const dedent = require("dedent");
 
-module.exports = function djediBabelPlugin(babel) {
-  const { types: t } = babel;
+const MODULE_NAME = "djedi-react";
+const CLIENT_NAME = "djedi";
+const CLIENT_METHOD_NAME = "reportPrefetchableNode";
+const COMPONENT_NAME = "Node";
+const URI_ATTR_NAME = "uri";
+const TEMPLATE_TAG_NAME = "md";
+const NODE_URI_KEY = "uri";
+const NODE_VALUE_KEY = "value";
+const URI_VAR_NAME = "djedi_uri";
+const DEFAULT_VAR_NAME = "djedi_default";
+
+module.exports = function djediBabelPlugin({ types: t }) {
   return {
-    name: "djedi",
+    name: MODULE_NAME,
     pre() {
-      this.djedi = undefined;
+      this.clientId = undefined;
       this.last = undefined;
     },
     post() {
-      this.djedi = undefined;
+      this.clientId = undefined;
       this.last = undefined;
     },
     visitor: {
       JSXElement(path) {
         if (
-          path.node.openingElement.name.name !== "Node" ||
+          path.node.openingElement.name.name !== COMPONENT_NAME ||
           path.node.children.length > 1
         ) {
           return;
         }
 
-        const attrs = path.get("openingElement.attributes").reverse();
-        let attr = undefined;
+        const uriAttr = getUriAttr(path, t);
 
-        for (const attrPath of attrs) {
-          if (t.isJSXIdentifier(attrPath.node.name, { name: "uri" })) {
-            attr = attrPath;
-            break;
-          }
-        }
-
-        if (attr == null) {
+        if (uriAttr == null) {
           return;
         }
 
-        const uri = getStringUri(attr.node.value, t);
+        const uri = getUri(uriAttr.node.value, t);
 
         if (uri == null) {
           return;
@@ -43,63 +45,53 @@ module.exports = function djediBabelPlugin(babel) {
 
         const program = path.scope.getProgramParent();
 
-        if (this.djedi == null) {
-          this.djedi = program.generateUidIdentifier("djedi");
+        if (this.clientId == null) {
+          this.clientId = program.generateUidIdentifier(CLIENT_NAME);
           [this.last] = program.path.unshiftContainer(
             "body",
-            t.importDeclaration(
-              [t.importSpecifier(this.djedi, t.identifier("djedi"))],
-              t.stringLiteral("djedi-react")
-            )
+            makeClientImport(this.clientId, t)
           );
         }
 
-        const uriId = path.scope.generateUidIdentifier("djedi_uri");
-        program.push({
-          id: uriId,
-          init: t.stringLiteral(uri),
-        });
-        attr.get("value").replaceWith(t.jSXExpressionContainer(uriId));
+        const uriId = path.scope.generateUidIdentifier(URI_VAR_NAME);
+        program.push({ id: uriId, init: t.stringLiteral(uri) });
+        uriAttr.get("value").replaceWith(t.jSXExpressionContainer(uriId));
 
-        let defId = undefined;
+        let defaultId = undefined;
         const child = path.get("children.0");
         const defaultValue =
-          child == null ? undefined : getStringDefaultValue(child.node, t);
+          child == null ? undefined : getDefaultValue(child.node, t);
 
         if (defaultValue != null) {
-          defId = path.scope.generateUidIdentifier("djedi_default");
+          defaultId = path.scope.generateUidIdentifier(DEFAULT_VAR_NAME);
           program.push({
-            id: defId,
+            id: defaultId,
             init: t.stringLiteral(dedent(defaultValue)),
           });
-          child.replaceWith(t.jSXExpressionContainer(defId));
+          child.replaceWith(t.jSXExpressionContainer(defaultId));
         }
 
         [this.last] = this.last.insertAfter(
-          t.expressionStatement(
-            t.callExpression(
-              t.memberExpression(
-                this.djedi,
-                t.identifier("reportPrefetchableNode")
-              ),
-              [
-                t.objectExpression([
-                  t.objectProperty(t.identifier("uri"), uriId),
-                  t.objectProperty(
-                    t.identifier("value"),
-                    defId == null ? t.identifier("undefined") : defId
-                  ),
-                ]),
-              ]
-            )
-          )
+          makeReportCall(this.clientId, uriId, defaultId, t)
         );
       },
     },
   };
 };
 
-function getStringUri(value, t) {
+function getUriAttr(jsxElementPath, t) {
+  const attrs = jsxElementPath.get("openingElement.attributes").reverse();
+
+  for (const attr of attrs) {
+    if (t.isJSXIdentifier(attr.node.name, { name: URI_ATTR_NAME })) {
+      return attr;
+    }
+  }
+
+  return undefined;
+}
+
+function getUri(value, t) {
   if (t.isStringLiteral(value)) {
     return value.value;
   }
@@ -123,7 +115,7 @@ function getStringUri(value, t) {
   return undefined;
 }
 
-function getStringDefaultValue(value, t) {
+function getDefaultValue(value, t) {
   if (t.isJSXText(value)) {
     return value.value;
   }
@@ -136,7 +128,7 @@ function getStringDefaultValue(value, t) {
     const templateLiteral = t.isTemplateLiteral(value.expression)
       ? value.expression
       : t.isTaggedTemplateExpression(value.expression) &&
-        t.isIdentifier(value.expression.tag, { name: "md" })
+        t.isIdentifier(value.expression.tag, { name: TEMPLATE_TAG_NAME })
         ? value.expression.quasi
         : undefined;
 
@@ -152,4 +144,28 @@ function getStringDefaultValue(value, t) {
   }
 
   return undefined;
+}
+
+function makeClientImport(clientId, t) {
+  return t.importDeclaration(
+    [t.importSpecifier(clientId, t.identifier(CLIENT_NAME))],
+    t.stringLiteral(MODULE_NAME)
+  );
+}
+
+function makeReportCall(clientId, uriId, defaultId, t) {
+  return t.expressionStatement(
+    t.callExpression(
+      t.memberExpression(clientId, t.identifier(CLIENT_METHOD_NAME)),
+      [
+        t.objectExpression([
+          t.objectProperty(t.identifier(NODE_URI_KEY), uriId),
+          t.objectProperty(
+            t.identifier(NODE_VALUE_KEY),
+            defaultId == null ? t.identifier("undefined") : defaultId
+          ),
+        ]),
+      ]
+    )
+  );
 }
