@@ -738,10 +738,14 @@ docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/no
 
 ### Notes
 
+#### npm install
+
 `npm start` creates `node_modules/djedi-react` – a symlink to this directory.
 This is so that the example app can use `import "djedi-react"`. However, `npm
 install` gets confused by that symlink. If you need to install or remove
 dependencies, run `npm run fix-install` first to remove the symlink.
+
+#### Test changes in example
 
 If you make changes to the library and want to try them out on
 <http://localhost:3000> you need to:
@@ -755,6 +759,15 @@ docker-compose exec node npm run build
 npm start # But kill old server first :)
 docker-compose restart node
 ```
+
+#### docker and permissions
+
+docker runs as root, so files that it creates are owned by root. If you run
+docker and then try to run some npm scripts outside docker, they might fail
+because of permissions. One solution is to remove the owned-by-root files first:
+
+- `npm start`: `sudo rm -r .next`
+- `npm run ubild`: `sudo rm -r dist`
 
 ## License
 
