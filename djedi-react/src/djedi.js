@@ -12,23 +12,34 @@ const DOCUMENT_DOMAIN_REGEX = /\bdocument\.domain\s*=\s*(["'])([^'"\s]+)\1/;
 
 /*
 This class fetches and caches nodes, provides global options, and keeps
-`window.DJEDI_NODES` up-to-date. See the docs for more information.
-
-The admin sidebar expects the following mapping of all rendered nodes on the page:
-
-    window.DJEDI_NODES = {
-      "<uri>": "<default>",
-    }
+`window.DJEDI_NODES` up-to-date.
 */
 export class Djedi {
   constructor() {
     this.options = makeDefaultOptions();
 
+    // `Map<uri: string, Node>`. Cache of all fetched nodes.
     this._nodes = new Map();
+
+    // `Map<uri: string, Node>`. Everything that `reportPrefetchableNode` has
+    // reported. The nodes contain default values (if any).
     this._prefetchableNodes = new Map();
-    this._renderedNodes = new Map();
+
+    // `{ [uri: string]: string }`. The return value of the last `prefetch` call.
+    // Mutated by `get` and `getBatched`. The values come from fetched nodes.
     this._lastPrefetch = {};
+
+    // Queue for `getBatched`.
     this._batch = makeEmptyBatch();
+
+    // `Map<uri: string, Node>`. Everything that `reportRenderedNode` has
+    // reported. The nodes contain default values (if any). Used to keep
+    // `_DJEDI_NODES` up-to-date.
+    this._renderedNodes = new Map();
+
+    // `{ [uri: string]: string }`. The values are default values (if any). //
+    // The admin sidebar expects the following mapping of all rendered nodes on
+    // the page: `window.DJEDI_NODES = { "<uri>": "<default>" }`.
     this._DJEDI_NODES = {};
 
     if (typeof window !== "undefined") {
@@ -50,9 +61,9 @@ export class Djedi {
 
     this._nodes = new Map();
     this._prefetchableNodes = new Map();
-    this._renderedNodes = new Map();
     this._lastPrefetch = {};
     this._batch = makeEmptyBatch();
+    this._renderedNodes = new Map();
     this._DJEDI_NODES = {};
 
     if (typeof window !== "undefined") {
