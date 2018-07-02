@@ -215,12 +215,12 @@ class PrivateRestTest(ClientTest):
             response = self.get('cms.editor', 'sv-se@page/title.' + ext)
             self.assertEqual(response.status_code, 200)
             assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
-            self.assertNotIn(b'window.domain', response.content)
+            self.assertNotIn(b'document.domain', response.content)
 
         with cio.conf.settings(XSS_DOMAIN='foobar.se'):
             response = self.post('cms.editor', 'sv-se@page/title', {'data': u'Djedi'})
             self.assertEqual(response.status_code, 200)
-            self.assertIn(b'window.domain = "foobar.se"', response.content)
+            self.assertIn(b'document.domain = "foobar.se"', response.content)
 
     def test_upload(self):
         tests_dir = os.path.dirname(os.path.abspath(__file__))
@@ -280,11 +280,11 @@ class PublicRestTest(ClientTest):
         cms_url = u'http://testserver' + reverse('admin:djedi:cms')
         self.assertIn(cms_url, html)
         self.assertNotIn(u'window.DJEDI_NODES', html)
-        self.assertNotIn(u'window.domain', html)
+        self.assertNotIn(u'document.domain', html)
 
         with cio.conf.settings(XSS_DOMAIN='foobar.se'):
             response = self.client.get(url)
-            self.assertIn(b'window.domain = "foobar.se"', response.content)
+            self.assertIn(b'document.domain = "foobar.se"', response.content)
 
     def test_nodes(self):
         cio.set('sv-se@label/email', u'E-post')

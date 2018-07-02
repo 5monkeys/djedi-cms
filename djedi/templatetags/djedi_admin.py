@@ -34,4 +34,4 @@ def djedi_admin(context):
 def djedi_xss_domain():
     domain = cio.conf.settings.get('XSS_DOMAIN')
     if domain:
-        return mark_safe(u'<script>window.domain = "{domain}";</script>'.format(domain=domain))
+        return mark_safe(u'<script>document.domain = "{domain}";</script>'.format(domain=domain))

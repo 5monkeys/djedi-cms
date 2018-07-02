@@ -19,6 +19,7 @@ beforeEach(() => {
   console.warn.mockClear();
   console.error.mockClear();
   document.body.textContent = "";
+  document.domain = "site.example.com";
 });
 
 // `addNodes` is tested together with `get` and `getBatched`.
@@ -258,6 +259,19 @@ describe("injectAdmin", () => {
     const inserted = await djedi.injectAdmin();
     expect(inserted).toBe(true);
     expect(document.body.innerHTML).toMatchSnapshot();
+    expect(document.domain).toBe("site.example.com");
+  });
+
+  test("it sets document.domain", async () => {
+    fetch(
+      '<script>document.domain = "example.com";</script><iframe></iframe>',
+      { stringify: false }
+    );
+    document.body.innerHTML = "<p>Some content</p>";
+    const inserted = await djedi.injectAdmin();
+    expect(inserted).toBe(true);
+    expect(document.body.innerHTML).toMatchSnapshot();
+    expect(document.domain).toBe("example.com");
   });
 
   test("handles not having permission", async () => {

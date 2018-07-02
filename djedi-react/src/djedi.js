@@ -8,6 +8,8 @@ import unfetch from "isomorphic-unfetch";
 
 import { applyUriDefaults, parseUri, stringifyUri } from "./uri";
 
+const DOCUMENT_DOMAIN_REGEX = /\bdocument\.domain\s*=\s*(["'])([^'"\s]+)\1/;
+
 /*
 This class fetches and caches nodes, provides global options, and keeps
 `window.DJEDI_NODES` up-to-date. See the docs for more information.
@@ -183,6 +185,13 @@ export class Djedi {
     return unfetch(url, { credentials: "include" }).then(response => {
       if (response.status >= 200 && response.status < 400) {
         return response.text().then(html => {
+          // Browsers don’t allow <script> tags inserted as part of an HTML
+          // chunk to modify `document.domain`, so cut out the domain and set it
+          // manually.
+          const [, , domain] = DOCUMENT_DOMAIN_REGEX.exec(html) || [];
+          if (domain != null) {
+            document.domain = domain;
+          }
           document.body.insertAdjacentHTML("beforeend", html);
           return true;
         });

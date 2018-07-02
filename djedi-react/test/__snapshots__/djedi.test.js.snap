@@ -376,6 +376,8 @@ Array [
 ]
 `;
 
+exports[`injectAdmin it sets document.domain 1`] = `"<p>Some content</p><script>document.domain = \\"example.com\\";</script><iframe></iframe>"`;
+
 exports[`injectAdmin it works 1`] = `"<p>Some content</p><iframe></iframe>"`;
 
 exports[`options.uri it works: callback calls 1`] = `
