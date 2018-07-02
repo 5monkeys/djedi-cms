@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 import cio
+import cio.conf
 
 from ..admin.mixins import JSONResponseMixin
 from ..auth import has_permission
@@ -22,7 +23,10 @@ class EmbedApi(View):
 
     def get(self, request):
         if has_permission(request):
-            return render(request, 'djedi/cms/embed.html', {'exclude_json_nodes': True})
+            return render(request, 'djedi/cms/embed.html', {
+                'exclude_json_nodes': True,
+                'XSS_DOMAIN': cio.conf.settings.get('XSS_DOMAIN'),
+            })
         else:
             raise PermissionDenied
 

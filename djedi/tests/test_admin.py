@@ -1,3 +1,4 @@
+import cio.conf
 from djedi.utils.encoding import smart_unicode
 from djedi.tests.base import ClientTest
 from ..compat import reverse
@@ -28,6 +29,11 @@ class PanelTest(ClientTest):
         url = reverse('admin:djedi:cms')
         response = self.client.get(url)
         self.assertIn(u'<title>djedi cms</title>', smart_unicode(response.content))
+        self.assertNotIn(u'window.domain', smart_unicode(response.content))
+
+        with cio.conf.settings(XSS_DOMAIN='foobar.se'):
+            response = self.client.get(url)
+            self.assertIn(b'window.domain = "foobar.se"', response.content)
 
     def test_django_admin(self):
         # Patch django admin index

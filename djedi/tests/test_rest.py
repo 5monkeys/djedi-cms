@@ -6,6 +6,7 @@ from django.test import Client
 from django.utils.http import urlquote
 
 import cio
+import cio.conf
 from cio.backends import storage
 from cio.backends.exceptions import NodeDoesNotExist, PersistenceError
 from cio.plugins import plugins
@@ -213,10 +214,13 @@ class PrivateRestTest(ClientTest):
         for ext in plugins:
             response = self.get('cms.editor', 'sv-se@page/title.' + ext)
             self.assertEqual(response.status_code, 200)
-            assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
+            assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'XSS_DOMAIN', 'uri',))
+            self.assertNotIn(b'window.domain', response.content)
 
-        response = self.post('cms.editor', 'sv-se@page/title', {'data': u'Djedi'})
-        self.assertEqual(response.status_code, 200)
+        with cio.conf.settings(XSS_DOMAIN='foobar.se'):
+            response = self.post('cms.editor', 'sv-se@page/title', {'data': u'Djedi'})
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'window.domain = "foobar.se"', response.content)
 
     def test_upload(self):
         tests_dir = os.path.dirname(os.path.abspath(__file__))
@@ -273,6 +277,11 @@ class PublicRestTest(ClientTest):
 
         self.assertIn(b'iframe id="djedi-cms"', response.content)
         self.assertNotIn(b'window.DJEDI_NODES', response.content)
+        self.assertNotIn(b'window.domain', response.content)
+
+        with cio.conf.settings(XSS_DOMAIN='foobar.se'):
+            response = self.client.get(url)
+            self.assertIn(b'window.domain = "foobar.se"', response.content)
 
     def test_nodes(self):
         cio.set('sv-se@label/email', u'E-post')

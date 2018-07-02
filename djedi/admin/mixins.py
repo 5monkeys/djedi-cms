@@ -38,5 +38,6 @@ class DjediContextMixin(object):
 
         context['THEME'] = theme
         context['VERSION'] = djedi.__version__
+        context['XSS_DOMAIN'] = settings.get('XSS_DOMAIN')
 
         return context
