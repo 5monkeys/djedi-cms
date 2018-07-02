@@ -384,6 +384,14 @@ exports[`it fetches again after changing the uri prop (but not other props): sec
 
 exports[`it fetches again after changing the uri prop (but not other props): third render (same uri, no edit) 1`] = `"second"`;
 
+exports[`it handles auto-versioning: render 1`] = `
+<span
+  data-i18n="en-us@test"
+>
+  user edited text
+</span>
+`;
+
 exports[`it handles error status codes: error 1`] = `"Failed to fetch content 😞 (500)"`;
 
 exports[`it handles missing nodes in response: missing 1`] = `"Failed to fetch content 😞 (1404)"`;

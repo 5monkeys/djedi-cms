@@ -611,12 +611,6 @@ Like `djedi.get`, but doesn’t make a network request straight away, batching u
 with other `djedi.getBatched` requests made during
 [djedi.options.batchInterval](#batchinterval)).
 
-##### `djedi.fetchMany(nodes: Nodes): Promise<Nodes>`
-
-Fetches many nodes at once. Mainly used internally by other methods.
-
-Note that this never hits the cache – it makes a network request straight away.
-
 ##### `djedi.reportPrefetchableNode(node: Node): void`
 
 Registers the passed node as available for

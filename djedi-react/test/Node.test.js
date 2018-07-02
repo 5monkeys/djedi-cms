@@ -149,6 +149,13 @@ test("it allows changing the default/children if also changing the uri", async (
   expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
 });
 
+test("it handles auto-versioning", async () => {
+  fetch({ "i18n://en-us@test.txt#1": "user edited text" });
+  const component = renderer.create(<Node uri="test" />);
+  await wait();
+  expect(component.toJSON()).toMatchSnapshot("render");
+});
+
 test("it handles error status codes", async () => {
   fetch("<h1>Server error 500</h1>", { status: 500, stringify: false });
   const component = renderer.create(<Node uri="test" />);
@@ -319,7 +326,7 @@ test("interpolations: rendering values", async () => {
     )
   );
 
-  const unusualKwargs = {
+  const unusualVariables = {
     "a/b": "slash",
     "a b": "ignored",
     "a{b": "ignored",
@@ -338,7 +345,7 @@ test("interpolations: rendering values", async () => {
       hasOwnProperty="Asking for trouble"
       undefined={undefined}
       null={null}
-      {...unusualKwargs}
+      {...unusualVariables}
     >
       Default value
     </Node>

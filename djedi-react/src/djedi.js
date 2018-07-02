@@ -68,12 +68,9 @@ export class Djedi {
       return;
     }
 
-    this.fetchMany({ [node.uri]: node.value }).then(
-      results => {
-        const value = results[uri];
-        const resultNode =
-          value == null ? missingUriError(uri) : { uri, value };
-        callback(resultNode);
+    this._fetchMany({ [node.uri]: node.value }).then(
+      () => {
+        callback(this._nodes.get(uri) || missingUriError(uri));
       },
       error => {
         callback(error);
@@ -112,20 +109,6 @@ export class Djedi {
     );
   }
 
-  fetchMany(nodes) {
-    // `JSON.stringify` excludes keys whose values are `undefined`. Change them
-    // to `null` so that all keys are sent to the backend.
-    const nodesWithNull = Object.keys(nodes).reduce((result, key) => {
-      const value = nodes[key];
-      result[key] = value === undefined ? null : value;
-      return result;
-    }, {});
-    return this._post("/nodes/", nodesWithNull).then(results => {
-      this.addNodes(results);
-      return results;
-    });
-  }
-
   reportPrefetchableNode(passedNode) {
     const node = this._normalizeNode(passedNode);
     const previous = this._prefetchableNodes.get(node.uri);
@@ -144,13 +127,12 @@ export class Djedi {
   }
 
   prefetch({ filter = undefined, extra = [] } = {}) {
-    const { separators } = this.options.uri;
-
     const nodes = {};
     this._prefetchableNodes.forEach(node => {
       if (
         !this._nodes.has(node.uri) &&
-        (filter == null || filter(parseUri(node.uri, separators)))
+        (filter == null ||
+          filter(this._parseUri(node.uri, { applyDefaults: false })))
       ) {
         nodes[node.uri] = node.value;
       }
@@ -164,14 +146,37 @@ export class Djedi {
 
     return Object.keys(nodes).length === 0
       ? Promise.resolve({})
-      : this.fetchMany(nodes);
+      : this._fetchMany(nodes);
   }
 
   // Needed to pick up the results from `prefetch` after server-side rendering.
   addNodes(nodes) {
     Object.keys(nodes).forEach(uri => {
-      const node = { uri: this._normalizeUri(uri), value: nodes[uri] };
+      const uriObject = this._parseUri(uri);
+      const value = nodes[uri];
+
+      if (value == null) {
+        return;
+      }
+
+      const node = { uri: this._stringifyUri(uriObject), value };
       this._nodes.set(node.uri, node);
+
+      // If the returned node URI has a version, also set the versionless URI to
+      // the same node. A request for `home/text.md` can return a URI ending
+      // with for example `home/text.md#1` if the user has edited the node.
+      if (uriObject.version) {
+        const versionlessUri = this._stringifyUri({
+          ...uriObject,
+          version: "",
+        });
+
+        // If the versionless URI has already been set, don’t update it so that
+        // if a node re-renders it doesn’t unexpectedly change its text.
+        if (!this._nodes.has(versionlessUri)) {
+          this._nodes.set(versionlessUri, node);
+        }
+      }
     });
   }
 
@@ -266,10 +271,12 @@ export class Djedi {
     };
   }
 
-  _parseUri(uri) {
+  _parseUri(uri, { applyDefaults = true } = {}) {
     const { defaults, namespaceByScheme, separators } = this.options.uri;
     const uriObject = parseUri(uri, separators);
-    return applyUriDefaults(uriObject, defaults, namespaceByScheme);
+    return applyDefaults
+      ? applyUriDefaults(uriObject, defaults, namespaceByScheme)
+      : uriObject;
   }
 
   _stringifyUri(uriObject) {
@@ -302,11 +309,10 @@ export class Djedi {
 
     this._batch = makeEmptyBatch();
 
-    this.fetchMany(nodes).then(
-      results => {
+    this._fetchMany(nodes).then(
+      () => {
         queue.forEach((data, uri) => {
-          const value = results[uri];
-          const node = value == null ? missingUriError(uri) : { uri, value };
+          const node = this._nodes.get(uri) || missingUriError(uri);
           data.callbacks.forEach(callback => {
             callback(node);
           });
@@ -320,6 +326,20 @@ export class Djedi {
         });
       }
     );
+  }
+
+  _fetchMany(nodes) {
+    // `JSON.stringify` excludes keys whose values are `undefined`. Change them
+    // to `null` so that all keys are sent to the backend.
+    const nodesWithNull = Object.keys(nodes).reduce((result, key) => {
+      const value = nodes[key];
+      result[key] = value === undefined ? null : value;
+      return result;
+    }, {});
+    return this._post("/nodes/", nodesWithNull).then(results => {
+      this.addNodes(results);
+      return results;
+    });
   }
 
   _post(passedUrl, data) {

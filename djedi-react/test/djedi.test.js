@@ -35,16 +35,6 @@ describe("get", () => {
     });
   });
 
-  test("it calls the callback synchronously if the node already exists", () => {
-    djedi.addNodes(simpleNodeResponse("test", "test"));
-    let called = false;
-    djedi.get({ uri: "test", value: "default" }, node => {
-      expect(node).toMatchSnapshot();
-      called = true;
-    });
-    expect(called).toBe(true);
-  });
-
   test("it handles missing node in response", done => {
     fetch({});
     djedi.get({ uri: "test", value: "default" }, node => {
@@ -52,6 +42,8 @@ describe("get", () => {
       done();
     });
   });
+
+  getTests(djedi.get.bind(djedi));
 
   networkTests(callback => {
     djedi.get({ uri: "test", value: "default" }, callback);
@@ -99,16 +91,6 @@ describe("getBatched", () => {
     expect(callback.mock.calls).toMatchSnapshot("callback call");
   });
 
-  test("it calls the callback synchronously if the node already exists", () => {
-    djedi.addNodes(simpleNodeResponse("test", "test"));
-    let called = false;
-    djedi.getBatched({ uri: "test", value: "default" }, node => {
-      expect(node).toMatchSnapshot();
-      called = true;
-    });
-    expect(called).toBe(true);
-  });
-
   test("it handles missing node in response", async () => {
     fetch(simpleNodeResponse("test", "test"));
     const callback = jest.fn();
@@ -118,32 +100,10 @@ describe("getBatched", () => {
     expect(callback.mock.calls).toMatchSnapshot();
   });
 
+  getTests(djedi.getBatched.bind(djedi));
+
   networkTests(callback => {
     djedi.getBatched({ uri: "test", value: "default" }, callback);
-  });
-});
-
-describe("fetchMany", () => {
-  test("it works", async () => {
-    fetch({
-      ...simpleNodeResponse("test", "test"),
-      ...simpleNodeResponse("other", "other"),
-    });
-    const spy = jest.spyOn(djedi, "addNodes");
-    const nodes = await djedi.fetchMany({
-      test: undefined,
-      "test.txt": undefined,
-      other: "default",
-    });
-    expect(nodes).toMatchSnapshot("nodes");
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
-    expect(spy.mock.calls).toMatchSnapshot("addNodes call");
-    spy.mockReset();
-    spy.mockRestore();
-  });
-
-  networkTests(callback => {
-    djedi.fetchMany({ test: "default" }).then(callback, callback);
   });
 });
 
@@ -411,6 +371,70 @@ describe("options.uri", () => {
     expect(callback.mock.calls).toMatchSnapshot("callback calls");
   });
 });
+
+// Tests in common for `djedi.get` and `djedi.getBatched`.
+function getTests(fn) {
+  test("it handles auto-versioning", done => {
+    fetch({ "i18n://en-us@test.txt#1": "user edited text" });
+    fn({ uri: "test", value: "default" }, node => {
+      expect(node).toMatchSnapshot();
+      done();
+    });
+    jest.runAllTimers();
+  });
+
+  test("it calls the callback synchronously if the node already exists", () => {
+    djedi.addNodes({
+      ...simpleNodeResponse("test", "test"),
+      "i18n://en-us@edited.txt#1": "user edited text",
+    });
+
+    let called = false;
+    fn({ uri: "test", value: "default" }, node => {
+      expect(node).toMatchSnapshot("simple");
+      called = true;
+    });
+    expect(called).toBe(true);
+
+    called = false;
+    fn({ uri: "edited", value: "default" }, node => {
+      expect(node).toMatchSnapshot("versionless");
+      called = true;
+    });
+    expect(called).toBe(true);
+
+    called = false;
+    fn({ uri: "edited#1", value: "default" }, node => {
+      expect(node).toMatchSnapshot("versioned");
+      called = true;
+    });
+    expect(called).toBe(true);
+  });
+
+  test("it does not update versionless nodes", async () => {
+    fetch(simpleNodeResponse("test", "default"));
+    fetch({ "i18n://en-us@test.txt#1": "edited" });
+
+    fn({ uri: "test", value: undefined }, node => {
+      expect(node).toMatchSnapshot("versionless");
+    });
+
+    await wait();
+
+    fn({ uri: "test#1", value: undefined }, node => {
+      expect(node).toMatchSnapshot("versioned");
+    });
+
+    await wait();
+
+    let called = false;
+    fn({ uri: "test", value: undefined }, node => {
+      expect(node).toMatchSnapshot("versionless unchanged");
+      called = true;
+    });
+    expect(called).toBe(true);
+  });
+}
 
 function networkTests(fn) {
   test("it handles error status codes", async done => {

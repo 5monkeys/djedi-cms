@@ -18,103 +18,52 @@ Object {
 }
 `;
 
-exports[`fetchMany it handles error status codes 1`] = `
-Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"test\\": \\"default\\"
-}
-Response: 500 <mock.statusText>
-Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.",
-  "responseText": "<h1>Server error 500</h1>",
-  "status": 500,
-}
-`;
-
-exports[`fetchMany it handles invalid JSON 1`] = `
-Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"test\\": \\"default\\"
-}
-Response: 200 <mock.statusText>
-SyntaxError: Unexpected end of JSON input",
-  "responseText": "{ \\"invalid\\": true",
-  "status": 200,
-}
-`;
-
-exports[`fetchMany it handles rejected requests 1`] = `
-Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"test\\": \\"default\\"
-}
-Response: undefined
-Error: Network error",
-  "responseText": "",
-  "status": -1,
-}
-`;
-
-exports[`fetchMany it respects options.baseUrl: api call 1`] = `
-Array [
-  Array [
-    "https://example.com/cms/nodes/",
-    Object {
-      "body": Object {
-        "test": "default",
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
-]
-`;
-
-exports[`fetchMany it works: addNodes call 1`] = `
-Array [
-  Array [
-    Object {
-      "i18n://en-us@other.txt": "other",
-      "i18n://en-us@test.txt": "test",
-    },
-  ],
-]
-`;
-
-exports[`fetchMany it works: api call 1`] = `
-Array [
-  Array [
-    "/djedi/nodes/",
-    Object {
-      "body": Object {
-        "other": "default",
-        "test": null,
-        "test.txt": null,
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
-]
-`;
-
-exports[`fetchMany it works: nodes 1`] = `
-Object {
-  "i18n://en-us@other.txt": "other",
-  "i18n://en-us@test.txt": "test",
-}
-`;
-
-exports[`get it calls the callback synchronously if the node already exists 1`] = `
+exports[`get it calls the callback synchronously if the node already exists: simple 1`] = `
 Object {
   "uri": "i18n://en-us@test.txt",
   "value": "test",
+}
+`;
+
+exports[`get it calls the callback synchronously if the node already exists: versioned 1`] = `
+Object {
+  "uri": "i18n://en-us@edited.txt#1",
+  "value": "user edited text",
+}
+`;
+
+exports[`get it calls the callback synchronously if the node already exists: versionless 1`] = `
+Object {
+  "uri": "i18n://en-us@edited.txt#1",
+  "value": "user edited text",
+}
+`;
+
+exports[`get it does not update versionless nodes: versioned 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt#1",
+  "value": "edited",
+}
+`;
+
+exports[`get it does not update versionless nodes: versionless 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt",
+  "value": "default",
+}
+`;
+
+exports[`get it does not update versionless nodes: versionless unchanged 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt",
+  "value": "default",
+}
+`;
+
+exports[`get it handles auto-versioning 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt#1",
+  "value": "user edited text",
 }
 `;
 
@@ -189,10 +138,52 @@ Object {
 }
 `;
 
-exports[`getBatched it calls the callback synchronously if the node already exists 1`] = `
+exports[`getBatched it calls the callback synchronously if the node already exists: simple 1`] = `
 Object {
   "uri": "i18n://en-us@test.txt",
   "value": "test",
+}
+`;
+
+exports[`getBatched it calls the callback synchronously if the node already exists: versioned 1`] = `
+Object {
+  "uri": "i18n://en-us@edited.txt#1",
+  "value": "user edited text",
+}
+`;
+
+exports[`getBatched it calls the callback synchronously if the node already exists: versionless 1`] = `
+Object {
+  "uri": "i18n://en-us@edited.txt#1",
+  "value": "user edited text",
+}
+`;
+
+exports[`getBatched it does not update versionless nodes: versioned 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt#1",
+  "value": "edited",
+}
+`;
+
+exports[`getBatched it does not update versionless nodes: versionless 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt",
+  "value": "default",
+}
+`;
+
+exports[`getBatched it does not update versionless nodes: versionless unchanged 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt",
+  "value": "default",
+}
+`;
+
+exports[`getBatched it handles auto-versioning 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt#1",
+  "value": "user edited text",
 }
 `;
 
