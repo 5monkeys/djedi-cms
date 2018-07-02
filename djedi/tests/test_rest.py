@@ -291,10 +291,10 @@ class PublicRestTest(ClientTest):
 
         with self.assertDB(calls=1):
             url = reverse('djedi:api.nodes')
-            response = self.client.post(url, {
+            response = self.client.post(url, json.dumps({
                 'page/body.md': u'# Foo Bar',
                 'label/email': u'E-mail',
-            })
+            }), content_type='application/json')
 
         json_content = json.loads(response.content)
 

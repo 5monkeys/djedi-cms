@@ -1,3 +1,4 @@
+import simplejson as json
 import six
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.cache import never_cache
@@ -39,7 +40,7 @@ class NodesApi(APIView):
     @never_cache
     def post(self, request):
         nodes = []
-        for uri, default in six.iteritems(request.POST):
+        for uri, default in six.iteritems(json.loads(request.body)):
             node = cio.get(uri, default=default)
             nodes.append(node)
 
