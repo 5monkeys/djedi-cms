@@ -284,9 +284,9 @@ class PublicRestTest(ClientTest):
                 'label/email': u'E-mail',
             })
 
-        data = response.json()
+        json_content = json.loads(response.content)
 
-        self.assertIn('i18n://sv-se@page/body.md', data.keys())
-        self.assertEqual(data['i18n://sv-se@page/body.md'], u'<h1>Foo Bar</h1>')
-        self.assertIn('i18n://sv-se@label/email.txt#1', data.keys())
-        self.assertEqual(data['i18n://sv-se@label/email.txt#1'], u'E-post')
+        self.assertIn('i18n://sv-se@page/body.md', json_content.keys())
+        self.assertEqual(json_content['i18n://sv-se@page/body.md'], u'<h1>Foo Bar</h1>')
+        self.assertIn('i18n://sv-se@label/email.txt#1', json_content.keys())
+        self.assertEqual(json_content['i18n://sv-se@label/email.txt#1'], u'E-post')
