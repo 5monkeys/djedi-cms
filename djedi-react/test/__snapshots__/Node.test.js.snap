@@ -116,7 +116,7 @@ exports[`custom render function: network error 1`] = `
   <div
     data-details={
       Object {
-        "message": "Djedi API error for request: POST /nodes/
+        "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@2.txt\\": null
 }
@@ -139,7 +139,7 @@ exports[`custom render function: status error 1`] = `
   <div
     data-details={
       Object {
-        "message": "Djedi API error for request: POST /nodes/
+        "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@1.txt\\": null
 }

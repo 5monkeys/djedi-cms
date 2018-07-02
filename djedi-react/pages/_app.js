@@ -1,12 +1,13 @@
+/* global process */
+
 import { djedi } from "djedi-react";
 import App, { Container } from "next/app";
 import React from "react";
 
 // Set baseUrl differently for server and browser rendering.
 djedi.options.baseUrl =
-  typeof window === "undefined"
-    ? "http://django:8000/djedi"
-    : "http://localhost:8000/djedi";
+  (typeof process !== "undefined" && process.env.SERVER_BASE_URL) ||
+  "http://localhost:8000/djedi";
 
 // Inject the admin sidebar, if the user has permission. Only do this in the
 // browser.

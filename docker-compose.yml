@@ -20,3 +20,5 @@ services:
     volumes:
       - ./djedi-react/:/code
       - /code/node_modules
+    environment:
+      - SERVER_BASE_URL=http://django:8000/djedi

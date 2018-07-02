@@ -699,6 +699,8 @@ works exactly the same without the `md` tag. But there are some benefits:
 
 You can either install [Node.js] 10 (with npm 6) or use [docker].
 
+### npm scripts
+
 - `npm start`: Start the [Next.js] example dev server. <http://localhost:3000>
 - `npm run watch`: Start [Jest] in watch mode. Outside docker you can use
   `npm run jest -- --watch` instead.
@@ -710,7 +712,7 @@ You can either install [Node.js] 10 (with npm 6) or use [docker].
 - `npm test`: Check that everything works.
 - `npm publish`: Publish to [npm], but only if `npm test` passes.
 
-For docker:
+### docker
 
 ```bash
 # Build:
@@ -726,13 +728,33 @@ docker-compose exec node npm test
 docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/node_modules djedi-react run watch
 ```
 
-Directories:
+### Directories
 
 - `src/`: Source code.
 - `test/` and `__mocks__/`: Tests and mocks.
 - `dist/`: Compiled code, built by `npm run build`. This is what is published in
   the npm package.
 - `pages/` and `components/`: [Next.js] example app.
+
+### Notes
+
+`npm start` creates `node_modules/djedi-react` – a symlink to this directory.
+This is so that the example app can use `import "djedi-react"`. However, `npm
+install` gets confused by that symlink. If you need to install or remove
+dependencies, run `npm run fix-install` first to remove the symlink.
+
+If you make changes to the library and want to try them out on
+<http://localhost:3000> you need to:
+
+```
+# Rebuild:
+npm run build
+docker-compose exec node npm run build
+
+# Restart:
+npm start # But kill old server first :)
+docker-compose restart node
+```
 
 ## License
 

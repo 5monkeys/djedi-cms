@@ -314,8 +314,8 @@ export class Djedi {
   }
 
   _post(passedUrl, data) {
-    const info = { method: "POST", apiUrl: passedUrl, data };
     const url = `${this.options.baseUrl}${passedUrl}`;
+    const info = { method: "POST", apiUrl: url, data };
 
     return unfetch(url, {
       method: "POST",

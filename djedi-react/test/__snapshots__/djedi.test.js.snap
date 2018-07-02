@@ -20,7 +20,7 @@ Object {
 
 exports[`fetchMany it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"test\\": \\"default\\"
 }
@@ -33,7 +33,7 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
 
 exports[`fetchMany it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"test\\": \\"default\\"
 }
@@ -46,7 +46,7 @@ SyntaxError: Unexpected end of JSON input",
 
 exports[`fetchMany it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"test\\": \\"default\\"
 }
@@ -120,7 +120,7 @@ Object {
 
 exports[`get it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -133,7 +133,7 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
 
 exports[`get it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -154,7 +154,7 @@ Object {
 
 exports[`get it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -198,7 +198,7 @@ Object {
 
 exports[`getBatched it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -211,7 +211,7 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
 
 exports[`getBatched it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -238,7 +238,7 @@ Array [
 
 exports[`getBatched it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": \\"default\\"
 }
@@ -519,7 +519,7 @@ Object {
 
 exports[`prefetch it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": null
 }
@@ -532,7 +532,7 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
 
 exports[`prefetch it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": null
 }
@@ -545,7 +545,7 @@ SyntaxError: Unexpected end of JSON input",
 
 exports[`prefetch it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /nodes/
+  "message": "Djedi API error for request: POST /djedi/nodes/
 RequestData sent: {
   \\"i18n://en-us@test.txt\\": null
 }
