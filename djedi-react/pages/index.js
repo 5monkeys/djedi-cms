@@ -72,7 +72,8 @@ export default class Home extends React.Component {
 
         {/* This node has a dynamic URI and therfore isn‘t prefetched. In this
         case, server-side rendering "Loading…" instead of a cookie warning is
-        acceptable. */}
+        acceptable. Note that it might be rendered on subsequent requests if the
+        node ends up in cache. */}
         <p>
           <Node uri={`store/${storeSlug}/cookie-warning/text`}>
             This site uses cookies.
