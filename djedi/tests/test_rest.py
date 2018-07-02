@@ -275,12 +275,12 @@ class PublicRestTest(ClientTest):
         self.assertNotIn(b'window.DJEDI_NODES', response.content)
 
     def test_nodes(self):
-        cio.set('sv-se@label/email', 'E-post')
+        cio.set('sv-se@label/email', u'E-post')
 
         with self.assertDB(calls=1):
             url = reverse('djedi:api.nodes')
             response = self.client.post(url, {
-                'page/body.md': u'#Foo Bar',
+                'page/body.md': u'# Foo Bar',
                 'label/email': u'E-mail',
             })
 
