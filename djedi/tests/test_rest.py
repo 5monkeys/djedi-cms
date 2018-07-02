@@ -274,10 +274,13 @@ class PublicRestTest(ClientTest):
     def test_embed(self):
         url = reverse('djedi:api.embed')
         response = self.client.get(url)
+        html = smart_unicode(response.content)
 
-        self.assertIn(b'iframe id="djedi-cms"', response.content)
-        self.assertNotIn(b'window.DJEDI_NODES', response.content)
-        self.assertNotIn(b'window.domain', response.content)
+        self.assertIn(u'iframe id="djedi-cms"', html)
+        cms_url = u'http://testserver' + reverse('admin:djedi:cms')
+        self.assertIn(cms_url, html)
+        self.assertNotIn(u'window.DJEDI_NODES', html)
+        self.assertNotIn(u'window.domain', html)
 
         with cio.conf.settings(XSS_DOMAIN='foobar.se'):
             response = self.client.get(url)

@@ -25,6 +25,7 @@ class EmbedApi(View):
         if has_permission(request):
             return render(request, 'djedi/cms/embed.html', {
                 'exclude_json_nodes': True,
+                'cms_url_prefix': request.build_absolute_uri('/').rstrip('/'),
             })
         else:
             raise PermissionDenied
