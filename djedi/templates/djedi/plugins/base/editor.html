@@ -1,4 +1,4 @@
-{% load static staticfiles %}
+{% load static staticfiles djedi_admin %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -53,8 +53,8 @@
         {% block script %}
             <script>
                 window.DJEDI_ENDPOINT = '{% url 'admin:djedi:cms' %}';
-                {% if XSS_DOMAIN %}window.domain = "{{ XSS_DOMAIN }}";{% endif %}
             </script>
+            {% djedi_xss_domain %}
             <script src="{% static 'djedi/vendor/jquery/jquery.min.js' %}?v={{ VERSION }}"></script>
             <script src="{% static 'djedi/vendor/jquery.form/jquery.form.min.js' %}?v={{ VERSION }}"></script>
             <script src="{% static 'djedi/vendor/bootstrap/js/bootstrap.min.js' %}?v={{ VERSION }}"></script>

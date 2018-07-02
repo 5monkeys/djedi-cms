@@ -214,7 +214,7 @@ class PrivateRestTest(ClientTest):
         for ext in plugins:
             response = self.get('cms.editor', 'sv-se@page/title.' + ext)
             self.assertEqual(response.status_code, 200)
-            assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'XSS_DOMAIN', 'uri',))
+            assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
             self.assertNotIn(b'window.domain', response.content)
 
         with cio.conf.settings(XSS_DOMAIN='foobar.se'):

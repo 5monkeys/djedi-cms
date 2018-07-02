@@ -2,7 +2,9 @@ import json
 import logging
 
 from django import template
+from django.utils.html import mark_safe
 
+import cio.conf
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
 from djedi.compat import render_to_string
@@ -26,3 +28,10 @@ def djedi_admin(context):
     pipeline.clear()
 
     return output
+
+
+@register.simple_tag
+def djedi_xss_domain():
+    domain = cio.conf.settings.get('XSS_DOMAIN')
+    if domain:
+        return mark_safe(u'<script>window.domain = "{domain}";</script>'.format(domain=domain))

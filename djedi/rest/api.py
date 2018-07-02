@@ -25,7 +25,6 @@ class EmbedApi(View):
         if has_permission(request):
             return render(request, 'djedi/cms/embed.html', {
                 'exclude_json_nodes': True,
-                'XSS_DOMAIN': cio.conf.settings.get('XSS_DOMAIN'),
             })
         else:
             raise PermissionDenied
