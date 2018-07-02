@@ -206,6 +206,26 @@ describe("prefetch", () => {
     expect(fetch.mockFn).toHaveBeenCalledTimes(0);
   });
 
+  test('it "returns" all "rendered" nodes even if no request', async () => {
+    fetch({
+      ...simpleNodeResponse("1", "1"),
+      ...simpleNodeResponse("2", "2"),
+    });
+
+    djedi.reportPrefetchableNode({ uri: "1", value: undefined });
+    djedi.reportPrefetchableNode({ uri: "2", value: undefined });
+
+    const nodes1 = await djedi.prefetch();
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+
+    const nodes2 = await djedi.prefetch();
+    const callback = jest.fn();
+    djedi.get({ uri: "1", value: undefined }, callback);
+    djedi.getBatched({ uri: "2", value: undefined }, callback);
+    expect(callback).toHaveBeenCalledTimes(2);
+    expect(nodes2).toEqual(nodes1);
+  });
+
   networkTests(callback => {
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.prefetch().then(callback, callback);

@@ -412,6 +412,24 @@ Array [
 ]
 `;
 
+exports[`prefetch it "returns" all "rendered" nodes even if no request: api call 1`] = `
+Array [
+  Array [
+    "/djedi/nodes/",
+    Object {
+      "body": Object {
+        "i18n://en-us@1.txt": null,
+        "i18n://en-us@2.txt": null,
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`;
+
 exports[`prefetch it allows filtering nodes: api call 1`] = `
 Array [
   Array [

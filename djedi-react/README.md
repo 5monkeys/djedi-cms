@@ -117,6 +117,14 @@ did not match” warnings from React since the actual node contents would be
 rendered on the server, but “Loading…” would be rendered in the browser (during
 the initial render).
 
+**Note:** There’s a weird quirk about the `nodes` object in `const nodes = await
+djedi.prefetch()`. **The returned object will be mutated.**  All `djedi.get`
+and `djedi.getBatched` calls update the `nodes` from the last
+`djedi.prefetch()` call. This is needed on the server to make sure that all
+rendered nodes actually end up in the object you send down to the browser (due
+to caching and renders of different pages). Be sure not to serialize `nodes`
+until _after_ you’ve rendered the page.
+
 So, how exactly does `djedi.prefetch` know what to fetch? It’s all thanks to the
 [Babel] plugin mentioned in [Installation](#installation).
 
@@ -583,6 +591,10 @@ djedi.prefetch({
   ],
 });
 ```
+
+**Note:** The nodes object that the promise resolves to can be mutated by
+subsequent `djedi.get` and `djedi.getBatched` calls. See [server-side
+rendering].
 
 ##### `djedi.addNodes(nodes: Nodes): void`
 

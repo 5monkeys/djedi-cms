@@ -27,6 +27,7 @@ export class Djedi {
     this._nodes = new Map();
     this._prefetchableNodes = new Map();
     this._renderedNodes = new Map();
+    this._lastPrefetch = {};
     this._batch = makeEmptyBatch();
     this._DJEDI_NODES = {};
 
@@ -50,6 +51,7 @@ export class Djedi {
     this._nodes = new Map();
     this._prefetchableNodes = new Map();
     this._renderedNodes = new Map();
+    this._lastPrefetch = {};
     this._batch = makeEmptyBatch();
     this._DJEDI_NODES = {};
 
@@ -64,16 +66,16 @@ export class Djedi {
     const existingNode = this._nodes.get(uri);
 
     if (existingNode != null) {
-      callback(existingNode);
+      this._callback(callback, existingNode);
       return;
     }
 
     this._fetchMany({ [node.uri]: node.value }).then(
       () => {
-        callback(this._nodes.get(uri) || missingUriError(uri));
+        this._callback(callback, this._nodes.get(uri) || missingUriError(uri));
       },
       error => {
-        callback(error);
+        this._callback(callback, error);
       }
     );
   }
@@ -88,7 +90,7 @@ export class Djedi {
     const existingNode = this._nodes.get(node.uri);
 
     if (existingNode != null) {
-      callback(existingNode);
+      this._callback(callback, existingNode);
       return;
     }
 
@@ -144,9 +146,15 @@ export class Djedi {
       }
     });
 
-    return Object.keys(nodes).length === 0
-      ? Promise.resolve({})
-      : this._fetchMany(nodes);
+    const promise =
+      Object.keys(nodes).length === 0
+        ? Promise.resolve({})
+        : this._fetchMany(nodes);
+
+    return promise.then(results => {
+      this._lastPrefetch = results;
+      return results;
+    });
   }
 
   // Needed to pick up the results from `prefetch` after server-side rendering.
@@ -271,6 +279,16 @@ export class Djedi {
     };
   }
 
+  // Calls `callback(node)` and also updates the last return value of
+  // `djedi.prefetch()`. This is really ugly but needed for server-side
+  // rendering.
+  _callback(callback, node) {
+    if (!(node instanceof Error)) {
+      this._lastPrefetch[node.uri] = node.value;
+    }
+    callback(node);
+  }
+
   _parseUri(uri, { applyDefaults = true } = {}) {
     const { defaults, namespaceByScheme, separators } = this.options.uri;
     const uriObject = parseUri(uri, separators);
@@ -314,14 +332,14 @@ export class Djedi {
         queue.forEach((data, uri) => {
           const node = this._nodes.get(uri) || missingUriError(uri);
           data.callbacks.forEach(callback => {
-            callback(node);
+            this._callback(callback, node);
           });
         });
       },
       error => {
         queue.forEach(data => {
           data.callbacks.forEach(callback => {
-            callback(error);
+            this._callback(callback, error);
           });
         });
       }
