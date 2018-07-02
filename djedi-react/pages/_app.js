@@ -12,12 +12,6 @@ djedi.options.baseUrl =
 // Inject the admin sidebar, if the user has permission. Only do this in the
 // browser.
 if (typeof document !== "undefined") {
-  // First allow the iframe to set its `document.domain` to the domain of this
-  // script. Only works if this domain is a superdomain of the iframe domain.
-  // This is only needed if the iframe is served from a (different) subdomain
-  // (or, in the case of this demo, different localhost ports are used).
-  // eslint-disable-next-line no-self-assign
-  document.domain = document.domain;
   djedi.injectAdmin();
 }
 

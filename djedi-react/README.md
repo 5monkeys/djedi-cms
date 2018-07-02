@@ -25,6 +25,8 @@ Optional [Babel] plugin (for [server-side rendering]):
 }
 ```
 
+See also [Django settings](#django-settings).
+
 ## Browser support
 
 All the latest browsers plus Internet Explorer 11 (which requires a `Promise`
@@ -695,6 +697,27 @@ works exactly the same without the `md` tag. But there are some benefits:
   template literal as markdown, which is very convenient. This is useful even if
   the value is plain text (markdown formatting usually works well there too).
 
+## Django settings
+
+If you run your React frontend and your Django backend on different domains, you
+need to add some extra settings on the Django side.
+
+Let’s say the React frontend lives on `example.com` while the Django backend
+lives on `api.example.com`. Then you need two things:
+
+- [CORS] headers, for example using [django-cors-headers] or nginx. This is to
+  allow djedi-react making AJAX requests to fetch nodes. You need to allow `GET`
+  and `POST` requests with credentials (cookies) from `example.com`.
+
+- `DJEDI_XSS_DOMAIN = 'example.com'` in your Django settings file. This is to
+  allow the admin sidebar iframe to reach into its parent page. This should be a
+  common superdomain of the frontend and backend domains. See [document.domain]
+  for more information.
+
+If the two domains do not share the same super domain (such as `site.com` and
+`api.com`) you need to set up a proxy server on the React frontend domain. For
+example, you could proxy `site.com/djedi` to `api.com/djedi`.
+
 ## Development
 
 You can either install [Node.js] 10 (with npm 6) or use [docker].
@@ -741,8 +764,8 @@ docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/no
 #### npm install
 
 `npm start` creates `node_modules/djedi-react` – a symlink to this directory.
-This is so that the example app can use `import "djedi-react"`. However, `npm
-install` gets confused by that symlink. If you need to install or remove
+This is so that the example app can use `import "djedi-react"`. However,
+`npm install` gets confused by that symlink. If you need to install or remove
 dependencies, run `npm run fix-install` first to remove the symlink.
 
 #### Test changes in example
@@ -774,8 +797,12 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [BSD-3-Clause](LICENSE)
 
 [babel]: https://babeljs.io/
+[cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+[django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
 [djedi cms]: https://djedi-cms.org/
 [docker]: https://www.docker.com/community-edition
+[document.domain]:
+  https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
 [eslint]: https://eslint.org/
 [jest]: https://jestjs.io/
 [next.js]: https://nextjs.org/

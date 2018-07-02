@@ -120,3 +120,9 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 CORS_ALLOW_CREDENTIALS = True
+
+
+# Djedi
+# http://djedi-cms.org/settings.html
+
+DJEDI_XSS_DOMAIN = 'localhost'
