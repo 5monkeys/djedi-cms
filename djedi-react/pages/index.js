@@ -25,20 +25,6 @@ export default class Home extends React.Component {
     // show its 500 page (in production mode). You can also choose to catch the
     // error and render something else.
 
-    // Using hard-coded nodes rather than `djedi.prefetch` until the API is done.
-    // TODO: Remove this.
-    // const nodes = {
-    //   "i18n://en-us@home/title.txt": "Welcome to the djedi-react example!",
-    //   "i18n://en-us@home/text.md":
-    //     '<h2>Using markdown</h2><p>Some text and a <a href="{url}">link</a>.</p>',
-    //   "i18n://en-us@home/image.img":
-    //     '<img src="https://djedi-cms.org/_static/djedi-portrait.svg" width="144">',
-    //   "i18n://en-us@home/footer.txt": "© [year]. This node is not editable.",
-    //   "i18n://en-us@store/andys-tools/special-offer/text.txt":
-    //     "50% off on all tools!",
-    //   "i18n://en-us@Search/placeholder.txt": "Search",
-    // };
-
     // Next.js will save the stuff returned here when server-side rendering and
     // pass it to the browser. This way the browser won’t have to make a request
     // for the nodes again (which also would cause “server and client did not
