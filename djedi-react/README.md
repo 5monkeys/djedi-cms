@@ -175,14 +175,14 @@ The Babel plugin has some constraints, though:
 - It is assumed that your build system can handle
   `import { djedi } from "djedi-react"`.
 
-There’s one final detail to keep in mind. Remember how `import`ing a file is
-enough to let djedi-react know about the nodes in there? For an SPA you might
-end up `import`ing every page and component of you whole site at startup. That
-means that calling `djedi.prefetch()` will try to load every single node of the
-whole site just to render a single page. The best way to solve this is to use
-code splitting ([Next.js] does that by default), which is good for performance
-anyway. If that’s not possible for you, you can pass a filter function to
-`djedi.prefetch`. For example:
+There’s a fine detail to keep in mind about the prefetching. Remember how
+`import`ing a file is enough to let djedi-react know about the nodes in there?
+For an SPA you might end up `import`ing every page and component of you whole
+site at startup. That means that calling `djedi.prefetch()` will try to load
+every single node of the whole site just to render a single page. The best way
+to solve this is to use code splitting ([Next.js] does that by default), which
+is good for performance anyway. If that’s not possible for you, you can pass a
+filter function to `djedi.prefetch`. For example:
 
 ```js
 djedi.prefetch({ filter: uri => uri.path.startsWith("home/") });
@@ -191,6 +191,14 @@ djedi.prefetch({ filter: uri => uri.path.startsWith("home/") });
 Using Djedi, it is common practice to group nodes by page. For example,
 `home/title.txt`, `home/text.md`, `about/title.txt`, `about/text.md`, etc. So
 loading all nodes starting with for example `home/` might work out.
+
+Finally, let’s talk about caching. djedi-react uses an in-memory cache of all
+nodes it fetches. Once a node has been fetched, it is never asked for again (as
+long as the cache exists). The idea is that in the browser the user will
+eventually reload the page, or close and re-open it or the whole browser. But a
+server might be running for long times without being restarted. So you’ll need
+to clear the cache periodically (as a sort of cache TTL). This is done by
+calling `djedi.resetNodes()`.
 
 ## Reference
 
@@ -601,6 +609,12 @@ rendering].
 Adds the given nodes to the cache. Usually comes from `djedi.prefetch` and done
 in the browser after [server-side rendering].
 
+##### `djedi.resetNodes(): void`
+
+Resets the nodes cache. Do this periodically on the server to implement a cache
+TTL. Otherwise your server will never serve changes made in the admin sidebar
+until it is restarted.
+
 #### Less common methods
 
 These methods are useful if you need to manually fetch nodes (rather than using
@@ -669,10 +683,6 @@ Might be useful for unit tests, but otherwise you’ll probably won’t need the
 ##### `djedi.resetOptions(): void`
 
 Resets [djedi.options](#options) back to the defaults.
-
-##### `djedi.resetNodes(): void`
-
-Resets the nodes cache.
 
 ### `md`
 
