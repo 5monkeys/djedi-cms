@@ -315,7 +315,7 @@ Some more text.
 Whether or not the node should be auto-updated after editing it in the admin
 sidebar. Editable nodes are wrapped in a `<span>` while non-editable nodes are
 rendered without any enclosing tag. (The name “edit” might be a bit confusing,
-but it is inherited from the Djano template tags.)
+but it is inherited from the Django template tags.)
 
 **Note:** It’s not possible to render HTML without a wrapper element in React.
 So you can’t do `edit={false}` and expect the node value to be treated as HTML.
