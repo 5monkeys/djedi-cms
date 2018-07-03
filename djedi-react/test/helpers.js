@@ -70,7 +70,7 @@ export function waitForPromises() {
 // Useful in `beforeEach`.
 export function resetAll() {
   djedi.resetOptions();
-  djedi.resetNodes();
+  djedi.resetState();
   fetch.reset();
 }
 

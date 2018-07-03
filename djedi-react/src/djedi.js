@@ -7,7 +7,9 @@
 import unfetch from "isomorphic-unfetch";
 
 import { applyUriDefaults, parseUri, stringifyUri } from "./uri";
+import Cache from "./Cache";
 
+const DEFAULT_CACHE_TTL = typeof window === "undefined" ? 20e3 : Infinity; // ms
 const DOCUMENT_DOMAIN_REGEX = /\bdocument\.domain\s*=\s*(["'])([^'"\s]+)\1/;
 
 /*
@@ -18,8 +20,8 @@ export class Djedi {
   constructor() {
     this.options = makeDefaultOptions();
 
-    // `Map<uri: string, Node>`. Cache of all fetched nodes.
-    this._nodes = new Map();
+    // `Cache<uri: string, Node>`. Cache of all fetched nodes.
+    this._nodes = new Cache({ ttl: DEFAULT_CACHE_TTL });
 
     // `Map<uri: string, Node>`. Everything that `reportPrefetchableNode` has
     // reported. The nodes contain default values (if any).
@@ -54,12 +56,12 @@ export class Djedi {
     this.options = makeDefaultOptions();
   }
 
-  resetNodes() {
+  resetState() {
     if (this._batch.timeoutId != null) {
       clearTimeout(this._batch.timeoutId);
     }
 
-    this._nodes = new Map();
+    this._nodes = new Cache({ ttl: DEFAULT_CACHE_TTL });
     this._prefetchableNodes = new Map();
     this._lastPrefetch = {};
     this._batch = makeEmptyBatch();
@@ -68,6 +70,18 @@ export class Djedi {
 
     if (typeof window !== "undefined") {
       window.DJEDI_NODES = this._DJEDI_NODES;
+    }
+  }
+
+  setCache(value) {
+    if (typeof value === "number") {
+      if (this._nodes instanceof Cache) {
+        this._nodes.ttl = value;
+      } else {
+        this._nodes = new Cache({ ttl: value });
+      }
+    } else {
+      this._nodes = value;
     }
   }
 
@@ -143,7 +157,7 @@ export class Djedi {
     const nodes = {};
     this._prefetchableNodes.forEach(node => {
       if (
-        !this._nodes.has(node.uri) &&
+        this._nodes.get(node.uri) == null &&
         (filter == null ||
           filter(this._parseUri(node.uri, { applyDefaults: false })))
       ) {
@@ -152,7 +166,7 @@ export class Djedi {
     });
     extra.forEach(node => {
       const uri = this._normalizeUri(node.uri);
-      if (!this._nodes.has(uri)) {
+      if (this._nodes.get(uri) == null) {
         nodes[uri] = node.value;
       }
     });
@@ -192,7 +206,7 @@ export class Djedi {
 
         // If the versionless URI has already been set, don’t update it so that
         // if a node re-renders it doesn’t unexpectedly change its text.
-        if (!this._nodes.has(versionlessUri)) {
+        if (this._nodes.get(versionlessUri) == null) {
           this._nodes.set(versionlessUri, node);
         }
       }

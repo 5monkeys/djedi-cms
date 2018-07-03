@@ -1,3 +1,5 @@
+import LRU from "lru-cache";
+
 import { djedi } from "../src";
 
 import {
@@ -13,18 +15,20 @@ jest.useFakeTimers();
 
 console.warn = jest.fn();
 console.error = jest.fn();
+jest.spyOn(Date, "now");
 
 beforeEach(() => {
   resetAll();
   console.warn.mockClear();
   console.error.mockClear();
+  Date.now.mockClear();
   document.body.textContent = "";
   document.domain = "site.example.com";
 });
 
 // `addNodes` is tested together with `get` and `getBatched`.
 // `reportPrefetchableNode` is tested together with `prefetch`.
-// `resetNodes` and `resetOptions` are run in `beforeEach`.
+// `resetState` and `resetOptions` are run in `beforeEach`.
 
 describe("get", () => {
   test("it works", done => {
@@ -226,6 +230,16 @@ describe("prefetch", () => {
     expect(nodes2).toEqual(nodes1);
   });
 
+  test("it refetches if cache has expired", async () => {
+    const ttl = 10e3;
+    await prefetchRefetchTest(ttl, ttl);
+  });
+
+  test("it refetches if custom cache has expired", async () => {
+    const ttl = 10e3;
+    await prefetchRefetchTest(ttl, new LRU({ maxAge: ttl }));
+  });
+
   networkTests(callback => {
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.prefetch().then(callback, callback);
@@ -330,6 +344,121 @@ describe("element", () => {
   test("it works", () => {
     expect(djedi.element("test")).toMatchSnapshot();
     expect(djedi.element("i18n://sv-se@home/intro.md#5")).toMatchSnapshot();
+  });
+});
+
+describe("setCache", () => {
+  test("it works", async () => {
+    fetch(simpleNodeResponse("test", "test"));
+
+    const start = new Date("2018-01-01").getTime();
+    const end = new Date("2118-01-01").getTime();
+
+    Date.now.mockReturnValue(start);
+    djedi.addNodes(simpleNodeResponse("test", "test"));
+
+    // We just added the node so it hasn't expired and the callback is called
+    // immediately.
+    const callback1 = jest.fn();
+    djedi.get({ uri: "test", default: "test" }, callback1);
+    expect(callback1).toHaveBeenCalledTimes(1);
+
+    // The default (browser) ttl is very long.
+    const callback2 = jest.fn();
+    Date.now.mockReturnValue(end);
+    djedi.get({ uri: "test", default: "test" }, callback2);
+    expect(callback2).toHaveBeenCalledTimes(1);
+
+    // Set a short ttl and let it expire.
+    const callback3 = jest.fn();
+    const ttl = 60e3;
+    djedi.setCache(ttl);
+    Date.now.mockReturnValue(start + ttl);
+    djedi.get({ uri: "test", default: "test" }, callback3);
+    expect(callback3).toHaveBeenCalledTimes(1);
+    Date.now.mockReturnValue(start + ttl + 1);
+    djedi.get({ uri: "test", default: "test" }, callback3);
+    expect(callback3).toHaveBeenCalledTimes(1);
+    await wait();
+    expect(callback3).toHaveBeenCalledTimes(2);
+  });
+
+  test("it allows setting a custom cache", async () => {
+    fetch(simpleNodeResponse("1", "1"));
+    fetch(simpleNodeResponse("1", "1"));
+
+    const start = new Date("2018-01-01").getTime();
+
+    const text1 = "text1";
+    const text2 = "some longer text";
+    const text3 = "the third and final text";
+
+    const ttl = 10e3;
+    djedi.setCache(
+      new LRU({
+        maxAge: ttl,
+        max: text2.length + text3.length,
+        length: node => node.value.length,
+      })
+    );
+
+    Date.now.mockReturnValue(start);
+    djedi.addNodes({
+      "1": text1,
+      "2": text2,
+    });
+
+    // We just added the nodes so they haven't expired and the callback is
+    // called immediately.
+    const callback1 = jest.fn();
+    djedi.get({ uri: "1", default: undefined }, callback1);
+    expect(callback1).toHaveBeenCalledTimes(1);
+
+    // Let the nodes expire because of age.
+    const callback2 = jest.fn();
+    Date.now.mockReturnValue(start + ttl + 1);
+    djedi.get({ uri: "1", default: undefined }, callback2);
+    expect(callback2).toHaveBeenCalledTimes(0);
+    await wait();
+    expect(callback2).toHaveBeenCalledTimes(1);
+
+    // Let the oldest node be removed because of size.
+    Date.now.mockReturnValue(start);
+    djedi.addNodes({
+      "1": text1,
+      "2": text2,
+    });
+    const callback3 = jest.fn();
+    djedi.get({ uri: "1", default: undefined }, callback3);
+    expect(callback3).toHaveBeenCalledTimes(1);
+    Date.now.mockReturnValue(start + 10);
+    djedi.get({ uri: "2", default: undefined }, callback3);
+    expect(callback3).toHaveBeenCalledTimes(2);
+    djedi.addNodes({ "3": text3 });
+    djedi.get({ uri: "3", default: undefined }, callback3);
+    expect(callback3).toHaveBeenCalledTimes(3);
+    djedi.get({ uri: "1", default: undefined }, callback3);
+    expect(callback3).toHaveBeenCalledTimes(3);
+    await wait();
+    expect(callback3).toHaveBeenCalledTimes(4);
+  });
+
+  test("it handles switching to a custom cache and back again", () => {
+    class FakeCache {
+      get() {
+        throw new Error("Expected FakeCache#get not to have been called");
+      }
+
+      set() {
+        throw new Error("Expected FakeCache#set not to have been called");
+      }
+    }
+
+    djedi.setCache(new FakeCache());
+    djedi.setCache(10e3);
+    expect(() => {
+      djedi.addNodes(simpleNodeResponse("test", "test"));
+    }).not.toThrow();
   });
 });
 
@@ -493,4 +622,26 @@ function networkTests(fn) {
     expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
     expect(callback).toHaveBeenCalledTimes(1);
   });
+}
+
+async function prefetchRefetchTest(ttl, cacheValue) {
+  fetch(simpleNodeResponse("test", "test"));
+
+  const start = new Date("2018-01-01").getTime();
+  djedi.setCache(cacheValue);
+
+  Date.now.mockReturnValue(start);
+  djedi.addNodes(simpleNodeResponse("test", "test"));
+  djedi.reportPrefetchableNode({ uri: "test", value: undefined });
+
+  await djedi.prefetch();
+  expect(fetch.mockFn).toHaveBeenCalledTimes(0);
+
+  Date.now.mockReturnValue(start + ttl + 1);
+  await djedi.prefetch();
+  expect(fetch.mockFn).toHaveBeenCalledTimes(1);
+
+  const callback = jest.fn();
+  djedi.get({ uri: "test", value: undefined }, callback);
+  expect(callback.mock.calls).toMatchSnapshot();
 }

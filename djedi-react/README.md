@@ -117,9 +117,9 @@ did not match” warnings from React since the actual node contents would be
 rendered on the server, but “Loading…” would be rendered in the browser (during
 the initial render).
 
-**Note:** There’s a weird quirk about the `nodes` object in `const nodes = await
-djedi.prefetch()`. **The returned object will be mutated.**  All `djedi.get`
-and `djedi.getBatched` calls update the `nodes` from the last
+**Note:** There’s a weird quirk about the `nodes` object in
+`const nodes = await djedi.prefetch()`. **The returned object will be mutated.**
+All `djedi.get` and `djedi.getBatched` calls update the `nodes` from the last
 `djedi.prefetch()` call. This is needed on the server to make sure that all
 rendered nodes actually end up in the object you send down to the browser (due
 to caching and renders of different pages). Be sure not to serialize `nodes`
@@ -192,13 +192,8 @@ Using Djedi, it is common practice to group nodes by page. For example,
 `home/title.txt`, `home/text.md`, `about/title.txt`, `about/text.md`, etc. So
 loading all nodes starting with for example `home/` might work out.
 
-Finally, let’s talk about caching. djedi-react uses an in-memory cache of all
-nodes it fetches. Once a node has been fetched, it is never asked for again (as
-long as the cache exists). The idea is that in the browser the user will
-eventually reload the page, or close and re-open it or the whole browser. But a
-server might be running for long times without being restarted. So you’ll need
-to clear the cache periodically (as a sort of cache TTL). This is done by
-calling `djedi.resetNodes()`.
+Finally, you probably want to check out
+[djedi.setCache](#djedisetcachevalue-number--cache-void) as well.
 
 ## Reference
 
@@ -609,11 +604,38 @@ rendering].
 Adds the given nodes to the cache. Usually comes from `djedi.prefetch` and done
 in the browser after [server-side rendering].
 
-##### `djedi.resetNodes(): void`
+##### `djedi.setCache(value: number | Cache): void`
 
-Resets the nodes cache. Do this periodically on the server to implement a cache
-TTL. Otherwise your server will never serve changes made in the admin sidebar
-until it is restarted.
+`number | Cache` Default: See below.
+
+djedi-react comes with a very basic in-memory cache for fetched nodes by
+default. It has no max-size, but each node has a max-age. Default:
+
+- Server: 20 seconds
+- Browser: Unlimited
+
+By passing a number to `djedi.setCache` you can change the above default
+max-age. The number should be in milliseconds.
+
+The point of the default cache is to avoid unnecessary requests from the
+browser. The reason for the short max-age on the server is to make sure that if
+nodes are edited in the admin sidebar they show up pretty quickly (instead of
+being stuck on an older version until you restart the server).
+
+If your app has tons of nodes and the cache eats up all your memory, you can
+pass in a custom cache, such as [lru-cache]. It needs to look like this:
+
+```js
+class CustomCache {
+  get(uri: string): Node;
+  set(uri: string, node: Node): void;
+}
+
+djedi.setCache(new CustomCache());
+```
+
+Note that when replacing the cache, items from the old cache is not transferred
+to the new one.
 
 #### Less common methods
 
@@ -679,6 +701,10 @@ use this information in some way.
 #### Other methods
 
 Might be useful for unit tests, but otherwise you’ll probably won’t need these.
+
+##### `djedi.resetState(): void`
+
+Resets the nodes cache, `window.DJEDI_NODES` and all other state.
 
 ##### `djedi.resetOptions(): void`
 
@@ -821,6 +847,7 @@ because of permissions. One solution is to remove the owned-by-root files first:
   https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
 [eslint]: https://eslint.org/
 [jest]: https://jestjs.io/
+[lru-cache]: https://github.com/isaacs/node-lru-cache
 [next.js]: https://nextjs.org/
 [node.js]: https://nodejs.org/en/
 [npm]: https://www.npmjs.com/
