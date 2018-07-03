@@ -96,13 +96,13 @@ test("cache ttl", async () => {
   // We just added the node so it hasn't expired and the callback is called
   // immediately.
   const callback1 = jest.fn();
-  djedi.get({ uri: "test", default: "test" }, callback1);
+  djedi.get({ uri: "test", value: "test" }, callback1);
   expect(callback1).toHaveBeenCalledTimes(1);
 
   // The default server ttl is short.
   const callback2 = jest.fn();
   Date.now.mockReturnValue(start + 60e3);
-  djedi.get({ uri: "test", default: "test" }, callback2);
+  djedi.get({ uri: "test", value: "test" }, callback2);
   expect(callback2).toHaveBeenCalledTimes(0);
   await wait();
   expect(callback2).toHaveBeenCalledTimes(1);

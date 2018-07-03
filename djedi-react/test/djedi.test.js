@@ -360,13 +360,13 @@ describe("setCache", () => {
     // We just added the node so it hasn't expired and the callback is called
     // immediately.
     const callback1 = jest.fn();
-    djedi.get({ uri: "test", default: "test" }, callback1);
+    djedi.get({ uri: "test", value: "test" }, callback1);
     expect(callback1).toHaveBeenCalledTimes(1);
 
     // The default (browser) ttl is very long.
     const callback2 = jest.fn();
     Date.now.mockReturnValue(end);
-    djedi.get({ uri: "test", default: "test" }, callback2);
+    djedi.get({ uri: "test", value: "test" }, callback2);
     expect(callback2).toHaveBeenCalledTimes(1);
 
     // Set a short ttl and let it expire.
@@ -374,10 +374,10 @@ describe("setCache", () => {
     const ttl = 60e3;
     djedi.setCache(ttl);
     Date.now.mockReturnValue(start + ttl);
-    djedi.get({ uri: "test", default: "test" }, callback3);
+    djedi.get({ uri: "test", value: "test" }, callback3);
     expect(callback3).toHaveBeenCalledTimes(1);
     Date.now.mockReturnValue(start + ttl + 1);
-    djedi.get({ uri: "test", default: "test" }, callback3);
+    djedi.get({ uri: "test", value: "test" }, callback3);
     expect(callback3).toHaveBeenCalledTimes(1);
     await wait();
     expect(callback3).toHaveBeenCalledTimes(2);
@@ -411,13 +411,13 @@ describe("setCache", () => {
     // We just added the nodes so they haven't expired and the callback is
     // called immediately.
     const callback1 = jest.fn();
-    djedi.get({ uri: "1", default: undefined }, callback1);
+    djedi.get({ uri: "1", value: undefined }, callback1);
     expect(callback1).toHaveBeenCalledTimes(1);
 
     // Let the nodes expire because of age.
     const callback2 = jest.fn();
     Date.now.mockReturnValue(start + ttl + 1);
-    djedi.get({ uri: "1", default: undefined }, callback2);
+    djedi.get({ uri: "1", value: undefined }, callback2);
     expect(callback2).toHaveBeenCalledTimes(0);
     await wait();
     expect(callback2).toHaveBeenCalledTimes(1);
@@ -429,15 +429,15 @@ describe("setCache", () => {
       "2": text2,
     });
     const callback3 = jest.fn();
-    djedi.get({ uri: "1", default: undefined }, callback3);
+    djedi.get({ uri: "1", value: undefined }, callback3);
     expect(callback3).toHaveBeenCalledTimes(1);
     Date.now.mockReturnValue(start + 10);
-    djedi.get({ uri: "2", default: undefined }, callback3);
+    djedi.get({ uri: "2", value: undefined }, callback3);
     expect(callback3).toHaveBeenCalledTimes(2);
     djedi.addNodes({ "3": text3 });
-    djedi.get({ uri: "3", default: undefined }, callback3);
+    djedi.get({ uri: "3", value: undefined }, callback3);
     expect(callback3).toHaveBeenCalledTimes(3);
-    djedi.get({ uri: "1", default: undefined }, callback3);
+    djedi.get({ uri: "1", value: undefined }, callback3);
     expect(callback3).toHaveBeenCalledTimes(3);
     await wait();
     expect(callback3).toHaveBeenCalledTimes(4);
