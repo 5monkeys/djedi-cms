@@ -2,6 +2,36 @@
 
 exports[`it does not affect files with no <Node>s 1`] = `console.log('<Node uri="uri">value</Node>');`;
 
+exports[`it throws helpful errors: children prop 1`] = `
+undefined: <Node> must not have \`children\` as a prop.
+> 1 | <Node uri="uri" children="children prop not supported" />
+    |                 ^
+`;
+
+exports[`it throws helpful errors: duplicate uri prop 1`] = `
+undefined: <Node> must only specify the \`uri\` prop once.
+> 1 | <Node uri="overwritten uri" uri />
+    |                             ^
+`;
+
+exports[`it throws helpful errors: jsx interpolation 1`] = `
+undefined: <Node> only takes a single child. Did you mean to use \`[foo]\` instead of \`{foo}\`?
+> 1 | <Node uri="uri">JSX interpolation {nope}</Node>
+    |                                   ^
+`;
+
+exports[`it throws helpful errors: md template literal interpolation 1`] = `
+undefined: Using \`\${foo}\` in a <Node> default value is an anti-pattern: it won't work if the user edits the node. Did you mean to use \`{foo}\` (without the \`$\`) or \`[foo]\`?
+> 1 | <Node uri="uri">{md\`template literal with interpolation \${nope}\`}</Node>
+    |                                                           ^
+`;
+
+exports[`it throws helpful errors: template literal interpolation 1`] = `
+undefined: Using \`\${foo}\` in a <Node> default value is an anti-pattern: it won't work if the user edits the node. Did you mean to use \`{foo}\` (without the \`$\`) or \`[foo]\`?
+> 1 | <Node uri="uri">{\`template literal with interpolation \${nope}\`}</Node>
+    |                                                         ^
+`;
+
 exports[`it works 1`] = `
 var _djedi_uri = "intro",
     _djedi_default = "[project] is a cool CMS",
@@ -11,24 +41,21 @@ var _djedi_uri = "intro",
     _djedi_uri4 = "string literal",
     _djedi_uri5 = "single quotes \\"",
     _djedi_uri6 = "simple template literal",
-    _djedi_uri7 = "ok 1",
+    _djedi_uri7 = "simple",
+    _djedi_uri8 = "ok 1",
     _djedi_default3 = "simple",
-    _djedi_uri8 = "ok 2",
+    _djedi_uri9 = "ok 2",
     _djedi_default4 = "string literal",
-    _djedi_uri9 = "ok 3",
+    _djedi_uri10 = "ok 3",
     _djedi_default5 = "single quotes \\"",
-    _djedi_uri10 = "ok 4",
+    _djedi_uri11 = "ok 4",
     _djedi_default6 = "simple template literal",
-    _djedi_uri11 = "ok 5",
+    _djedi_uri12 = "ok 5",
     _djedi_default7 = "# markdown\\n\\nexample",
-    _djedi_uri12 = "ok 6",
+    _djedi_uri13 = "ok 6",
     _djedi_default8 = "simple jsx text on its own line (parses differently)",
-    _djedi_uri13 = "ok 7",
-    _djedi_default9 = "simple template literal on its own line (parses differently)",
-    _djedi_uri14 = "nope 1",
-    _djedi_uri15 = "nope 3",
-    _djedi_uri16 = "nope 4",
-    _djedi_uri17 = "nope 5";
+    _djedi_uri14 = "ok 7",
+    _djedi_default9 = "simple template literal on its own line (parses differently)";
 import { djedi as _djedi2 } from "djedi-react";
 
 _djedi2.reportPrefetchableNode({
@@ -63,67 +90,51 @@ _djedi2.reportPrefetchableNode({
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri7,
-  value: _djedi_default3
+  value: undefined
 });
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri8,
-  value: _djedi_default4
+  value: _djedi_default3
 });
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri9,
-  value: _djedi_default5
+  value: _djedi_default4
 });
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri10,
-  value: _djedi_default6
+  value: _djedi_default5
 });
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri11,
-  value: _djedi_default7
+  value: _djedi_default6
 });
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri12,
-  value: _djedi_default8
+  value: _djedi_default7
 });
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri13,
-  value: _djedi_default9
+  value: _djedi_default8
 });
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri14,
-  value: undefined
+  value: _djedi_default9
 });
 
-_djedi2.reportPrefetchableNode({
-  uri: _djedi_uri15,
-  value: undefined
-});
-
-_djedi2.reportPrefetchableNode({
-  uri: _djedi_uri16,
-  value: undefined
-});
-
-_djedi2.reportPrefetchableNode({
-  uri: _djedi_uri17,
-  value: undefined
-});
-
-/* global nope */
+/* eslint-disable no-undef, func-style, react/jsx-no-undef */
 import { Node, djedi, md } from "djedi-react";
 import React from "react";
 djedi.options.baseUrl = "/api";
 const _djedi = "djedi";
 const intro = <Node uri={_djedi_uri} project={_djedi}>{_djedi_default}</Node>;
 export default function Home() {
-  // eslint-disable-next-line func-style
   const link = text => <a href={\`?page=\${text}\`}>
       <Node uri={_djedi_uri2} text={text}>{_djedi_default2}</Node>
     </a>;
@@ -136,44 +147,36 @@ export default function Home() {
       <Node uri={_djedi_uri4} />
       <Node uri={_djedi_uri5} />
       <Node uri={_djedi_uri6} />
+      <Node uri={_djedi_uri7} {...variables} />
 
       <h2>nope uri</h2>
-      {
-      /* eslint-disable-next-line react/jsx-no-duplicate-props */
-    }
-      <Node uri="overwritten uri" uri />
       <Node uri={"nope".toUpperCase()} />
       <Node uri={\`template literal with interpolation \${nope}\`} />
       <Node uri={nope\`tagged template literal\`} />
       <Node uri={nope} />
+      <Node uri={nope}>default</Node>
 
       <h2>ok children</h2>
-      <Node uri={_djedi_uri7}>{_djedi_default3}</Node>
-      <Node uri={_djedi_uri8}>{_djedi_default4}</Node>
-      <Node uri={_djedi_uri9}>{_djedi_default5}</Node>
-      <Node uri={_djedi_uri10}>{_djedi_default6}</Node>
-      <Node uri={_djedi_uri11}>{_djedi_default7}</Node>
-      <Node uri={_djedi_uri12}>{_djedi_default8}</Node>
-      <Node uri={_djedi_uri13}>{_djedi_default9}</Node>
+      <Node uri={_djedi_uri8}>{_djedi_default3}</Node>
+      <Node uri={_djedi_uri9}>{_djedi_default4}</Node>
+      <Node uri={_djedi_uri10}>{_djedi_default5}</Node>
+      <Node uri={_djedi_uri11}>{_djedi_default6}</Node>
+      <Node uri={_djedi_uri12}>{_djedi_default7}</Node>
+      <Node uri={_djedi_uri13}>{_djedi_default8}</Node>
+      <Node uri={_djedi_uri14}>{_djedi_default9}</Node>
 
       <h2>nope children</h2>
-      <Node uri={_djedi_uri14} children="children prop not supported" />
-      <Node uri="nope 2">JSX interpolation {nope}</Node>
-      <Node uri={_djedi_uri15}>{\`template literal with interpolation \${nope}\`}</Node>
-      <Node uri={_djedi_uri16}>{nope\`non-md tagged template literal\`}</Node>
-      <Node uri={_djedi_uri17}>{nope}</Node>
+      <Node uri="nope 1">{nope\`non-md tagged template literal\`}</Node>
+      <Node uri="nope 2">{nope}</Node>
+
+      <h2>non-Nodes</h2>
+      <node uri="simple" />
+      <TreeNode uri="simple" />
 
       <div>
         {link("previous")}
         {link("next")}
       </div>
-
-      <h2>non-Nodes</h2>
-      <node uri="simple" />
-      {
-      /* eslint-disable-next-line react/jsx-no-undef */
-    }
-      <TreeNode uri="simple" />
     </div>;
 }
 `;

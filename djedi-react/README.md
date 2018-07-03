@@ -735,6 +735,10 @@ works exactly the same without the `md` tag. But there are some benefits:
   template literal. That’s an anti-pattern, since it won’t work if the user
   edits the node. Use [variables](#variables) instead.
 
+  The [Babel] plugin mentioned in [Installation](#installation) optimizes the
+  tag away (`` md`text` `` → `"text"`) and makes the warning into a compile-time
+  error instead (even for non-tagged template literals!).
+
 - If you use [Prettier], it will automatically format the contents of the
   template literal as markdown, which is very convenient. This is useful even if
   the value is plain text (markdown formatting usually works well there too).

@@ -1,4 +1,4 @@
-/* global nope */
+/* eslint-disable no-undef, func-style, react/jsx-no-undef */
 import { Node, djedi, md } from "djedi-react";
 import React from "react";
 
@@ -13,7 +13,6 @@ const intro = (
 );
 
 export default function Home() {
-  // eslint-disable-next-line func-style
   const link = text => (
     <a href={`?page=${text}`}>
       <Node uri="en-us@link.txt" text={text}>
@@ -31,14 +30,14 @@ export default function Home() {
       <Node uri={"string literal"} />
       <Node uri={'single quotes "'} />
       <Node uri={`simple template literal`} />
+      <Node uri="simple" {...variables} />
 
       <h2>nope uri</h2>
-      {/* eslint-disable-next-line react/jsx-no-duplicate-props */}
-      <Node uri="overwritten uri" uri />
       <Node uri={"nope".toUpperCase()} />
       <Node uri={`template literal with interpolation ${nope}`} />
       <Node uri={nope`tagged template literal`} />
       <Node uri={nope} />
+      <Node uri={nope}>default</Node>
 
       <h2>ok children</h2>
       <Node uri="ok 1">simple</Node>
@@ -58,21 +57,17 @@ export default function Home() {
       </Node>
 
       <h2>nope children</h2>
-      <Node uri="nope 1" children="children prop not supported" />
-      <Node uri="nope 2">JSX interpolation {nope}</Node>
-      <Node uri="nope 3">{`template literal with interpolation ${nope}`}</Node>
-      <Node uri="nope 4">{nope`non-md tagged template literal`}</Node>
-      <Node uri="nope 5">{nope}</Node>
+      <Node uri="nope 1">{nope`non-md tagged template literal`}</Node>
+      <Node uri="nope 2">{nope}</Node>
+
+      <h2>non-Nodes</h2>
+      <node uri="simple" />
+      <TreeNode uri="simple" />
 
       <div>
         {link("previous")}
         {link("next")}
       </div>
-
-      <h2>non-Nodes</h2>
-      <node uri="simple" />
-      {/* eslint-disable-next-line react/jsx-no-undef */}
-      <TreeNode uri="simple" />
     </div>
   );
 }

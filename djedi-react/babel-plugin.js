@@ -24,30 +24,37 @@ module.exports = function djediBabelPlugin({ types: t }) {
     },
     visitor: {
       JSXElement(path) {
+        // Bail if the element isn't a node.
         if (path.node.openingElement.name.name !== COMPONENT_NAME) {
           return;
         }
 
         const uriAttr = getUriAttr(path, t);
 
+        // Bail if the uri prop is missing.
         if (uriAttr == null) {
           return;
         }
 
         const uri = getUri(uriAttr.node.value, t);
 
+        // Bail if the uri prop isn't a static string.
         if (uri == null) {
           return;
         }
 
         const child = maybeGetLoneChild(path, t);
+        const defaultValue =
+          child == null ? undefined : getDefaultValue(child, t);
 
-        if (child === false) {
+        // Bail if there is a child but it isn't a static string.
+        if (child != null && defaultValue == null) {
           return;
         }
 
         const program = path.scope.getProgramParent();
 
+        // Add import for djedi (the first time).
         if (this.clientId == null) {
           this.clientId = program.generateUidIdentifier(CLIENT_NAME);
           [this.last] = program.path.unshiftContainer(
@@ -56,14 +63,14 @@ module.exports = function djediBabelPlugin({ types: t }) {
           );
         }
 
+        // Move the uri into a variable.
         const uriId = path.scope.generateUidIdentifier(URI_VAR_NAME);
         program.push({ id: uriId, init: t.stringLiteral(uri) });
         uriAttr.get("value").replaceWith(t.jSXExpressionContainer(uriId));
 
         let defaultId = undefined;
-        const defaultValue =
-          child == null ? undefined : getDefaultValue(child.node, t);
 
+        // Move the default value into a variable (if any).
         if (defaultValue != null) {
           defaultId = path.scope.generateUidIdentifier(DEFAULT_VAR_NAME);
           program.push({
@@ -78,6 +85,7 @@ module.exports = function djediBabelPlugin({ types: t }) {
           }
         }
 
+        // Insert a `reportPrefetchableNode` call.
         [this.last] = this.last.insertAfter(
           makeReportCall(this.clientId, uriId, defaultId, t)
         );
@@ -87,15 +95,25 @@ module.exports = function djediBabelPlugin({ types: t }) {
 };
 
 function getUriAttr(jsxElementPath, t) {
-  const attrs = jsxElementPath.get("openingElement.attributes").reverse();
+  const attrs = jsxElementPath.get("openingElement.attributes");
+  let result = undefined;
 
   for (const attr of attrs) {
     if (t.isJSXIdentifier(attr.node.name, { name: URI_ATTR_NAME })) {
-      return attr;
+      if (result != null) {
+        throw attr.buildCodeFrameError(
+          `<${COMPONENT_NAME}> must only specify the \`${URI_ATTR_NAME}\` prop once.`
+        );
+      }
+      result = attr;
+    } else if (t.isJSXIdentifier(attr.node.name, { name: "children" })) {
+      throw attr.buildCodeFrameError(
+        `<${COMPONENT_NAME}> must not have \`children\` as a prop.`
+      );
     }
   }
 
-  return undefined;
+  return result;
 }
 
 function getUri(value, t) {
@@ -131,7 +149,9 @@ function maybeGetLoneChild(jsxElementPath, t) {
     // JSXExpressionContainer. Ignore those, just like Babel does.
     if (!isEmptyJSXText(child.node, t)) {
       if (result != null) {
-        return false;
+        throw child.buildCodeFrameError(
+          `<${COMPONENT_NAME}> only takes a single child. Did you mean to use \`[foo]\` instead of \`{foo}\`?`
+        );
       }
       result = child;
     }
@@ -144,29 +164,33 @@ function isEmptyJSXText(node, t) {
   return t.isJSXText(node) && node.value.trim() === "";
 }
 
-function getDefaultValue(value, t) {
-  if (t.isJSXText(value)) {
-    return value.value;
+function getDefaultValue(valuePath, t) {
+  if (t.isJSXText(valuePath.node)) {
+    return valuePath.node.value;
   }
 
-  if (t.isJSXExpressionContainer(value)) {
-    if (t.isStringLiteral(value.expression)) {
-      return value.expression.value;
+  if (t.isJSXExpressionContainer(valuePath.node)) {
+    if (t.isStringLiteral(valuePath.node.expression)) {
+      return valuePath.node.expression.value;
     }
 
-    const templateLiteral = t.isTemplateLiteral(value.expression)
-      ? value.expression
-      : t.isTaggedTemplateExpression(value.expression) &&
-        t.isIdentifier(value.expression.tag, { name: TEMPLATE_TAG_NAME })
-        ? value.expression.quasi
+    const templateLiteral = t.isTemplateLiteral(valuePath.node.expression)
+      ? valuePath.get("expression")
+      : t.isTaggedTemplateExpression(valuePath.node.expression) &&
+        t.isIdentifier(valuePath.node.expression.tag, {
+          name: TEMPLATE_TAG_NAME,
+        })
+        ? valuePath.get("expression.quasi")
         : undefined;
 
-    if (
-      templateLiteral != null &&
-      templateLiteral.expressions.length === 0 &&
-      templateLiteral.quasis.length === 1
-    ) {
-      return templateLiteral.quasis[0].value.cooked;
+    if (templateLiteral != null) {
+      const expressions = templateLiteral.get("expressions");
+      if (expressions.length > 0) {
+        throw expressions[0].buildCodeFrameError(
+          `Using \`\${foo}\` in a <${COMPONENT_NAME}> default value is an anti-pattern: it won't work if the user edits the node. Did you mean to use \`{foo}\` (without the \`$\`) or \`[foo]\`?`
+        );
+      }
+      return templateLiteral.node.quasis[0].value.cooked;
     }
 
     return undefined;
