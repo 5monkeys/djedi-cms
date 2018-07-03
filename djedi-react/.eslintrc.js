@@ -1,7 +1,7 @@
 const baseRules = require("eslint-config-lydell");
 
 module.exports = {
-  plugins: ["import", "react", "prettier", "sort-imports-es6-autofix"],
+  plugins: ["import", "react", "prettier", "sort-imports-es6-autofix", "jest"],
   parser: "babel-eslint",
   env: { es6: true },
   globals: {
@@ -24,6 +24,7 @@ module.exports = {
     {
       files: ["*.test.js", "{test,__mocks__}/*.js"],
       env: { node: true, jest: true },
+      rules: baseRules({ builtin: false, jest: true }),
     },
     {
       files: ["src/*.js"],
