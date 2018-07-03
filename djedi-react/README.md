@@ -756,6 +756,12 @@ lives on `api.example.com`. Then you need two things:
   common superdomain of the frontend and backend domains. See [document.domain]
   for more information.
 
+- `SESSION_COOKIE_DOMAIN = '.example.com'` in your Django settings file.
+  [djedi.injectAdmin](#djediinjectadmin-promiseboolean) needs to make a request
+  for the admin sidebar, and has to send along the session cookie created when
+  logging in to the Django admin on `api.example.com`. This makes the cookie
+  available on both domains.
+
 If the two domains do not share the same super domain (such as `site.com` and
 `api.com`) you need to set up a proxy server on the React frontend domain. For
 example, you could proxy `site.com/djedi` to `api.com/djedi`.
