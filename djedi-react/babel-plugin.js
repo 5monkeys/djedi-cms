@@ -24,10 +24,7 @@ module.exports = function djediBabelPlugin({ types: t }) {
     },
     visitor: {
       JSXElement(path) {
-        if (
-          path.node.openingElement.name.name !== COMPONENT_NAME ||
-          path.node.children.length > 1
-        ) {
+        if (path.node.openingElement.name.name !== COMPONENT_NAME) {
           return;
         }
 
@@ -40,6 +37,12 @@ module.exports = function djediBabelPlugin({ types: t }) {
         const uri = getUri(uriAttr.node.value, t);
 
         if (uri == null) {
+          return;
+        }
+
+        const child = maybeGetLoneChild(path, t);
+
+        if (child === false) {
           return;
         }
 
@@ -58,7 +61,6 @@ module.exports = function djediBabelPlugin({ types: t }) {
         uriAttr.get("value").replaceWith(t.jSXExpressionContainer(uriId));
 
         let defaultId = undefined;
-        const child = path.get("children.0");
         const defaultValue =
           child == null ? undefined : getDefaultValue(child.node, t);
 
@@ -69,6 +71,11 @@ module.exports = function djediBabelPlugin({ types: t }) {
             init: t.stringLiteral(dedent(defaultValue)),
           });
           child.replaceWith(t.jSXExpressionContainer(defaultId));
+          for (const otherChild of path.get("children")) {
+            if (otherChild !== child) {
+              otherChild.remove();
+            }
+          }
         }
 
         [this.last] = this.last.insertAfter(
@@ -113,6 +120,28 @@ function getUri(value, t) {
   }
 
   return undefined;
+}
+
+function maybeGetLoneChild(jsxElementPath, t) {
+  const children = jsxElementPath.get("children");
+  let result = undefined;
+
+  for (const child of children) {
+    // There can be whitespace-only JSXText nodes around an
+    // JSXExpressionContainer. Ignore those, just like Babel does.
+    if (!isEmptyJSXText(child.node, t)) {
+      if (result != null) {
+        return false;
+      }
+      result = child;
+    }
+  }
+
+  return result;
+}
+
+function isEmptyJSXText(node, t) {
+  return t.isJSXText(node) && node.value.trim() === "";
 }
 
 function getDefaultValue(value, t) {

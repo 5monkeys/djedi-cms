@@ -50,6 +50,12 @@ export default function Home() {
 
         example
       `}</Node>
+      <Node uri="ok 6">
+        simple jsx text on its own line (parses differently)
+      </Node>
+      <Node uri="ok 7">
+        {`simple template literal on its own line (parses differently)`}
+      </Node>
 
       <h2>nope children</h2>
       <Node uri="nope 1" children="children prop not supported" />

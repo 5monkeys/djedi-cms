@@ -21,10 +21,14 @@ var _djedi_uri = "intro",
     _djedi_default6 = "simple template literal",
     _djedi_uri11 = "ok 5",
     _djedi_default7 = "# markdown\\n\\nexample",
-    _djedi_uri12 = "nope 1",
-    _djedi_uri13 = "nope 3",
-    _djedi_uri14 = "nope 4",
-    _djedi_uri15 = "nope 5";
+    _djedi_uri12 = "ok 6",
+    _djedi_default8 = "simple jsx text on its own line (parses differently)",
+    _djedi_uri13 = "ok 7",
+    _djedi_default9 = "simple template literal on its own line (parses differently)",
+    _djedi_uri14 = "nope 1",
+    _djedi_uri15 = "nope 3",
+    _djedi_uri16 = "nope 4",
+    _djedi_uri17 = "nope 5";
 import { djedi as _djedi2 } from "djedi-react";
 
 _djedi2.reportPrefetchableNode({
@@ -84,12 +88,12 @@ _djedi2.reportPrefetchableNode({
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri12,
-  value: undefined
+  value: _djedi_default8
 });
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri13,
-  value: undefined
+  value: _djedi_default9
 });
 
 _djedi2.reportPrefetchableNode({
@@ -99,6 +103,16 @@ _djedi2.reportPrefetchableNode({
 
 _djedi2.reportPrefetchableNode({
   uri: _djedi_uri15,
+  value: undefined
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri16,
+  value: undefined
+});
+
+_djedi2.reportPrefetchableNode({
+  uri: _djedi_uri17,
   value: undefined
 });
 
@@ -139,13 +153,15 @@ export default function Home() {
       <Node uri={_djedi_uri9}>{_djedi_default5}</Node>
       <Node uri={_djedi_uri10}>{_djedi_default6}</Node>
       <Node uri={_djedi_uri11}>{_djedi_default7}</Node>
+      <Node uri={_djedi_uri12}>{_djedi_default8}</Node>
+      <Node uri={_djedi_uri13}>{_djedi_default9}</Node>
 
       <h2>nope children</h2>
-      <Node uri={_djedi_uri12} children="children prop not supported" />
+      <Node uri={_djedi_uri14} children="children prop not supported" />
       <Node uri="nope 2">JSX interpolation {nope}</Node>
-      <Node uri={_djedi_uri13}>{\`template literal with interpolation \${nope}\`}</Node>
-      <Node uri={_djedi_uri14}>{nope\`non-md tagged template literal\`}</Node>
-      <Node uri={_djedi_uri15}>{nope}</Node>
+      <Node uri={_djedi_uri15}>{\`template literal with interpolation \${nope}\`}</Node>
+      <Node uri={_djedi_uri16}>{nope\`non-md tagged template literal\`}</Node>
+      <Node uri={_djedi_uri17}>{nope}</Node>
 
       <div>
         {link("previous")}
