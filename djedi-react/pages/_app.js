@@ -9,11 +9,8 @@ djedi.options.baseUrl =
   (typeof process !== "undefined" && process.env.SERVER_BASE_URL) ||
   "http://localhost:8000/djedi";
 
-// Inject the admin sidebar, if the user has permission. Only do this in the
-// browser.
-if (typeof document !== "undefined") {
-  djedi.injectAdmin();
-}
+// Inject the admin sidebar, if the user has permission.
+djedi.injectAdmin();
 
 // This is 99% the standard Next.js boilerplate for _app.js.
 export default class MyApp extends App {
