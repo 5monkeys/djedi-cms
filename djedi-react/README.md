@@ -832,7 +832,7 @@ docker and then try to run some npm scripts outside docker, they might fail
 because of permissions. One solution is to remove the owned-by-root files first:
 
 - `npm start`: `sudo rm -r .next`
-- `npm run ubild`: `sudo rm -r dist`
+- `npm run build`: `sudo rm -r dist`
 
 ## License
 
