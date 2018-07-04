@@ -272,7 +272,7 @@ class PrivateRestTest(ClientTest):
 class PublicRestTest(ClientTest):
 
     def test_embed(self):
-        url = reverse('djedi:api.embed')
+        url = reverse('djedi:rest.embed')
         response = self.client.get(url)
         html = smart_unicode(response.content)
 
@@ -290,7 +290,7 @@ class PublicRestTest(ClientTest):
         cio.set('sv-se@label/email', u'E-post')
 
         with self.assertDB(calls=1):
-            url = reverse('djedi:api.nodes')
+            url = reverse('djedi:rest.nodes')
             response = self.client.post(url, json.dumps({
                 'page/body.md': u'# Foo Bar',
                 'label/email': u'E-mail',

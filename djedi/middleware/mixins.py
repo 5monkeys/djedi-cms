@@ -1,4 +1,3 @@
-import json
 import logging
 
 import cio
@@ -9,7 +8,8 @@ from django.utils import translation
 from cio.conf import settings
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
-from djedi.compat import render_to_string, reverse, NoReverseMatch
+from djedi.compat import reverse, NoReverseMatch
+from djedi.utils.templates import render_embed
 
 _log = logging.getLogger(__name__)
 
@@ -87,9 +87,7 @@ class AdminPanelMixin(object):
             for node in pipeline.history.list('get')
         )
 
-        return render_to_string('djedi/cms/embed.html', {
-            'json_nodes': json.dumps(defaults).replace('</', '\\x3C/'),
-        })
+        return render_embed(nodes=defaults)
 
     def body_append(self, response, html):
         idx = response.content.lower().rfind(b'</body>')

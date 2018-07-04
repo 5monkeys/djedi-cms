@@ -10,7 +10,7 @@ import cio.conf
 
 from ..admin.mixins import JSONResponseMixin
 from ..auth import has_permission
-from ..compat import render
+from ..utils.templates import render_embed
 
 
 class APIView(JSONResponseMixin, View):
@@ -24,10 +24,7 @@ class EmbedApi(View):
 
     def get(self, request):
         if has_permission(request):
-            return render(request, 'djedi/cms/embed.html', {
-                'exclude_json_nodes': True,
-                'cms_url_prefix': request.build_absolute_uri('/').rstrip('/'),
-            })
+            return render_embed(request=request)
         else:
             raise PermissionDenied
 
