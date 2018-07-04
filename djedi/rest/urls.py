@@ -1,7 +1,6 @@
 from ..compat import include, patterns, url
 from .api import EmbedApi, NodesApi
 
-from django.urls import re_path
 app_name = 'djedi'
 
 urlpatterns = patterns(
