@@ -21,7 +21,8 @@ def render_embed(nodes=None, request=None):
         except NoReverseMatch:
             raise ImproperlyConfigured(
                 "Could not find djedi in your url conf, "
-                "include djedi.rest.urls within the djedi namespace."
+                "enable django admin or include "
+                "djedi.urls within the admin namespace."
             )
 
     else:
