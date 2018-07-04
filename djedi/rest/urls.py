@@ -1,10 +1,17 @@
-from ..compat import include, patterns, url
+from django.http import Http404
+
+from ..compat import patterns, url
 from .api import EmbedApi, NodesApi
 
-app_name = 'djedi'
+app_name = 'rest'
+
+
+def not_found(*args, **kwargs):
+    raise Http404
+
 
 urlpatterns = patterns(
-    url(r'^embed/$', EmbedApi.as_view(), name='rest.embed'),
-    url(r'^nodes/$', NodesApi.as_view(), name='rest.nodes'),
-    url(r'^cms/', include('djedi.admin.urls', namespace='cms')),
+    url(r'^$', not_found),
+    url(r'^embed/$', EmbedApi.as_view(), name='embed'),
+    url(r'^nodes/$', NodesApi.as_view(), name='nodes'),
 )

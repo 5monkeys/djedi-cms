@@ -272,12 +272,12 @@ class PrivateRestTest(ClientTest):
 class PublicRestTest(ClientTest):
 
     def test_embed(self):
-        url = reverse('djedi:rest.embed')
+        url = reverse('admin:djedi:rest:embed')
         response = self.client.get(url)
         html = smart_unicode(response.content)
 
         self.assertIn(u'iframe id="djedi-cms"', html)
-        cms_url = u'http://testserver' + reverse('djedi:cms:cms')
+        cms_url = u'http://testserver' + reverse('admin:djedi:cms')
         self.assertIn(cms_url, html)
         self.assertNotIn(u'window.DJEDI_NODES', html)
         self.assertNotIn(u'document.domain', html)
@@ -290,7 +290,7 @@ class PublicRestTest(ClientTest):
         cio.set('sv-se@label/email', u'E-post')
 
         with self.assertDB(calls=1):
-            url = reverse('djedi:rest.nodes')
+            url = reverse('admin:djedi:rest:nodes')
             response = self.client.post(url, json.dumps({
                 'page/body.md': u'# Foo Bar',
                 'label/email': u'E-mail',
