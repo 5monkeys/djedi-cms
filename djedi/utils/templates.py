@@ -13,7 +13,7 @@ def render_embed(nodes=None, request=None):
             prefix = request.build_absolute_uri("/").rstrip("/")
             context.update(
                 {
-                    "cms_url": prefix + reverse("admin:djedi:cms"),
+                    "cms_url": prefix + reverse("djedi:cms:cms"),
                     "exclude_json_nodes": True,
                 }
             )
