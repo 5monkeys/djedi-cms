@@ -7,7 +7,7 @@ import React from "react";
 // Set baseUrl differently for server and browser rendering.
 djedi.options.baseUrl =
   (typeof process !== "undefined" && process.env.SERVER_BASE_URL) ||
-  "http://localhost:8000/djedi";
+  "http://localhost:8000/djedi/api";
 
 // Inject the admin sidebar, if the user has permission.
 djedi.injectAdmin();

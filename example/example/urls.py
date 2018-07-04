@@ -21,4 +21,5 @@ urlpatterns = [
     path('', lambda r: render_to_response('index.html', {'request': r}),
         name='index'),
     path('admin/', admin.site.urls),
+    path('djedi/', include('djedi.urls')),
 ]
