@@ -16,7 +16,7 @@ jest.spyOn(Date, "now");
 
 beforeEach(() => {
   resetAll();
-  Date.now.mockClear();
+  Date.now.mockReset();
 });
 
 test("it renders loading and then the node", async () => {

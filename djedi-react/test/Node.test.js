@@ -20,8 +20,8 @@ console.error = jest.fn();
 
 beforeEach(() => {
   resetAll();
-  console.warn.mockClear();
-  console.error.mockClear();
+  console.warn.mockReset();
+  console.error.mockReset();
   // The `prop-types` package only logs the exact same error once. As a
   // workaround, tests that need to check for logged errors temporarily assign
   // `Node.displayName` to something unique. That is cleaned up here.

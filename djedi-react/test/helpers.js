@@ -45,7 +45,7 @@ export function fetch(value, { status = 200, stringify = true } = {}) {
 }
 
 fetch.reset = () => {
-  unfetch.mockClear();
+  unfetch.mockReset();
 };
 
 fetch.mockFn = unfetch;

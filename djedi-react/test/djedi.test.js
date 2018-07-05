@@ -19,9 +19,9 @@ jest.spyOn(Date, "now");
 
 beforeEach(() => {
   resetAll();
-  console.warn.mockClear();
-  console.error.mockClear();
-  Date.now.mockClear();
+  console.warn.mockReset();
+  console.error.mockReset();
+  Date.now.mockReset();
   document.body.textContent = "";
   document.domain = "site.example.com";
 });
