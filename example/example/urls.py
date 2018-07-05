@@ -18,8 +18,7 @@ from django.shortcuts import render_to_response
 from django.urls import path, include
 
 urlpatterns = [
-    path('', lambda r: render_to_response('index.html', {'request': r}),
-        name='index'),
+    path('', lambda r: render_to_response('index.html', {'request': r}), name='index'),
     path('admin/', admin.site.urls),
     path('djedi/', include('djedi.urls')),
 ]
