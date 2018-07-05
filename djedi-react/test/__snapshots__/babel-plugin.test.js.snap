@@ -2,36 +2,6 @@
 
 exports[`it does not affect files with no <Node>s 1`] = `console.log('<Node uri="uri">value</Node>');`;
 
-exports[`it throws helpful errors: children prop 1`] = `
-undefined: <Node> must not have \`children\` as a prop.
-> 1 | <Node uri="uri" children="children prop not supported" />
-    |                 ^
-`;
-
-exports[`it throws helpful errors: duplicate uri prop 1`] = `
-undefined: <Node> must only specify the \`uri\` prop once.
-> 1 | <Node uri="overwritten uri" uri />
-    |                             ^
-`;
-
-exports[`it throws helpful errors: jsx interpolation 1`] = `
-undefined: <Node> only takes a single child. Did you mean to use \`[foo]\` instead of \`{foo}\`?
-> 1 | <Node uri="uri">JSX interpolation {nope}</Node>
-    |                                   ^
-`;
-
-exports[`it throws helpful errors: md template literal interpolation 1`] = `
-undefined: Using \`\${foo}\` in a <Node> default value is an anti-pattern: it won't work if the user edits the node. Did you mean to use \`{foo}\` (without the \`$\`) or \`[foo]\`?
-> 1 | <Node uri="uri">{md\`template literal with interpolation \${nope}\`}</Node>
-    |                                                           ^
-`;
-
-exports[`it throws helpful errors: template literal interpolation 1`] = `
-undefined: Using \`\${foo}\` in a <Node> default value is an anti-pattern: it won't work if the user edits the node. Did you mean to use \`{foo}\` (without the \`$\`) or \`[foo]\`?
-> 1 | <Node uri="uri">{\`template literal with interpolation \${nope}\`}</Node>
-    |                                                         ^
-`;
-
 exports[`it works 1`] = `
 var _djedi_uri = "intro",
     _djedi_default = "[project] is a cool CMS",

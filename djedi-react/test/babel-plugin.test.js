@@ -26,6 +26,7 @@ function transform(code) {
 }
 
 test("it works", () => {
+  // The fixture is pretty long, so it makes sense not using an inline snapshot.
   const code = fs.readFileSync(require.resolve("./fixtures/nodes.js"), "utf8");
   expect(transform(code)).toMatchSnapshot();
 });
@@ -34,26 +35,63 @@ test("it does not affect files with no <Node>s", () => {
   const code = dedent`
     console.log('<Node uri="uri">value</Node>');
   `;
-  expect(transform(code)).toMatchSnapshot();
+  expect(transform(code)).toMatchInlineSnapshot(
+    `console.log('<Node uri="uri">value</Node>');`
+  );
 });
 
-test("it throws helpful errors", () => {
-  /* eslint-disable no-template-curly-in-string */
-  const cases = {
-    "duplicate uri prop": '<Node uri="overwritten uri" uri />',
-    "children prop":
-      '<Node uri="uri" children="children prop not supported" />',
-    "jsx interpolation": '<Node uri="uri">JSX interpolation {nope}</Node>',
-    "template literal interpolation":
-      '<Node uri="uri">{`template literal with interpolation ${nope}`}</Node>',
-    "md template literal interpolation":
-      '<Node uri="uri">{md`template literal with interpolation ${nope}`}</Node>',
-  };
-  /* eslint-enable no-template-curly-in-string */
+describe("it throws helpful errors", () => {
+  test("duplicate uri prop", () => {
+    expect(() => transform('<Node uri="overwritten uri" uri />'))
+      .toThrowErrorMatchingInlineSnapshot(`
+undefined: <Node> must only specify the \`uri\` prop once.
+> 1 | <Node uri="overwritten uri" uri />
+    |                             ^
+`);
+  });
 
-  for (const [name, code] of Object.entries(cases)) {
-    expect(() => {
-      transform(code);
-    }).toThrowErrorMatchingSnapshot(name);
-  }
+  test("children prop", () => {
+    expect(() =>
+      transform('<Node uri="uri" children="children prop not supported" />')
+    ).toThrowErrorMatchingInlineSnapshot(`
+undefined: <Node> must not have \`children\` as a prop.
+> 1 | <Node uri="uri" children="children prop not supported" />
+    |                 ^
+`);
+  });
+
+  test("jsx interpolation", () => {
+    expect(() => transform('<Node uri="uri">JSX interpolation {nope}</Node>'))
+      .toThrowErrorMatchingInlineSnapshot(`
+undefined: <Node> only takes a single child. Did you mean to use \`[foo]\` instead of \`{foo}\`?
+> 1 | <Node uri="uri">JSX interpolation {nope}</Node>
+    |                                   ^
+`);
+  });
+
+  test("template literal interpolation", () => {
+    expect(() =>
+      transform(
+        // eslint-disable-next-line no-template-curly-in-string
+        '<Node uri="uri">{`template literal with interpolation ${nope}`}</Node>'
+      )
+    ).toThrowErrorMatchingInlineSnapshot(`
+undefined: Using \`\${foo}\` in a <Node> default value is an anti-pattern: it won't work if the user edits the node. Did you mean to use \`{foo}\` (without the \`$\`) or \`[foo]\`?
+> 1 | <Node uri="uri">{\`template literal with interpolation \${nope}\`}</Node>
+    |                                                         ^
+`);
+  });
+
+  test("md template literal interpolation", () => {
+    expect(() =>
+      transform(
+        // eslint-disable-next-line no-template-curly-in-string
+        '<Node uri="uri">{md`template literal with interpolation ${nope}`}</Node>'
+      )
+    ).toThrowErrorMatchingInlineSnapshot(`
+undefined: Using \`\${foo}\` in a <Node> default value is an anti-pattern: it won't work if the user edits the node. Did you mean to use \`{foo}\` (without the \`$\`) or \`[foo]\`?
+> 1 | <Node uri="uri">{md\`template literal with interpolation \${nope}\`}</Node>
+    |                                                           ^
+`);
+  });
 });
