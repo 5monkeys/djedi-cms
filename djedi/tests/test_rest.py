@@ -271,6 +271,11 @@ class PrivateRestTest(ClientTest):
 
 class PublicRestTest(ClientTest):
 
+    def test_api_root_not_found(self):
+        url = reverse('admin:djedi:rest:api-base')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
     def test_embed(self):
         url = reverse('admin:djedi:rest:embed')
         response = self.client.get(url)
@@ -285,6 +290,11 @@ class PublicRestTest(ClientTest):
         with cio.conf.settings(XSS_DOMAIN='foobar.se'):
             response = self.client.get(url)
             self.assertIn(b'document.domain = "foobar.se"', response.content)
+
+        self.client.logout()
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
 
     def test_nodes(self):
         cio.set('sv-se@label/email', u'E-post')
