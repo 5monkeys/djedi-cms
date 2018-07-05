@@ -14,4 +14,5 @@ else:
 urlpatterns = patterns(
     url(r'^$', lambda r: render_to_response('index.html'), name='index'),
     url(r'^adm1n/', admin_urls),
+    url(r'^djed1/', include('djedi.urls', namespace='admin'))
 )
