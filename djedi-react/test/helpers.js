@@ -46,9 +46,18 @@ export function fetch(value, { status = 200, stringify = true } = {}) {
 
 fetch.reset = () => {
   unfetch.mockReset();
+  unfetch.mockResolvedValue({});
 };
 
 fetch.mockFn = unfetch;
+
+// A shorter version of `fetch.mockFn.mock.calls`, for shorter inline snapshots.
+// We don't need to assert the URL and headers every time. For most tests only
+// the body is interesting.
+fetch.calls = () => {
+  const calls = unfetch.mock.calls.map(args => args[1].body);
+  return calls.length === 1 ? calls[0] : calls;
+};
 
 export function simpleNodeResponse(path, value) {
   return { [`i18n://en-us@${path}.txt`]: value };
