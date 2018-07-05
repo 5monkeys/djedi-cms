@@ -46,7 +46,14 @@ export function fetch(value, { status = 200, stringify = true } = {}) {
 
 fetch.reset = () => {
   unfetch.mockReset();
-  unfetch.mockResolvedValue({});
+  unfetch.mockImplementation(() =>
+    Promise.resolve(
+      new Response({
+        status: 200,
+        body: JSON.stringify({}),
+      })
+    )
+  );
 };
 
 fetch.mockFn = unfetch;
@@ -92,9 +99,9 @@ component.
     ));
     const component = renderer.create(<Wrapper />);
     const instance = component.getInstance();
-    expect(component.toJSON()).toMatchSnapshot("first render");
+    expect(component.toJSON()).toMatchInlineSnapshot();
     instance.setState({ name: "Bob" });
-    expect(component.toJSON()).toMatchSnapshot("second render");
+    expect(component.toJSON()).toMatchInlineSnapshot();
 */
 export function withState(render) {
   return class extends React.Component {

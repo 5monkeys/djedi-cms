@@ -16,12 +16,16 @@ jest.useFakeTimers();
 console.warn = jest.fn();
 console.error = jest.fn();
 jest.spyOn(Date, "now");
+jest.spyOn(djedi, "addNodes");
 
 beforeEach(() => {
   resetAll();
   console.warn.mockReset();
   console.error.mockReset();
   Date.now.mockReset();
+  // Use `mockClear` rather than `mockReset` here to keep the default
+  // implementation. (We only spy on `addNodes` and don't mock it).
+  djedi.addNodes.mockClear();
   document.body.textContent = "";
   document.domain = "site.example.com";
 });
@@ -34,7 +38,12 @@ describe("get", () => {
   test("it works", done => {
     fetch(simpleNodeResponse("test", "test"));
     djedi.get({ uri: "test", value: "default" }, node => {
-      expect(node).toMatchSnapshot();
+      expect(node).toMatchInlineSnapshot(`
+Object {
+  "uri": "i18n://en-us@test.txt",
+  "value": "test",
+}
+`);
       done();
     });
   });
@@ -42,7 +51,13 @@ describe("get", () => {
   test("it handles missing node in response", done => {
     fetch({});
     djedi.get({ uri: "test", value: "default" }, node => {
-      expect(errorDetails(node)).toMatchSnapshot();
+      expect(errorDetails(node)).toMatchInlineSnapshot(`
+Object {
+  "message": "Missing result for node: i18n://en-us@test.txt",
+  "responseText": undefined,
+  "status": 1404,
+}
+`);
       done();
     });
   });
@@ -78,11 +93,54 @@ describe("getBatched", () => {
     jest.advanceTimersByTime(10);
     djedi.getBatched({ uri: "3", value: undefined }, callback);
 
+    // One request for 1 and 2, one for 3.
     await wait();
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot(
-      "api calls (one request for 1 & 2, one for 3)"
-    );
-    expect(callback.mock.calls).toMatchSnapshot("callback calls");
+    expect(fetch.calls()).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "i18n://en-us@1.txt": null,
+    "i18n://en-us@2.txt": null,
+  },
+  Object {
+    "i18n://en-us@3.txt": null,
+  },
+]
+`);
+
+    expect(callback.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@1.txt",
+      "value": "1",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "i18n://en-us@1.txt",
+      "value": "1",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "i18n://en-us@1.txt",
+      "value": "1",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "i18n://en-us@2.txt",
+      "value": "2",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "i18n://en-us@3.txt",
+      "value": "3",
+    },
+  ],
+]
+`);
   });
 
   test("it uses no timeout if batchInterval=0", async () => {
@@ -90,9 +148,25 @@ describe("getBatched", () => {
     djedi.options.batchInterval = 0;
     const callback = jest.fn();
     djedi.getBatched({ uri: "test", value: undefined }, callback);
+
+    // Only waiting for promises, not for timeouts.
     await waitForPromises();
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
-    expect(callback.mock.calls).toMatchSnapshot("callback call");
+    expect(fetch.calls()).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@test.txt": null,
+}
+`);
+
+    expect(callback.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "test",
+    },
+  ],
+]
+`);
   });
 
   test("it handles missing node in response", async () => {
@@ -101,7 +175,19 @@ describe("getBatched", () => {
     djedi.getBatched({ uri: "test", value: "default" }, callback);
     djedi.getBatched({ uri: "missing", value: "default" }, callback);
     await wait();
-    expect(callback.mock.calls).toMatchSnapshot();
+    expect(callback.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "test",
+    },
+  ],
+  Array [
+    [Error: Missing result for node: i18n://en-us@missing.txt],
+  ],
+]
+`);
   });
 
   getTests(djedi.getBatched.bind(djedi));
@@ -113,7 +199,6 @@ describe("getBatched", () => {
 
 describe("reportPrefetchableNode", () => {
   test("it warns about reporting nodes with different defaults", async () => {
-    fetch({});
     djedi.reportPrefetchableNode({ uri: "test", value: "default" });
     djedi.reportPrefetchableNode({
       uri: "en-us@test",
@@ -123,9 +208,34 @@ describe("reportPrefetchableNode", () => {
       uri: "i18n://test.txt",
       value: undefined,
     });
-    expect(console.warn.mock.calls).toMatchSnapshot("console.warn");
+
+    expect(console.warn.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    "djedi-react: Encountered two nodes with the same URI but with different default values. Using the previous value and ignoring the next.",
+    Object {
+      "next": "other default",
+      "prev": "default",
+      "uri": "i18n://en-us@test.txt",
+    },
+  ],
+  Array [
+    "djedi-react: Encountered two nodes with the same URI but with different default values. Using the previous value and ignoring the next.",
+    Object {
+      "next": undefined,
+      "prev": "default",
+      "uri": "i18n://en-us@test.txt",
+    },
+  ],
+]
+`);
+
     await djedi.prefetch();
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+    expect(fetch.calls()).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@test.txt": "default",
+}
+`);
   });
 });
 
@@ -135,15 +245,34 @@ describe("prefetch", () => {
       ...simpleNodeResponse("test", "test"),
       ...simpleNodeResponse("other", "other"),
     });
-    const spy = jest.spyOn(djedi, "addNodes");
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.reportPrefetchableNode({ uri: "other", value: "default" });
     const nodes = await djedi.prefetch();
-    expect(nodes).toMatchSnapshot("nodes");
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
-    expect(spy.mock.calls).toMatchSnapshot("addNodes call");
-    spy.mockReset();
-    spy.mockRestore();
+
+    expect(nodes).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@other.txt": "other",
+  "i18n://en-us@test.txt": "test",
+}
+`);
+
+    expect(fetch.calls()).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@other.txt": "default",
+  "i18n://en-us@test.txt": null,
+}
+`);
+
+    expect(djedi.addNodes.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "i18n://en-us@other.txt": "other",
+      "i18n://en-us@test.txt": "test",
+    },
+  ],
+]
+`);
   });
 
   test("it allows filtering nodes", async () => {
@@ -154,9 +283,41 @@ describe("prefetch", () => {
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.reportPrefetchableNode({ uri: "other", value: "default" });
     const nodes = await djedi.prefetch({ filter });
-    expect(nodes).toMatchSnapshot("nodes");
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
-    expect(filter.mock.calls).toMatchSnapshot("filter calls");
+
+    expect(nodes).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@test.txt": "test",
+}
+`);
+
+    expect(fetch.calls()).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@test.txt": null,
+}
+`);
+
+    expect(filter.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "ext": "txt",
+      "namespace": "en-us",
+      "path": "test",
+      "scheme": "i18n",
+      "version": "",
+    },
+  ],
+  Array [
+    Object {
+      "ext": "txt",
+      "namespace": "en-us",
+      "path": "other",
+      "scheme": "i18n",
+      "version": "",
+    },
+  ],
+]
+`);
   });
 
   test("it allows passing extra nodes", async () => {
@@ -173,8 +334,22 @@ describe("prefetch", () => {
         { uri: "extra", value: "extra" },
       ],
     });
-    expect(nodes).toMatchSnapshot("nodes");
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+
+    expect(nodes).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@extra.txt": "extra",
+  "i18n://en-us@other.txt": "other",
+  "i18n://en-us@test.txt": "test",
+}
+`);
+
+    expect(fetch.calls()).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@extra.txt": "extra",
+  "i18n://en-us@other.txt": "default",
+  "i18n://en-us@test.txt": null,
+}
+`);
   });
 
   test("it does not filter the extra nodes", async () => {
@@ -191,8 +366,20 @@ describe("prefetch", () => {
         { uri: "extra", value: "extra" },
       ],
     });
-    expect(nodes).toMatchSnapshot("nodes");
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+
+    expect(nodes).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@extra.txt": "extra",
+  "i18n://en-us@test.txt": "test",
+}
+`);
+
+    expect(fetch.calls()).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@extra.txt": "extra",
+  "i18n://en-us@test.txt": null,
+}
+`);
   });
 
   test("it makes no request if there are no nodes to prefetch", async () => {
@@ -220,12 +407,19 @@ describe("prefetch", () => {
     djedi.reportPrefetchableNode({ uri: "2", value: undefined });
 
     const nodes1 = await djedi.prefetch();
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+
+    expect(fetch.calls()).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@1.txt": null,
+  "i18n://en-us@2.txt": null,
+}
+`);
 
     const nodes2 = await djedi.prefetch();
     const callback = jest.fn();
     djedi.get({ uri: "1", value: undefined }, callback);
     djedi.getBatched({ uri: "2", value: undefined }, callback);
+    expect(fetch.mockFn).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledTimes(2);
     expect(nodes2).toEqual(nodes1);
   });
@@ -252,8 +446,10 @@ describe("injectAdmin", () => {
     document.body.innerHTML = "<p>Some content</p>";
     const inserted = await djedi.injectAdmin();
     expect(inserted).toBe(true);
-    expect(document.body.innerHTML).toMatchSnapshot();
     expect(document.domain).toBe("site.example.com");
+    expect(document.body.innerHTML).toMatchInlineSnapshot(
+      `"<p>Some content</p><iframe></iframe>"`
+    );
   });
 
   test("it sets document.domain", async () => {
@@ -264,8 +460,10 @@ describe("injectAdmin", () => {
     document.body.innerHTML = "<p>Some content</p>";
     const inserted = await djedi.injectAdmin();
     expect(inserted).toBe(true);
-    expect(document.body.innerHTML).toMatchSnapshot();
     expect(document.domain).toBe("example.com");
+    expect(document.body.innerHTML).toMatchInlineSnapshot(
+      `"<p>Some content</p><script>document.domain = \\"example.com\\";</script><iframe></iframe>"`
+    );
   });
 
   test("handles not having permission", async () => {
@@ -273,64 +471,133 @@ describe("injectAdmin", () => {
     document.body.innerHTML = "<p>Some content</p>";
     const inserted = await djedi.injectAdmin();
     expect(inserted).toBe(false);
-    expect(document.body.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchInlineSnapshot(
+      `"<p>Some content</p>"`
+    );
   });
 
   test("it handles error status codes", async () => {
     fetch("<h1>Server error 500</h1>", { status: 500, stringify: false });
-    await expect(djedi.injectAdmin()).rejects.toThrowErrorMatchingSnapshot();
+    await expect(
+      djedi.injectAdmin()
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"Unexpected response status code. Got 500 but expected 200 <= status < 400 or status = 403."`
+    );
   });
 
   test("it handles rejected requests", async () => {
     fetch(new Error("Network error"));
-    await expect(djedi.injectAdmin()).rejects.toThrowErrorMatchingSnapshot();
+    await expect(
+      djedi.injectAdmin()
+    ).rejects.toThrowErrorMatchingInlineSnapshot(`"Network error"`);
   });
 
   test("it respects options.baseUrl", async () => {
     fetch("", { stringify: false });
     djedi.options.baseUrl = "https://example.com/cms";
     await djedi.injectAdmin();
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+    expect(fetch.mockFn.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    "https://example.com/cms/embed/",
+    Object {
+      "credentials": "include",
+    },
+  ],
+]
+`);
   });
 });
 
 describe("reportRenderedNode and reportRemovedNode", () => {
   test("they work", () => {
-    expect(window.DJEDI_NODES).toMatchSnapshot();
+    expect(window.DJEDI_NODES).toMatchInlineSnapshot(`Object {}`);
 
     djedi.reportRenderedNode({ uri: "first", value: "first" });
     djedi.reportRenderedNode({ uri: "first", value: "first" });
     djedi.reportRenderedNode({ uri: "second", value: "second" });
-    expect(window.DJEDI_NODES).toMatchSnapshot();
+    expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@first.txt": "first",
+  "i18n://en-us@second.txt": "second",
+}
+`);
 
     djedi.reportRemovedNode("first");
-    expect(window.DJEDI_NODES).toMatchSnapshot();
+    expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@first.txt": "first",
+  "i18n://en-us@second.txt": "second",
+}
+`);
 
     djedi.reportRemovedNode("first");
-    expect(window.DJEDI_NODES).toMatchSnapshot();
+    expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@second.txt": "second",
+}
+`);
 
     djedi.reportRemovedNode("second");
-    expect(window.DJEDI_NODES).toMatchSnapshot();
+    expect(window.DJEDI_NODES).toMatchInlineSnapshot(`Object {}`);
   });
 
   test("they handle an already present window.DJEDI_NODES", () => {
     window.DJEDI_NODES = simpleNodeResponse("already", "existing");
-    expect(window.DJEDI_NODES).toMatchSnapshot();
+    expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@already.txt": "existing",
+}
+`);
 
     djedi.constructor();
     djedi.reportRenderedNode({ uri: "test", value: "test" });
-    expect(window.DJEDI_NODES).toMatchSnapshot();
+    expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@already.txt": "existing",
+  "i18n://en-us@test.txt": "test",
+}
+`);
 
     djedi.reportRemovedNode("test");
-    expect(window.DJEDI_NODES).toMatchSnapshot();
+    expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@already.txt": "existing",
+}
+`);
   });
 
   test("reportRenderedNode warns about rendering nodes with different defaults", () => {
     djedi.reportRenderedNode({ uri: "test", value: "default" });
     djedi.reportRenderedNode({ uri: "en-us@test", value: "other default" });
     djedi.reportRenderedNode({ uri: "i18n://test.txt", value: undefined });
-    expect(console.warn.mock.calls).toMatchSnapshot("console.warn");
-    expect(window.DJEDI_NODES).toMatchSnapshot("window.DJEDI_NODES");
+
+    expect(console.warn.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
+    Object {
+      "next": "other default",
+      "prev": "default",
+      "uri": "i18n://en-us@test.txt",
+    },
+  ],
+  Array [
+    "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
+    Object {
+      "next": undefined,
+      "prev": "default",
+      "uri": "i18n://en-us@test.txt",
+    },
+  ],
+]
+`);
+
+    expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@test.txt": "default",
+}
+`);
   });
 
   test("reportRemovedNode handles trying to remove a non-existing node", () => {
@@ -342,8 +609,24 @@ describe("reportRenderedNode and reportRemovedNode", () => {
 
 describe("element", () => {
   test("it works", () => {
-    expect(djedi.element("test")).toMatchSnapshot();
-    expect(djedi.element("i18n://sv-se@home/intro.md#5")).toMatchSnapshot();
+    expect(djedi.element("test")).toMatchInlineSnapshot(`
+Object {
+  "attributes": Object {
+    "data-i18n": "en-us@test",
+  },
+  "tag": "span",
+}
+`);
+
+    expect(djedi.element("i18n://sv-se@home/intro.md#5"))
+      .toMatchInlineSnapshot(`
+Object {
+  "attributes": Object {
+    "data-i18n": "sv-se@home/intro",
+  },
+  "tag": "span",
+}
+`);
   });
 });
 
@@ -517,7 +800,46 @@ describe("options.uri", () => {
       callback
     );
 
-    expect(callback.mock.calls).toMatchSnapshot("callback calls");
+    expect(callback.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>ext<VERSION>version",
+      "value": "text1",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>ext<VERSION>version",
+      "value": "text1",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>md<VERSION>version",
+      "value": "text2",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>md<VERSION>version",
+      "value": "text2",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "scheme2<SCHEME>namespace2<NAMESPACE>test<EXT>ext<VERSION>version",
+      "value": "text3",
+    },
+  ],
+  Array [
+    Object {
+      "uri": "scheme2<SCHEME>namespace3<NAMESPACE>home<PATH>test<EXT>html<VERSION>5",
+      "value": "text4",
+    },
+  ],
+]
+`);
   });
 });
 
@@ -614,12 +936,11 @@ function networkTests(fn) {
   });
 
   test("it respects options.baseUrl", async () => {
-    fetch({});
     djedi.options.baseUrl = "https://example.com/cms";
     const callback = jest.fn();
     fn(callback);
     await wait();
-    expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
+    expect(fetch.mockFn.mock.calls).toMatchSnapshot();
     expect(callback).toHaveBeenCalledTimes(1);
   });
 }
@@ -643,5 +964,9 @@ async function prefetchRefetchTest(ttl, cacheValue) {
 
   const callback = jest.fn();
   djedi.get({ uri: "test", value: undefined }, callback);
-  expect(callback.mock.calls).toMatchSnapshot();
+  expect(callback).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledWith({
+    uri: "i18n://en-us@test.txt",
+    value: "test",
+  });
 }

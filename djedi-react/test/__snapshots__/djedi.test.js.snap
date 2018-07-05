@@ -1,23 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`element it works 1`] = `
-Object {
-  "attributes": Object {
-    "data-i18n": "en-us@test",
-  },
-  "tag": "span",
-}
-`;
-
-exports[`element it works 2`] = `
-Object {
-  "attributes": Object {
-    "data-i18n": "sv-se@home/intro",
-  },
-  "tag": "span",
-}
-`;
-
 exports[`get it calls the callback synchronously if the node already exists: simple 1`] = `
 Object {
   "uri": "i18n://en-us@test.txt",
@@ -114,7 +96,7 @@ Error: Network error",
 }
 `;
 
-exports[`get it respects options.baseUrl: api call 1`] = `
+exports[`get it respects options.baseUrl 1`] = `
 Array [
   Array [
     "https://example.com/cms/nodes/",
@@ -240,7 +222,7 @@ Error: Network error",
 }
 `;
 
-exports[`getBatched it respects options.baseUrl: api call 1`] = `
+exports[`getBatched it respects options.baseUrl 1`] = `
 Array [
   Array [
     "https://example.com/cms/nodes/",
@@ -257,275 +239,16 @@ Array [
 ]
 `;
 
-exports[`getBatched it uses no timeout if batchInterval=0: api call 1`] = `
+exports[`getBatched it works 1`] = `
 Array [
-  Array [
-    "/djedi/nodes/",
-    Object {
-      "body": Object {
-        "i18n://en-us@test.txt": null,
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
+  Object {
+    "i18n://en-us@1.txt": null,
+    "i18n://en-us@2.txt": null,
+  },
+  Object {
+    "i18n://en-us@3.txt": null,
+  },
 ]
-`;
-
-exports[`getBatched it uses no timeout if batchInterval=0: callback call 1`] = `
-Array [
-  Array [
-    Object {
-      "uri": "i18n://en-us@test.txt",
-      "value": "test",
-    },
-  ],
-]
-`;
-
-exports[`getBatched it works: api calls (one request for 1 & 2, one for 3) 1`] = `
-Array [
-  Array [
-    "/djedi/nodes/",
-    Object {
-      "body": Object {
-        "i18n://en-us@1.txt": null,
-        "i18n://en-us@2.txt": null,
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
-  Array [
-    "/djedi/nodes/",
-    Object {
-      "body": Object {
-        "i18n://en-us@3.txt": null,
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
-]
-`;
-
-exports[`getBatched it works: callback calls 1`] = `
-Array [
-  Array [
-    Object {
-      "uri": "i18n://en-us@1.txt",
-      "value": "1",
-    },
-  ],
-  Array [
-    Object {
-      "uri": "i18n://en-us@1.txt",
-      "value": "1",
-    },
-  ],
-  Array [
-    Object {
-      "uri": "i18n://en-us@1.txt",
-      "value": "1",
-    },
-  ],
-  Array [
-    Object {
-      "uri": "i18n://en-us@2.txt",
-      "value": "2",
-    },
-  ],
-  Array [
-    Object {
-      "uri": "i18n://en-us@3.txt",
-      "value": "3",
-    },
-  ],
-]
-`;
-
-exports[`injectAdmin handles not having permission 1`] = `"<p>Some content</p>"`;
-
-exports[`injectAdmin it handles error status codes 1`] = `"Unexpected response status code. Got 500 but expected 200 <= status < 400 or status = 403."`;
-
-exports[`injectAdmin it handles rejected requests 1`] = `"Network error"`;
-
-exports[`injectAdmin it respects options.baseUrl: api call 1`] = `
-Array [
-  Array [
-    "https://example.com/cms/embed/",
-    Object {
-      "credentials": "include",
-    },
-  ],
-]
-`;
-
-exports[`injectAdmin it sets document.domain 1`] = `"<p>Some content</p><script>document.domain = \\"example.com\\";</script><iframe></iframe>"`;
-
-exports[`injectAdmin it works 1`] = `"<p>Some content</p><iframe></iframe>"`;
-
-exports[`options.uri it works: callback calls 1`] = `
-Array [
-  Array [
-    Object {
-      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>ext<VERSION>version",
-      "value": "text1",
-    },
-  ],
-  Array [
-    Object {
-      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>ext<VERSION>version",
-      "value": "text1",
-    },
-  ],
-  Array [
-    Object {
-      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>md<VERSION>version",
-      "value": "text2",
-    },
-  ],
-  Array [
-    Object {
-      "uri": "scheme<SCHEME>namespace<NAMESPACE>test<EXT>md<VERSION>version",
-      "value": "text2",
-    },
-  ],
-  Array [
-    Object {
-      "uri": "scheme2<SCHEME>namespace2<NAMESPACE>test<EXT>ext<VERSION>version",
-      "value": "text3",
-    },
-  ],
-  Array [
-    Object {
-      "uri": "scheme2<SCHEME>namespace3<NAMESPACE>home<PATH>test<EXT>html<VERSION>5",
-      "value": "text4",
-    },
-  ],
-]
-`;
-
-exports[`prefetch it "returns" all "rendered" nodes even if no request: api call 1`] = `
-Array [
-  Array [
-    "/djedi/nodes/",
-    Object {
-      "body": Object {
-        "i18n://en-us@1.txt": null,
-        "i18n://en-us@2.txt": null,
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
-]
-`;
-
-exports[`prefetch it allows filtering nodes: api call 1`] = `
-Array [
-  Array [
-    "/djedi/nodes/",
-    Object {
-      "body": Object {
-        "i18n://en-us@test.txt": null,
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
-]
-`;
-
-exports[`prefetch it allows filtering nodes: filter calls 1`] = `
-Array [
-  Array [
-    Object {
-      "ext": "txt",
-      "namespace": "en-us",
-      "path": "test",
-      "scheme": "i18n",
-      "version": "",
-    },
-  ],
-  Array [
-    Object {
-      "ext": "txt",
-      "namespace": "en-us",
-      "path": "other",
-      "scheme": "i18n",
-      "version": "",
-    },
-  ],
-]
-`;
-
-exports[`prefetch it allows filtering nodes: nodes 1`] = `
-Object {
-  "i18n://en-us@test.txt": "test",
-}
-`;
-
-exports[`prefetch it allows passing extra nodes: api call 1`] = `
-Array [
-  Array [
-    "/djedi/nodes/",
-    Object {
-      "body": Object {
-        "i18n://en-us@extra.txt": "extra",
-        "i18n://en-us@other.txt": "default",
-        "i18n://en-us@test.txt": null,
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
-]
-`;
-
-exports[`prefetch it allows passing extra nodes: nodes 1`] = `
-Object {
-  "i18n://en-us@extra.txt": "extra",
-  "i18n://en-us@other.txt": "other",
-  "i18n://en-us@test.txt": "test",
-}
-`;
-
-exports[`prefetch it does not filter the extra nodes: api call 1`] = `
-Array [
-  Array [
-    "/djedi/nodes/",
-    Object {
-      "body": Object {
-        "i18n://en-us@extra.txt": "extra",
-        "i18n://en-us@test.txt": null,
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
-]
-`;
-
-exports[`prefetch it does not filter the extra nodes: nodes 1`] = `
-Object {
-  "i18n://en-us@extra.txt": "extra",
-  "i18n://en-us@test.txt": "test",
-}
 `;
 
 exports[`prefetch it handles error status codes 1`] = `
@@ -567,29 +290,7 @@ Error: Network error",
 }
 `;
 
-exports[`prefetch it refetches if cache has expired 1`] = `
-Array [
-  Array [
-    Object {
-      "uri": "i18n://en-us@test.txt",
-      "value": "test",
-    },
-  ],
-]
-`;
-
-exports[`prefetch it refetches if custom cache has expired 1`] = `
-Array [
-  Array [
-    Object {
-      "uri": "i18n://en-us@test.txt",
-      "value": "test",
-    },
-  ],
-]
-`;
-
-exports[`prefetch it respects options.baseUrl: api call 1`] = `
+exports[`prefetch it respects options.baseUrl 1`] = `
 Array [
   Array [
     "https://example.com/cms/nodes/",
@@ -605,147 +306,3 @@ Array [
   ],
 ]
 `;
-
-exports[`prefetch it works: addNodes call 1`] = `
-Array [
-  Array [
-    Object {
-      "i18n://en-us@other.txt": "other",
-      "i18n://en-us@test.txt": "test",
-    },
-  ],
-]
-`;
-
-exports[`prefetch it works: api call 1`] = `
-Array [
-  Array [
-    "/djedi/nodes/",
-    Object {
-      "body": Object {
-        "i18n://en-us@other.txt": "default",
-        "i18n://en-us@test.txt": null,
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
-]
-`;
-
-exports[`prefetch it works: nodes 1`] = `
-Object {
-  "i18n://en-us@other.txt": "other",
-  "i18n://en-us@test.txt": "test",
-}
-`;
-
-exports[`reportPrefetchableNode it warns about reporting nodes with different defaults: api call 1`] = `
-Array [
-  Array [
-    "/djedi/nodes/",
-    Object {
-      "body": Object {
-        "i18n://en-us@test.txt": "default",
-      },
-      "headers": Object {
-        "Content-Type": "application/json",
-      },
-      "method": "POST",
-    },
-  ],
-]
-`;
-
-exports[`reportPrefetchableNode it warns about reporting nodes with different defaults: console.warn 1`] = `
-Array [
-  Array [
-    "djedi-react: Encountered two nodes with the same URI but with different default values. Using the previous value and ignoring the next.",
-    Object {
-      "next": "other default",
-      "prev": "default",
-      "uri": "i18n://en-us@test.txt",
-    },
-  ],
-  Array [
-    "djedi-react: Encountered two nodes with the same URI but with different default values. Using the previous value and ignoring the next.",
-    Object {
-      "next": undefined,
-      "prev": "default",
-      "uri": "i18n://en-us@test.txt",
-    },
-  ],
-]
-`;
-
-exports[`reportRenderedNode and reportRemovedNode reportRenderedNode warns about rendering nodes with different defaults: console.warn 1`] = `
-Array [
-  Array [
-    "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
-    Object {
-      "next": "other default",
-      "prev": "default",
-      "uri": "i18n://en-us@test.txt",
-    },
-  ],
-  Array [
-    "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
-    Object {
-      "next": undefined,
-      "prev": "default",
-      "uri": "i18n://en-us@test.txt",
-    },
-  ],
-]
-`;
-
-exports[`reportRenderedNode and reportRemovedNode reportRenderedNode warns about rendering nodes with different defaults: window.DJEDI_NODES 1`] = `
-Object {
-  "i18n://en-us@test.txt": "default",
-}
-`;
-
-exports[`reportRenderedNode and reportRemovedNode they handle an already present window.DJEDI_NODES 1`] = `
-Object {
-  "i18n://en-us@already.txt": "existing",
-}
-`;
-
-exports[`reportRenderedNode and reportRemovedNode they handle an already present window.DJEDI_NODES 2`] = `
-Object {
-  "i18n://en-us@already.txt": "existing",
-  "i18n://en-us@test.txt": "test",
-}
-`;
-
-exports[`reportRenderedNode and reportRemovedNode they handle an already present window.DJEDI_NODES 3`] = `
-Object {
-  "i18n://en-us@already.txt": "existing",
-}
-`;
-
-exports[`reportRenderedNode and reportRemovedNode they work 1`] = `Object {}`;
-
-exports[`reportRenderedNode and reportRemovedNode they work 2`] = `
-Object {
-  "i18n://en-us@first.txt": "first",
-  "i18n://en-us@second.txt": "second",
-}
-`;
-
-exports[`reportRenderedNode and reportRemovedNode they work 3`] = `
-Object {
-  "i18n://en-us@first.txt": "first",
-  "i18n://en-us@second.txt": "second",
-}
-`;
-
-exports[`reportRenderedNode and reportRemovedNode they work 4`] = `
-Object {
-  "i18n://en-us@second.txt": "second",
-}
-`;
-
-exports[`reportRenderedNode and reportRemovedNode they work 5`] = `Object {}`;
