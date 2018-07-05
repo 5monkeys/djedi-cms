@@ -29,6 +29,9 @@ test("it renders loading and then the node", async () => {
       `
     )
   );
+
+  djedi.options.baseUrl = "http://internal:3210";
+
   const component = renderer.create(
     <Node uri="test" url="https://example.com/">{md`
       # Heading
@@ -36,11 +39,41 @@ test("it renders loading and then the node", async () => {
       And a [link]({url}).
     `}</Node>
   );
-  djedi.options.baseUrl = "http://internal:3210";
-  expect(component.toJSON()).toMatchSnapshot("loading");
+
+  expect(component.toJSON()).toMatchInlineSnapshot(`"Loading…"`);
+
   await wait();
-  expect(fetch.mockFn.mock.calls).toMatchSnapshot("api call");
-  expect(component.toJSON()).toMatchSnapshot("with value");
+  expect(fetch.mockFn.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    "http://internal:3210/nodes/",
+    Object {
+      "body": Object {
+        "i18n://en-us@test.txt": "# Heading
+
+And a [link]({url}).",
+      },
+      "headers": Object {
+        "Content-Type": "application/json",
+      },
+      "method": "POST",
+    },
+  ],
+]
+`);
+
+  expect(component.toJSON()).toMatchInlineSnapshot(`
+<span
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "<h1>Heading</h1>
+<p>And a <a href=\\"https://example.com/\\">link</a>.</p>",
+    }
+  }
+  data-i18n="en-us@test"
+/>
+`);
+
   expect(typeof window).toBe("undefined");
 });
 
