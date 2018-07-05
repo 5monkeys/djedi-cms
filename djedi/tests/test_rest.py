@@ -295,7 +295,6 @@ class PublicRestTest(ClientTest):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 
-
     def test_nodes(self):
         cio.set('sv-se@label/email', u'E-post')
 
