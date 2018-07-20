@@ -1,13 +1,16 @@
 language: python
 sudo: false
 
-python: 3.5
+python: 3.7
 
 env:
   # NOTE: On Travis web page define private STASH_URL, STASH_TOKEN, STASH_SECRET.
   global:
     - STASH_BOX=$TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER:$STASH_SECRET
   matrix:
+    - TOXENV=py26-django15
+    - TOXENV=py26-django16
+
     - TOXENV=py27-django15
     - TOXENV=py27-django16
     - TOXENV=py27-django17
@@ -15,6 +18,11 @@ env:
     - TOXENV=py27-django19
     - TOXENV=py27-django110
     - TOXENV=py27-django111
+
+    - TOXENV=py33-django15
+    - TOXENV=py33-django16
+    - TOXENV=py33-django17
+    - TOXENV=py33-django18
 
     - TOXENV=py34-django17
     - TOXENV=py34-django18
@@ -29,28 +37,13 @@ env:
     - TOXENV=py35-django111
     - TOXENV=py35-django20
 
+    - TOXENV=py36-django111
+    - TOXENV=py36-django20
+
+    - TOXENV=py37-django20
+
     - TOXENV=lint
     - TOXENV=coverage
-
-matrix:
-  include:
-    - env: TOXENV=py26-django15
-      python: 2.6
-    - env: TOXENV=py26-django16
-      python: 2.6
-    - env: TOXENV=py33-django15
-      python: 3.3
-    - env: TOXENV=py33-django16
-      python: 3.3
-    - env: TOXENV=py33-django17
-      python: 3.3
-    - env: TOXENV=py33-django18
-      python: 3.3
-    - env: TOXENV=py36-django111
-      python: 3.6
-    - env: TOXENV=py36-django20
-      python: 3.6
-
 
 install:
   - pip install --upgrade pip
