@@ -75,14 +75,6 @@ SyntaxError: Unexpected end of JSON input",
 }
 `;
 
-exports[`get it handles missing node in response 1`] = `
-Object {
-  "message": "Missing result for node: i18n://en-us@test.txt",
-  "responseText": undefined,
-  "status": 1404,
-}
-`;
-
 exports[`get it handles rejected requests 1`] = `
 Object {
   "message": "Djedi API error for request: POST /djedi/nodes/
@@ -111,13 +103,6 @@ Array [
     },
   ],
 ]
-`;
-
-exports[`get it works 1`] = `
-Object {
-  "uri": "i18n://en-us@test.txt",
-  "value": "test",
-}
 `;
 
 exports[`getBatched it calls the callback synchronously if the node already exists: simple 1`] = `
@@ -195,20 +180,6 @@ SyntaxError: Unexpected end of JSON input",
 }
 `;
 
-exports[`getBatched it handles missing node in response 1`] = `
-Array [
-  Array [
-    Object {
-      "uri": "i18n://en-us@test.txt",
-      "value": "test",
-    },
-  ],
-  Array [
-    [Error: Missing result for node: i18n://en-us@missing.txt],
-  ],
-]
-`;
-
 exports[`getBatched it handles rejected requests 1`] = `
 Object {
   "message": "Djedi API error for request: POST /djedi/nodes/
@@ -236,18 +207,6 @@ Array [
       "method": "POST",
     },
   ],
-]
-`;
-
-exports[`getBatched it works 1`] = `
-Array [
-  Object {
-    "i18n://en-us@1.txt": null,
-    "i18n://en-us@2.txt": null,
-  },
-  Object {
-    "i18n://en-us@3.txt": null,
-  },
 ]
 `;
 

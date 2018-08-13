@@ -1,7 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`it does not affect files with no <Node>s 1`] = `console.log('<Node uri="uri">value</Node>');`;
-
 exports[`it works 1`] = `
 var _djedi_uri = "intro",
     _djedi_default = "[project] is a cool CMS",
