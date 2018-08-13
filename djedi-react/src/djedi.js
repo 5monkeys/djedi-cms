@@ -57,6 +57,7 @@ export class Djedi {
   }
 
   resetState() {
+    // istanbul ignore next
     if (this._batch.timeoutId != null) {
       clearTimeout(this._batch.timeoutId);
     }
