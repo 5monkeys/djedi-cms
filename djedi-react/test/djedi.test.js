@@ -62,6 +62,19 @@ Object {
     });
   });
 
+  test("it handles node with null value in response", done => {
+    fetch(simpleNodeResponse("test", null));
+    djedi.get({ uri: "test", value: null }, node => {
+      expect(node).toMatchInlineSnapshot(`
+Object {
+  "uri": "i18n://en-us@test.txt",
+  "value": null,
+}
+`);
+      done();
+    });
+  });
+
   getTests(djedi.get.bind(djedi));
 
   networkTests(callback => {

@@ -311,6 +311,19 @@ test("it handles missing nodes in response", async () => {
   );
 });
 
+test("it handles nodes with null value in response", async () => {
+  fetch(simpleNodeResponse("test", null));
+  const component = renderer.create(<Node uri="test" />);
+  await wait();
+  expect(component.toJSON()).toMatchInlineSnapshot(`
+<span
+  data-i18n="en-us@test"
+>
+  
+</span>
+`);
+});
+
 test("it treats node values as HTML", async () => {
   fetch({
     ...simpleNodeResponse("first", 'A <a href="https://example.com">link</a>.'),
@@ -595,8 +608,9 @@ Double brackets OK: {Bob}",
 test("custom render function", async () => {
   fetch("<h1>Server error 500</h1>", { status: 500, stringify: false });
   fetch(new Error("Network error"));
-  fetch(simpleNodeResponse("3", null));
+  fetch({});
   fetch(simpleNodeResponse("4", "returned value"));
+  fetch(simpleNodeResponse("5", null));
 
   function render1(state) {
     return state.type;
@@ -725,6 +739,23 @@ Error: Network error",
   </article>
 </div>
 `);
+
+  // Null value.
+  instance.setState({ uri: "5" });
+  await wait();
+  expect(component.toJSON()).toMatchInlineSnapshot(`
+<div>
+  success
+  <hr />
+  <article>
+    <span
+      data-i18n="en-us@5"
+    >
+      
+    </span>
+  </article>
+</div>
+`);
 });
 
 test("it handles window.DJEDI_NODES", async () => {
@@ -825,19 +856,6 @@ Object {
 Object {
   "i18n://en-us@test.txt": "default",
 }
-`);
-});
-
-test("edge case: if node.value is missing somehow, it doesn’t crash", () => {
-  const component = renderer.create(<Node uri="test" />);
-  const instance = component.getInstance();
-  instance.setState({ node: { uri: "test", value: null } });
-  expect(component.toJSON()).toMatchInlineSnapshot(`
-<span
-  data-i18n="en-us@test"
->
-  
-</span>
 `);
 });
 

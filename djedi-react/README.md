@@ -542,9 +542,9 @@ When `Node` or `Nodes` is used as _input:_
 When `Node` or `Nodes` is used as _output:_
 
 - `uri` is an absolute URI, such as `i18n://en-us@home/title.txt`.
-- `value` is the final value, and supposed to always exist. The final value can
-  be the default value, or a value entered by the user in the admin sidebar. It
-  can also be transformed (such as markdown→HTML).
+- `value` is the final value, if any. The final value can be the default value
+  (if any), or a value entered by the user in the admin sidebar. It can also be
+  transformed (such as markdown→HTML).
 
 ##### `djedi.injectAdmin(): Promise<boolean>`
 

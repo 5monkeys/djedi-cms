@@ -114,6 +114,8 @@ export default class Node extends React.Component {
       return render({ type: "error", error: node });
     }
 
+    // If there’s neither a default value nor a database value, `node.value`
+    // will be `null`.
     const value = interpolate(node.value || "", variables);
     const element = djedi.element(node.uri);
 

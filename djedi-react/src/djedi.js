@@ -188,10 +188,6 @@ export class Djedi {
       const uriObject = this._parseUri(uri);
       const value = nodes[uri];
 
-      if (value == null) {
-        return;
-      }
-
       const node = { uri: this._stringifyUri(uriObject), value };
       this._nodes.set(node.uri, node);
 
