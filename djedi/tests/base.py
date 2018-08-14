@@ -10,6 +10,9 @@ from django.contrib.auth.models import User, Group
 from django.test import Client
 from django.test import TransactionTestCase
 
+from cio.conf import settings as cio_settings
+from djedi import configure
+
 
 if django.VERSION < (1, 8):
     DEBUG_CURSOR_ATTR = 'use_debug_cursor'
@@ -32,6 +35,13 @@ class DjediTest(TransactionTestCase):
 
     def tearDown(self):
         shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+
+    @contextmanager
+    def settings(self, *args, **kwargs):
+        with super(DjediTest, self).settings(*args, **kwargs):
+            with cio_settings():
+                configure()
+                yield
 
 
 class AssertionMixin(object):
