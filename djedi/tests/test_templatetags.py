@@ -39,6 +39,19 @@ class TagTest(DjediTest, AssertionMixin):
         html = self.render(u"{% node 'l10n://foo/bar' default='bogus' %}")
         self.assertEqual(html, u'<span data-i18n="djedi@foo/bar">bogus</span>')
 
+    def test_node_tag_with_default_scheme(self):
+        cio.set('i18n://sv-se@page/title.txt', u'Swedish Djedi')
+        html = self.render(u"{% node 'page/title' edit=False %}")
+        assert html == u'Swedish Djedi'
+
+        with self.settings(DJEDI={'URI_DEFAULT_SCHEME': 'l10n'}):
+            html = self.render(u"{% node 'page/title' edit=False %}")
+            assert html == u''
+
+            cio.set('l10n://djedi@page/title.txt', u'Local Djedi')
+            html = self.render(u"{% node 'page/title' edit=False %}")
+            assert html == u'Local Djedi'
+
     def test_blocknode_tag(self):
         with self.assertRaises(TemplateSyntaxError):
             self.render("{% blocknode 'page/body' arg %}{% endblocknode %}")
