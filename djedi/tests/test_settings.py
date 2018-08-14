@@ -1,6 +1,5 @@
 from cio.conf import settings
 from cio.plugins import plugins
-from djedi import configure
 from djedi.tests import DjediTest
 
 

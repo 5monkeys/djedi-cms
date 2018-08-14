@@ -52,7 +52,6 @@ class TagTest(DjediTest, AssertionMixin):
             html = self.render(u"{% node 'page/title' edit=False %}")
             assert html == u'Local Djedi'
 
-
     def test_blocknode_tag(self):
         with self.assertRaises(TemplateSyntaxError):
             self.render("{% blocknode 'page/body' arg %}{% endblocknode %}")
