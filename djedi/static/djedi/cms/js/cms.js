@@ -217,8 +217,9 @@
               return _results1;
             })();
             path = parts.slice(1).join(" <span class=\"plugin-fg-" + color + "\">/</span> ");
+            lang = uri.namespace;
             if (uri.scheme === 'i18n') {
-              lang = uri.namespace.split('-')[0];
+              lang = lang.split('-')[0];
             }
             root = parts[0];
             if (!groups[root]) {

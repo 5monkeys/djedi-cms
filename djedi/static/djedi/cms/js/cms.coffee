@@ -156,7 +156,8 @@ class Search
         parts = (part[0].toUpperCase() + part[1..-1] for part in uri.path.split '/')
         path = parts[1..].join " <span class=\"plugin-fg-#{color}\">/</span> "
 
-        lang = uri.namespace.split('-')[0] if uri.scheme == 'i18n'
+        lang = uri.namespace
+        lang = lang.split('-')[0] if uri.scheme == 'i18n'
 
         # Create new group if node path root changed
         root = parts[0]
