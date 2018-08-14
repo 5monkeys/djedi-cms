@@ -38,14 +38,6 @@ matrix:
       python: 2.6
     - env: TOXENV=py26-django16
       python: 2.6
-    - env: TOXENV=py33-django15
-      python: 3.3
-    - env: TOXENV=py33-django16
-      python: 3.3
-    - env: TOXENV=py33-django17
-      python: 3.3
-    - env: TOXENV=py33-django18
-      python: 3.3
     - env: TOXENV=py36-django111
       python: 3.6
     - env: TOXENV=py36-django20
