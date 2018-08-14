@@ -6,6 +6,7 @@
 .idea
 .DS_Store
 .tox
+.tags
 build
 dist
 docs/_build
