@@ -1,3 +1,8 @@
+### Version 0.1.2 (2018-08-15)
+
+- Fixed: The admin sidebar is now properly updated as nodes come and go on the
+  page.
+
 ### Version 0.1.1 (2018-08-13)
 
 - Fixed: Nodes with null values returned from the server are now handled
