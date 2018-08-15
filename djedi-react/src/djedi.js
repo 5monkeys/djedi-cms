@@ -11,6 +11,7 @@ import Cache from "./Cache";
 
 const DEFAULT_CACHE_TTL = typeof window === "undefined" ? 20e3 : Infinity; // ms
 const DOCUMENT_DOMAIN_REGEX = /\bdocument\.domain\s*=\s*(["'])([^'"\s]+)\1/;
+const UPDATE_ADMIN_SIDEBAR_TIMEOUT = 10; // ms
 
 /*
 This class fetches and caches nodes, provides global options, and keeps
@@ -44,6 +45,10 @@ export class Djedi {
     // the page: `window.DJEDI_NODES = { "<uri>": "<default>" }`.
     this._DJEDI_NODES = {};
 
+    // Whenever a node is rendered or removed the admin sidebar needs to be
+    // refreshed. This is used to batch that refreshing.
+    this._updateAdminSidebarTimeoutId = undefined;
+
     if (typeof window !== "undefined") {
       if (window.DJEDI_NODES == null) {
         window.DJEDI_NODES = {};
@@ -61,6 +66,10 @@ export class Djedi {
     if (this._batch.timeoutId != null) {
       clearTimeout(this._batch.timeoutId);
     }
+    // istanbul ignore next
+    if (this._updateAdminSidebarTimeoutId != null) {
+      clearTimeout(this._updateAdminSidebarTimeoutId);
+    }
 
     this._nodes = new Cache({ ttl: DEFAULT_CACHE_TTL });
     this._prefetchableNodes = new Map();
@@ -68,6 +77,7 @@ export class Djedi {
     this._batch = makeEmptyBatch();
     this._renderedNodes = new Map();
     this._DJEDI_NODES = {};
+    this._updateAdminSidebarTimeoutId = undefined;
 
     if (typeof window !== "undefined") {
       window.DJEDI_NODES = this._DJEDI_NODES;
@@ -268,6 +278,7 @@ export class Djedi {
     });
 
     this._DJEDI_NODES[this._djediNodesUri(node.uri)] = node.value;
+    this._updateAdminSidebar();
   }
 
   reportRemovedNode(passedUri) {
@@ -283,6 +294,7 @@ export class Djedi {
     if (previous.numInstances <= 0) {
       this._renderedNodes.delete(uri);
       delete this._DJEDI_NODES[this._djediNodesUri(uri)];
+      this._updateAdminSidebar();
     }
   }
 
@@ -447,6 +459,16 @@ export class Djedi {
         });
       });
   }
+
+  _updateAdminSidebar() {
+    if (this._updateAdminSidebarTimeoutId != null) {
+      clearTimeout(this._updateAdminSidebarTimeoutId);
+    }
+    this._updateAdminSidebarTimeoutId = setTimeout(() => {
+      this._updateAdminSidebarTimeoutId = undefined;
+      updateAdminSidebar();
+    }, UPDATE_ADMIN_SIDEBAR_TIMEOUT);
+  }
 }
 
 // This is a function, not a constant, since it can be mutated by the user.
@@ -522,6 +544,30 @@ function missingUriError(uri) {
   const error = new Error(`Missing result for node: ${uri}`);
   error.status = 1404;
   return error;
+}
+
+function updateAdminSidebar() {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  const iframe = document.getElementById("djedi-cms");
+
+  if (iframe == null) {
+    return;
+  }
+
+  // The sidebar sets a width on `<html>` when the sidebar is open.
+  document.documentElement.style.width = "";
+
+  // Remove old outline elements.
+  [].forEach.call(document.querySelectorAll(".djedi-node-outline"), element => {
+    element.parentNode.removeChild(element);
+  });
+
+  // Reload the iframe.
+  // eslint-disable-next-line no-self-assign
+  iframe.src = iframe.src;
 }
 
 export default new Djedi();

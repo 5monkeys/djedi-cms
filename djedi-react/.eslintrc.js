@@ -50,6 +50,7 @@ module.exports = {
       rules: {
         "import/no-unresolved": ["error", { ignore: ["djedi-react"] }],
         "import/no-extraneous-dependencies": "off",
+        "no-invalid-this": "off",
       },
     },
   ],

@@ -675,13 +675,13 @@ yourself.
 
 ##### `djedi.reportRenderedNode(node: Node): void`
 
-Report that a node has been rendered, so that `window.DJEDI_NODES` can be kept
-up-to-date.
+Report that a node has been rendered, so that `window.DJEDI_NODES` and the admin
+sidebar can be kept up-to-date.
 
 ##### `djedi.reportRemovedNode(uri: string): void`
 
-Report that a node has been removed, so that `window.DJEDI_NODES` can be kept
-up-to-date.
+Report that a node has been removed, so that `window.DJEDI_NODES` and the admin
+sidebar can be kept up-to-date.
 
 ##### `djedi.element(uri: string): object`
 

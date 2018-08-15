@@ -618,6 +618,70 @@ Object {
       djedi.reportRemovedNode("test");
     }).not.toThrow();
   });
+
+  test("the admin sidebar is updated", async () => {
+    const iframe = document.createElement("iframe");
+    iframe.id = "djedi-cms";
+    iframe.src = "/test/src.html";
+    const srcSpy = jest.spyOn(iframe, "src", "set");
+    document.body.append(iframe);
+    expect(document.getElementById("djedi-cms")).toBe(iframe);
+
+    function reset() {
+      srcSpy.mockClear();
+
+      const num = 3;
+      for (let i = 0; i < num; i++) {
+        const span = document.createElement("span");
+        span.className = "djedi-node-outline";
+        document.body.append(span);
+      }
+      expect(
+        document.getElementsByClassName("djedi-node-outline")
+      ).toHaveLength(num);
+
+      document.documentElement.style.width = "1600px";
+    }
+
+    function assert() {
+      // iframe has been reloaded.
+      expect(srcSpy).toHaveBeenCalledTimes(1);
+      expect(srcSpy).toHaveBeenCalledWith(iframe.src);
+
+      // Outlines have been removed.
+      expect(
+        document.getElementsByClassName("djedi-node-outline")
+      ).toHaveLength(0);
+
+      // Width has been reset.
+      expect(document.documentElement.style.width).toBe("");
+    }
+
+    // Rendered.
+    reset();
+    djedi.reportRenderedNode({ uri: "test", value: "test" });
+    await wait();
+    assert();
+
+    // Removed.
+    reset();
+    djedi.reportRemovedNode("test");
+    await wait();
+    assert();
+
+    // Removing a non-existing node does not trigger update.
+    srcSpy.mockClear();
+    djedi.reportRemovedNode("test");
+    await wait();
+    expect(srcSpy).toHaveBeenCalledTimes(0);
+
+    // Batching.
+    reset();
+    djedi.reportRenderedNode({ uri: "test", value: "test" });
+    djedi.reportRemovedNode("test");
+    await wait();
+    assert();
+  });
 });
 
 describe("element", () => {

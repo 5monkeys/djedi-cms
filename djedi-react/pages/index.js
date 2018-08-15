@@ -1,5 +1,6 @@
 import { Node, djedi, md } from "djedi-react";
 import Head from "next/head";
+import Link from "next/link";
 import PropTypes from "prop-types";
 import React from "react";
 
@@ -53,6 +54,12 @@ export default class Home extends React.Component {
 
           Some text and a [link]({url}).
         `}</Node>
+
+        <p>
+          <Link href="/about">
+            <a>About us</a>
+          </Link>
+        </p>
 
         {/* Image node. */}
         <Node uri="home/image.img" />
