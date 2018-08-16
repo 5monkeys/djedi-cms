@@ -21,7 +21,7 @@ Default settings:
 Built-in plugins
 ----------------
 
-Djedi CMS comes with tre built-in plugins; text, markdown and image.
+Djedi CMS comes with three built-in plugins; text, markdown and image.
 
 
 Text Plugin
