@@ -4,7 +4,7 @@
 
 [React] client for [Djedi CMS].
 
-Requires djedi-cms version TODO or later.
+Requires djedi-cms version 1.2.0 or later.
 
 ## Installation
 
