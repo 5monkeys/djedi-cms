@@ -1,3 +1,7 @@
+### Version 1.0.0 (2018-08-16)
+
+- No changes, just marking as stable.
+
 ### Version 0.1.2 (2018-08-15)
 
 - Fixed: The admin sidebar is now properly updated as nodes come and go on the
