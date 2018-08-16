@@ -1,4 +1,8 @@
+{% load djedi_admin %}
+{% if not exclude_json_nodes %}
 <script>window.DJEDI_NODES = {{ json_nodes|safe }};</script>
+{% endif %}
+{% djedi_xss_domain %}
 <style type="text/css">
 #djedi-cms{position:fixed;top:0;right:-400px;width:400px;height:100%;border:0;z-index:30000}#djedi-cms.fullscreen{width:100%}
 #djedi-cms.closed{opacity:.5}
@@ -8,4 +12,4 @@
 .djedi-node-outline.selected{opacity:1;background-color:transparent;-webkit-box-shadow:0 0 20px 3px rgba(0,220,255,0.5),inset 0 0 0 2px #00dcff;box-shadow:0 0 20px 3px rgba(0,220,255,0.5),inset 0 0 0 2px #00dcff}
 .djedi-overlay{background-color:rgba(0,0,0,0.5);position:absolute;z-index:10000;display:none}
 </style>
-<iframe id="djedi-cms" src="{% url 'admin:djedi:cms' %}"></iframe>
+<iframe id="djedi-cms" src="{{ cms_url }}"></iframe>

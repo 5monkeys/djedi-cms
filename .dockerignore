@@ -1,0 +1,16 @@
+*.log
+*.md
+*cache
+.dockerignore
+.git/
+.gitignore
+.next/
+.stuff/
+.travis.yml
+Dockerfile
+dist/
+djedi-react/
+docker-compose.yml
+node_modules/
+out/
+static/

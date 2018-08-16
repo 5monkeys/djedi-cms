@@ -55,7 +55,7 @@ def configure():
     config.update(getattr(django_settings, 'DJEDI', {}))
 
     # Overwrite config with prefixed variables from django settings
-    for setting in ('ENVIRONMENT', 'CACHE', 'STORAGE', 'PIPELINE', 'PLUGINS', 'THEME'):
+    for setting in ('ENVIRONMENT', 'CACHE', 'STORAGE', 'PIPELINE', 'PLUGINS', 'THEME', 'XSS_DOMAIN'):
         conf = getattr(django_settings, 'DJEDI_%s' % setting, None)
         if conf is not None:
             config[setting] = conf

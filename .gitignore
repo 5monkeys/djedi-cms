@@ -8,8 +8,12 @@
 .tox
 .tags
 build
+coverage
 dist
 docs/_build
 docs/_themes/
 tests/media
 htmlcov/
+node_modules/
+.next/
+example/db.sqlite3

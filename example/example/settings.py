@@ -25,7 +25,7 @@ SECRET_KEY = 'jf_&sn#&5gb7n510ji#9m7^@@-w@g%f(j0y=@=)pmvpc@4ia0)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'djedi',
     'example',
 ]
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -108,3 +110,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# CORS
+# https://github.com/OttoYiu/django-cors-headers
+
+CORS_ORIGIN_WHITELIST = (
+    'localhost:3000',
+)
+
+CORS_ALLOW_CREDENTIALS = True
+
+
+# Djedi
+# http://djedi-cms.org/settings.html
+
+DJEDI_XSS_DOMAIN = 'localhost'

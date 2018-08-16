@@ -1,4 +1,4 @@
-{% load static staticfiles %}
+{% load static staticfiles djedi_admin %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -39,6 +39,7 @@
             <section id="editor-panel" class="tab-pane active"></section>
             <section id="settings-panel" class="tab-pane hide"></section>
         </div>
+        {% djedi_xss_domain %}
         <script src="{% static 'djedi/vendor/jquery/jquery.min.js' %}?v={{ VERSION }}"></script>
         <script src="{% static 'djedi/vendor/bootstrap/js/bootstrap.min.js' %}?v={{ VERSION }}"></script>
         <script src="{% static 'djedi/cms/js/uri.js' %}?v={{ VERSION }}"></script>

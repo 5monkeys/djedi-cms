@@ -10,3 +10,15 @@ services:
       - "8000:8000"
     volumes:
       - .:/djedi-cms
+
+  node:
+    build: ./djedi-react
+    image: djedi-react
+    tty: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./djedi-react/:/code
+      - /code/node_modules
+    environment:
+      - SERVER_BASE_URL=http://django:8000/djedi/api
