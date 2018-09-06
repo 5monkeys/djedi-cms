@@ -558,6 +558,8 @@ permission.
 The returned `Promise` resolves to a boolean indicating whether any HTML was
 inserted, or rejects with an error if the request fails.
 
+On the server, this method no-ops and always returns `Promise<false>`.
+
 ##### `djedi.prefetch({ filter?: Uri => boolean, extra?: Array<Node> } = {}): Promise<Nodes>`
 
 Fetches and returns all nodes that
