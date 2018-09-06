@@ -106,7 +106,7 @@ all nodes.
 
 The idea is to call `await djedi.prefetch()` before rendering. That will fetch
 needed nodes and put them in the cache. Then, when rendering, they’ll all be
-available straight away.
+available straight away. ([Mostly.](#nodes-behind-conditionals))
 
 `djedi.prefetch` also returns the nodes it fetched:
 `const nodes = await djedi.prefetch()`. You need to serialize those and pass
@@ -587,7 +587,7 @@ reported. It also automatically adds the nodes to the cache. Useful for
 [server-side rendering], and for avoiding excessive loading indicators.
 
 By calling this before rendering, node contents will be available straight away.
-No loading indicators. No re-renders.
+([Mostly.](#nodes-behind-conditionals)) No loading indicators. No re-renders.
 
 You may optionally pass a filter function, that decides which URIs to fetch (by
 returning `true` or `false`). The passed URI can look like this:
@@ -619,6 +619,60 @@ djedi.prefetch({
 **Note:** The nodes object that the promise resolves to can be mutated by
 subsequent `djedi.get` and `djedi.getBatched` calls. See [server-side
 rendering].
+
+###### Nodes behind conditionals
+
+There’s a scenario where you cannot rely on all nodes on a page being available
+straight away after a successful `djedi.prefetch()`.
+
+Here’s an example:
+
+```js
+import React from "react";
+import { Node } from "djedi-react";
+import HelpPopup from "../components/HelpPopup";
+
+// Imagine `djedi.prefetch()` and `djedi.addNodes(nodes)` have been called
+// before this renders (as expected).
+
+export default function SomePage() {
+  return (
+    <div>
+      <Node uri="SomePage/intro">Hello!</Node>
+      <HelpPopup />
+    </div>
+  );
+}
+```
+
+As seen above, the page contains a `<Node>`.
+
+The `<HelpPopup />` component also contains a `<Node>`, for its help text, but
+that text isn’t shown until the user hovers a little question mark icon.
+
+The first time this is rendered on the server, neither the page nor
+`HelpPopup.js` has run yet, so the `djedi.reportPrefetchableNode()` calls
+inserted by the Babel plugin are executed. This way `djedi.prefetch()` knows
+about both the page node and the help text node.
+
+The next time this is rendered on the server, the JavaScript files have already
+been run and as such won’t run again – including the
+`djedi.reportPrefetchableNode()` calls. Rendering `<SomePage>` causes its node
+to be rendered too, reporting that its contents should be serialized and served
+to the browser. (This is the mutation case described above.) But rendering
+`<HelpPopup>` won’t render its help text node (since it isn’t shown until
+hovering the question mark icon). So that node won’t be sent down to the
+browser.
+
+This means that after the first server render, the help text node would be
+available immediately when the `<HelpPopup>` opens. But after the next server
+render, the help text node would starting loading when the `<HelpPopup>` opens.
+
+For example `<HelpPopup>` might make DOM measurements to position the popup. In
+this case it is not safe to rely on the node content being available straight
+away – it might load later. This is a case where using the [render](#render)
+prop can be helpful. Using it, you can make the node load earlier and/or update
+things when `state.type` changes.
 
 ##### `djedi.addNodes(nodes: Nodes): void`
 
