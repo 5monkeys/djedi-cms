@@ -76,6 +76,7 @@ if django.VERSION < (1, 9):
     from django.core.cache import get_cache
 else:
     from django.core.cache import caches
+
     def get_cache(name):
         return caches[name]
 
