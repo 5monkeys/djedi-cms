@@ -71,6 +71,16 @@ if django.VERSION >= (1, 8):
 else:
     TemplateResponse = BaseTemplateResponse
 
+
+if django.VERSION < (1, 9):
+    from django.core.cache import get_cache
+else:
+    from django.core.cache import caches
+
+    def get_cache(name):
+        return caches[name]
+
+
 __all__ = ['render_to_string',
            'render',
            'patterns',
@@ -79,4 +89,5 @@ __all__ = ['render_to_string',
            'reverse',
            'NoReverseMatch',
            'generic_tag_compiler',
-           'parse_bits']
+           'parse_bits',
+           'get_cache']

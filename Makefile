@@ -47,7 +47,7 @@ example:
 
 .PHONY: clean
 clean:
-	rm -rf .tox/ dist/ *.egg *.egg-info .coverage
+	rm -rf .tox/ dist/ *.egg *.egg-info .coverage* .eggs
 
 .PHONY: compile
 compile:
