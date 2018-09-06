@@ -1,7 +1,7 @@
 import fs from "fs";
 
 import * as babel from "@babel/core";
-import dedent from "dedent";
+import dedent from "dedent-js";
 import jsx from "@babel/plugin-syntax-jsx";
 
 import babelPlugin from "../babel-plugin";

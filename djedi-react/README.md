@@ -169,7 +169,7 @@ The Babel plugin has some constraints, though:
   the server. You can use `djedi.prefetch({ extra: [...] })` for this case – see
   [djedi.prefetch](#djediprefetch-filter-uri--boolean-extra-arraynode----promisenodes).
 - Nodes with dynamic `children` are not supported either. That’s a
-  [bad idea](#md) anyway.
+  [bad idea](#variables) anyway.
 - You cannot rename `Node` to something else when importing it. It must be
   called exactly `Node`.
 - It is assumed that your build system can handle
@@ -251,8 +251,11 @@ interpolations. This is because nodes are simple URI→string content mappings.
 The default value is sent to the backend as a string, and the backend returns a
 another string for display.
 
+<!-- prettier-ignore -->
 ```js
-<Node uri="uri">This is OK</Node>
+<Node uri="uri">
+  This is OK
+</Node>
 ```
 
 The following won’t work, because the `<em>` part is not a string but another
@@ -283,29 +286,26 @@ Escaping also works, but might not be very readable:
 </Node>
 ```
 
-Finally, the default value is dedented, so that you can format it nicely without
-worrying about extraneous whitespace.
+But **don’t** use a non-tagged template literal, because then you’ll end up with
+extraneous whitespace in the default value, which can be especially troublesome
+for markdown:
 
+<!-- prettier-ignore -->
 ```js
-<Node uri="uri">{md`
-  Some text.
-
-  Some more text.
-
-      function some(code) {
-        return code;
-      }
+// DON'T DO THIS!
+<Node uri="uri.md">{`
+    This will be a code block in markdown! (The line starts with 4 spaces.)
 `}</Node>
 
-// Equivalent to:
+// The md tag dedents the value as expected.
+<Node uri="uri.md">{md`
+    This will be a paragraph in markdown.
+`}</Node>
 
-<Node uri="uri">{md`Some text.
-
-Some more text.
-
-    function some(code) {
-      return code;
-    }`}</Node>
+// This also works, because of Babel’s JSX whitespace rules.
+<Node uri="uri.md">
+    This will be a paragraph in markdown.
+</Node>
 ```
 
 ##### `edit`
@@ -377,6 +377,11 @@ escaping or using strings. For example:
 ```
 
 `{name}` and `[name]` chunks that you did not pass any value for are left as-is.
+
+The [Babel] plugin mentioned in [Installation](#installation) warns you if
+you’ve accidentally used JSX or template string interpolation instead of
+variables. That’s an anti-pattern, since it won’t work if the user edits the
+node (unlike variable props).
 
 ### `djedi`
 
@@ -607,13 +612,31 @@ nodes with dynamic URIs that the Babel plugin cannot automatically do its thing
 with. These won’t be matched against the filter function.
 
 ```js
-djedi.prefetch({
-  filter: uri => uri.path.startsWith("some/path/"),
-  extra: [
-    { uri: `some/${dynamic}/path`, value: "default" },
-    makeStoreInfoNode(storeId),
-  ],
-});
+function prefetch({ storeId }) {
+  return djedi.prefetch({
+    filter: uri => uri.path.startsWith("some/path/"),
+    extra: [
+      { uri: `some/${dynamic}/path`, value: "default" },
+      makeStoreInfoNode(storeId),
+    ],
+  });
+}
+
+function makeStoreInfoNode(storeId) {
+  return {
+    uri: `store/${storeId}/intro`,
+    value: md`
+      <h1>Welcome!</h1>
+
+      Check out our latest offers.
+    `,
+  };
+}
+
+function Page({ storeId }) {
+  const node = makeStoreInfoNode(storeId);
+  return <Node uri={node.uri}>{node.value}</Node>;
+}
 ```
 
 **Note:** The nodes object that the promise resolves to can be mutated by
@@ -792,6 +815,13 @@ This is a template literal tag. It’s meant to be used for the `children` of
 
 - When your default text contains characters that are annoying to escape in JSX.
 - When your default is markdown.
+- When you define the default as a string outside `<Node>`, as in the
+  [djedi.prefetch](#djediprefetch-filter-uri--boolean-extra-arraynode----promisenodes)
+  example.
+
+Why tag the template literal with `md`? Because `md` dedents your string, so
+that you can format it nicely without worrying about extraneous whitespace
+(which can turn text into code blocks in markdown, for example).
 
 ```js
 <Node uri="home/text.md">{md`
@@ -800,23 +830,32 @@ This is a template literal tag. It’s meant to be used for the `children` of
   Some **bold** text.
 
   <video src="/media/intro.webm"></video>
+
+      function some(code) {
+        return code;
+      }
 `}</Node>
+
+// Equivalent to:
+
+<Node uri="uri">{md`## Using markdown
+
+Some **bold** text.
+
+<video src="/media/intro.webm"></video>
+
+    function some(code) {
+      return code;
+    }`}</Node>
 ```
 
-Now, what does the tag actually do? Not much to be honest. The above example
-works exactly the same without the `md` tag. But there are some benefits:
+So why is it called `md` and not `dedent`? If you use [Prettier], it will
+automatically format the contents of the template literal as markdown, which is
+very convenient. This is useful even if the value is plain text (markdown
+formatting usually works well there too).
 
-- The `md` tag warns you if you use interpolation (`${variable}`) in the
-  template literal. That’s an anti-pattern, since it won’t work if the user
-  edits the node. Use [variables](#variables) instead.
-
-  The [Babel] plugin mentioned in [Installation](#installation) optimizes the
-  tag away (`` md`text` `` → `"text"`) and makes the warning into a compile-time
-  error instead (even for non-tagged template literals!).
-
-- If you use [Prettier], it will automatically format the contents of the
-  template literal as markdown, which is very convenient. This is useful even if
-  the value is plain text (markdown formatting usually works well there too).
+As an extra bonus, the [Babel] plugin mentioned in [Installation](#installation)
+optimizes the tag away (`` md`text` `` → `"text"`) when used inside a `<Node>`.
 
 ## Django settings
 
@@ -923,7 +962,6 @@ because of permissions. One solution is to remove the owned-by-root files first:
 
 [BSD-3-Clause](LICENSE)
 
-[language_code]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
 [babel]: https://babeljs.io/
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
@@ -932,6 +970,7 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [document.domain]: https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
 [eslint]: https://eslint.org/
 [jest]: https://jestjs.io/
+[language_code]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
 [lru-cache]: https://github.com/isaacs/node-lru-cache
 [next.js]: https://nextjs.org/
 [node.js]: https://nodejs.org/en/

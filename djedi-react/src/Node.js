@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React from "react";
-import dedent from "dedent";
 
 import djedi from "./djedi";
 
@@ -89,7 +88,7 @@ export default class Node extends React.Component {
 
   _getDefault() {
     const { children } = this.props;
-    return children == null ? undefined : dedent(String(children));
+    return children == null ? undefined : String(children);
   }
 
   render() {

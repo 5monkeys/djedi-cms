@@ -1,4 +1,4 @@
-const dedent = require("dedent");
+const dedent = require("dedent-js");
 
 const MODULE_NAME = "djedi-react";
 const CLIENT_NAME = "djedi";

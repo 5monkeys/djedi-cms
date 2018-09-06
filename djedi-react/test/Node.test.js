@@ -1,5 +1,5 @@
 import React from "react";
-import dedent from "dedent";
+import dedent from "dedent-js";
 import renderer from "react-test-renderer";
 
 import { Node, djedi, md } from "../src";
@@ -365,32 +365,6 @@ test("edit=false", async () => {
   expect(component.toJSON()).toMatchInlineSnapshot(`"test"`);
 });
 
-test("default values are dedented", async () => {
-  renderer.create(
-    <div>
-      <Node uri="first">
-        Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
-        hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
-        metus, torquent ac egestas integer erat pharetra vehicula senectus.
-      </Node>
-      <Node uri="second">{`
-        Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
-        hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
-        metus, torquent ac egestas integer erat pharetra vehicula senectus.
-      `}</Node>
-    </div>
-  );
-  await wait();
-  expect(fetch.calls()).toMatchInlineSnapshot(`
-Object {
-  "i18n://en-us@first.txt": "Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id, hendrerit euismod iaculis convallis ante tincidunt tempus bibendum metus, torquent ac egestas integer erat pharetra vehicula senectus.",
-  "i18n://en-us@second.txt": "Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
-hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
-metus, torquent ac egestas integer erat pharetra vehicula senectus.",
-}
-`);
-});
-
 test("using the md tag", async () => {
   renderer.create(
     <Node uri="test">{md`
@@ -421,27 +395,76 @@ Some text with a [link](https://example.com)
 `);
 });
 
-test("the md tag ignores interpolations and warns about them", async () => {
-  const user = "Bob";
+test("dedenting", async () => {
+  const withoutMd = `
+    Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+    hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+    metus, torquent ac egestas integer erat pharetra vehicula senectus.
+  `;
+
+  const withMd = md`
+    Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id, hendrerit
+    euismod iaculis convallis ante tincidunt tempus bibendum metus, torquent ac
+    egestas integer erat pharetra vehicula senectus.
+  `;
+
   renderer.create(
-    <Node uri="test">{md`
-      Hello, ${user}!
-    `}</Node>
+    <div>
+      <Node uri="babel-dedented">
+        Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+        hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+        metus, torquent ac egestas integer erat pharetra vehicula senectus.
+      </Node>
+      <Node uri="not-dedented">{`
+        Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+        hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+        metus, torquent ac egestas integer erat pharetra vehicula senectus.
+      `}</Node>
+      <Node uri="not-dedented-var">{withoutMd}</Node>
+      <Node uri="md-dedented">{md`
+        Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+        hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+        metus, torquent ac egestas integer erat pharetra vehicula senectus.
+      `}</Node>
+      <Node uri="md-dedented-var">{withMd}</Node>
+    </div>
   );
 
-  expect(console.warn.mock.calls).toMatchInlineSnapshot(`
-Array [
-  Array [
-    "djedi-react: Using \`\${foo}\` in a node default value is an anti-pattern: it won't work if the user edits the node. For consistency, your interpolations will be ignored. Did you mean to use \`{foo}\` (without the \`$\`) or \`[foo]\`?",
-  ],
-]
+  await wait();
+
+  // Note the whitespace difference. md dedents.
+  expect(withoutMd).toMatchInlineSnapshot(`
+"
+    Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+    hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+    metus, torquent ac egestas integer erat pharetra vehicula senectus.
+  "
+`);
+  expect(withMd).toMatchInlineSnapshot(`
+"Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id, hendrerit
+euismod iaculis convallis ante tincidunt tempus bibendum metus, torquent ac
+egestas integer erat pharetra vehicula senectus."
 `);
 
-  // The interpolations have been ignored.
-  await wait();
   expect(fetch.calls()).toMatchInlineSnapshot(`
 Object {
-  "i18n://en-us@test.txt": "Hello, !",
+  "i18n://en-us@babel-dedented.txt": "Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id, hendrerit euismod iaculis convallis ante tincidunt tempus bibendum metus, torquent ac egestas integer erat pharetra vehicula senectus.",
+  "i18n://en-us@md-dedented-var.txt": "Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id, hendrerit
+euismod iaculis convallis ante tincidunt tempus bibendum metus, torquent ac
+egestas integer erat pharetra vehicula senectus.",
+  "i18n://en-us@md-dedented.txt": "Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+metus, torquent ac egestas integer erat pharetra vehicula senectus.",
+  "i18n://en-us@not-dedented-var.txt": "
+    Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+    hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+    metus, torquent ac egestas integer erat pharetra vehicula senectus.
+  ",
+  "i18n://en-us@not-dedented.txt": "
+        Lorem ipsum dolor sit amet consectetur adipiscing elit tempor id,
+        hendrerit euismod iaculis convallis ante tincidunt tempus bibendum
+        metus, torquent ac egestas integer erat pharetra vehicula senectus.
+      ",
 }
 `);
 });

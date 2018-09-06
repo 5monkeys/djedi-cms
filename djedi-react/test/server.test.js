@@ -3,7 +3,7 @@
  */
 
 import React from "react";
-import dedent from "dedent";
+import dedent from "dedent-js";
 import renderer from "react-test-renderer";
 
 import { Node, djedi, md } from "../src";
