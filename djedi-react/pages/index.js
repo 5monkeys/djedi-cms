@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import React from "react";
 
 import Search from "../components/Search";
+import Toplist from "../components/Toplist";
 
 export default class Home extends React.Component {
   static propTypes = {
@@ -75,6 +76,10 @@ export default class Home extends React.Component {
           {/* This component shows how to use a node in an HTML attribute. Even
           though this node is defined in another file, it is still prefetched. */}
           <Search />
+
+          {/* This component shows how to parse a node value. (This is also
+          prefetched.) */}
+          <Toplist />
         </footer>
 
         {/* This node has a dynamic URI and therfore isn‘t prefetched. In this

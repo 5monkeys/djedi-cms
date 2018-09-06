@@ -335,8 +335,13 @@ node (in other words, anything that you can return from a React component).
 See [djedi.options.defaultRender](#defaultrender) for how to implement this
 function.
 
-See the [Search](components/Search.js) example component for a use case for this
-prop. You probably won’t need this most of the time.
+Use cases for this prop include:
+
+- Using a node for something that isn’t an element, such as an attribute. See
+  the [Search](components/Search.js) example component for an example. prop.
+- Parsing a node value and rendering a custom component. See the
+  [Toplist](components/Toplist.js) example component for an example.
+- Customizing the loading and error states for a specific node.
 
 ##### `...variables`
 
@@ -864,7 +869,7 @@ because of permissions. One solution is to remove the owned-by-root files first:
 
 [BSD-3-Clause](LICENSE)
 
-[LANGUAGE_CODE]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
+[language_code]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
 [babel]: https://babeljs.io/
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
