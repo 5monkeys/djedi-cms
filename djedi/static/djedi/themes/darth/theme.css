@@ -6358,7 +6358,7 @@ body.editor header .dropdown-menu {
   border-color: #666;
   text-shadow: none;
   min-width: 80px;
-  overflow: scroll;
+  overflow: auto;
   max-height: 300px;
   margin-right: 45px;
 }
