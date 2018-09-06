@@ -25,7 +25,7 @@ Optional [Babel] plugin (for [server-side rendering]):
 }
 ```
 
-See also [Django settings](#django-settings).
+See also [options](#options) and [Django settings](#django-settings).
 
 ## Browser support
 
@@ -388,8 +388,11 @@ made in the future.
 
 You can configure djedi-react by mutating `djedi.options`.
 
+You most likely want to set these:
+
 ```js
 djedi.options.baseUrl = "/cms";
+djedi.options.uri.namespaceByScheme.i18n = "sv-se";
 ```
 
 These are the toplevel keys:
@@ -484,8 +487,19 @@ even after a small timeout).
 
 `object` Default: See below.
 
-The backend allows customizing defaults and separators for the node URIs. If you
-do that, you need to make the same customizations in djedi-react.
+The most important part of this option is setting the default namespace for the
+`i18n` scheme. In the Django backend, it defaults to the [LANGUAGE_CODE] Django
+setting, but djedi-react can’t know about that value so it defaults to `en-us`.
+For example, to set it to `sv-se`:
+
+```
+djedi.options.uri.namespaceByScheme.i18n = "sv-se";
+```
+
+You might also want to set it conditionally if you support several languages.
+
+The Django backend also allows customizing defaults and separators for the node
+URIs. If you do that, you need to make the same customizations in djedi-react.
 
 This is the default value:
 
@@ -850,13 +864,13 @@ because of permissions. One solution is to remove the owned-by-root files first:
 
 [BSD-3-Clause](LICENSE)
 
+[LANGUAGE_CODE]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
 [babel]: https://babeljs.io/
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
 [djedi cms]: https://djedi-cms.org/
 [docker]: https://www.docker.com/community-edition
-[document.domain]:
-  https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
+[document.domain]: https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
 [eslint]: https://eslint.org/
 [jest]: https://jestjs.io/
 [lru-cache]: https://github.com/isaacs/node-lru-cache
