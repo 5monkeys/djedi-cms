@@ -24,8 +24,8 @@ export class Djedi {
     // `Cache<uri: string, Node>`. Cache of all fetched nodes.
     this._nodes = new Cache({ ttl: DEFAULT_CACHE_TTL });
 
-    // `Map<uri: string, Node>`. Everything that `reportPrefetchableNode` has
-    // reported. The nodes contain default values (if any).
+    // `Map<uri: string, Node>`. Tracks everything that `reportPrefetchableNode`
+    // has reported. The nodes contain default values (if any).
     this._prefetchableNodes = new Map();
 
     // `{ [uri: string]: string }`. The return value of the last `prefetch` call.
@@ -35,9 +35,9 @@ export class Djedi {
     // Queue for `getBatched`.
     this._batch = makeEmptyBatch();
 
-    // `Map<uri: string, Node>`. Everything that `reportRenderedNode` has
-    // reported. The nodes contain default values (if any). Used to keep
-    // `_DJEDI_NODES` up-to-date.
+    // `Map<uri: string, number>`. Tracks everything that `reportRenderedNode`
+    // has reported. The number shows how many nodes of the `uri` in question
+    // are rendered. Used to keep `_DJEDI_NODES` up-to-date.
     this._renderedNodes = new Map();
 
     // `{ [uri: string]: string }`. The values are default values (if any). //
@@ -150,17 +150,13 @@ export class Djedi {
   reportPrefetchableNode(passedNode) {
     const node = this._normalizeNode(passedNode);
     const previous = this._prefetchableNodes.get(node.uri);
+
+    // During development, it is not uncommon to change defaults. If so, delete
+    // the cached entry so the node can be re-fetched.
     if (previous != null && previous.value !== node.value) {
-      console.warn(
-        "djedi-react: Encountered two nodes with the same URI but with different default values. Using the previous value and ignoring the next.",
-        {
-          uri: node.uri,
-          prev: previous.value,
-          next: node.value,
-        }
-      );
-      return;
+      this._nodes.delete(previous.uri);
     }
+
     this._prefetchableNodes.set(node.uri, node);
   }
 
@@ -256,27 +252,9 @@ export class Djedi {
   reportRenderedNode(passedNode) {
     const node = this._normalizeNode(passedNode);
     const previous = this._renderedNodes.get(node.uri);
+    const numInstances = previous == null ? 1 : previous + 1;
 
-    if (previous != null) {
-      if (previous.value !== node.value) {
-        console.warn(
-          "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
-          {
-            uri: node.uri,
-            prev: previous.value,
-            next: node.value,
-          }
-        );
-      }
-      previous.numInstances++;
-      return;
-    }
-
-    this._renderedNodes.set(node.uri, {
-      value: node.value,
-      numInstances: 1,
-    });
-
+    this._renderedNodes.set(node.uri, numInstances);
     this._DJEDI_NODES[this._djediNodesUri(node.uri)] = node.value;
     this._updateAdminSidebar();
   }
@@ -289,12 +267,14 @@ export class Djedi {
       return;
     }
 
-    previous.numInstances--;
+    const numInstances = previous - 1;
 
-    if (previous.numInstances <= 0) {
+    if (numInstances <= 0) {
       this._renderedNodes.delete(uri);
       delete this._DJEDI_NODES[this._djediNodesUri(uri)];
       this._updateAdminSidebar();
+    } else {
+      this._renderedNodes.set(uri, numInstances);
     }
   }
 

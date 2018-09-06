@@ -727,10 +727,13 @@ pass in a custom cache, such as [lru-cache]. It needs to look like this:
 class CustomCache {
   get(uri: string): Node;
   set(uri: string, node: Node): void;
+  delete(uri: string): void;
 }
 
 djedi.setCache(new CustomCache());
 ```
+
+For example, `new Map()` is a valid cache that has a TTL of 0.
 
 Note that when replacing the cache, items from the old cache is not transferred
 to the new one.

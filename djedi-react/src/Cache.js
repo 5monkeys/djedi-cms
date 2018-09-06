@@ -22,4 +22,8 @@ export default class Cache {
   set(key, value) {
     this._cache.set(key, { timestamp: Date.now(), value });
   }
+
+  delete(key) {
+    this._cache.delete(key);
+  }
 }

@@ -15,12 +15,10 @@ import {
 
 jest.useFakeTimers();
 
-console.warn = jest.fn();
 console.error = jest.fn();
 
 beforeEach(() => {
   resetAll();
-  console.warn.mockReset();
   console.error.mockReset();
   // The `prop-types` package only logs the exact same error once. As a
   // workaround, tests that need to check for logged errors temporarily assign
@@ -838,46 +836,18 @@ Object {
   expect(window.DJEDI_NODES).toMatchInlineSnapshot(`Object {}`);
 });
 
-test("it warns about rendering nodes with different defaults", async () => {
+test("it uses the last default when rendering nodes with different defaults", async () => {
   renderer.create(
     <div>
       <Node uri="test">default</Node>
-      <Node uri="en-us@test">other default</Node>
       <Node uri="i18n://test.txt" />
+      <Node uri="en-us@test">other default</Node>
     </div>
   );
 
-  expect(console.warn.mock.calls).toMatchInlineSnapshot(`
-Array [
-  Array [
-    "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
-    Object {
-      "next": "other default",
-      "prev": "default",
-      "uri": "i18n://en-us@test.txt",
-    },
-  ],
-  Array [
-    "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
-    Object {
-      "next": undefined,
-      "prev": "default",
-      "uri": "i18n://en-us@test.txt",
-    },
-  ],
-]
-`);
-
   expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
 Object {
-  "i18n://en-us@test.txt": "default",
-}
-`);
-
-  await wait();
-  expect(fetch.calls()).toMatchInlineSnapshot(`
-Object {
-  "i18n://en-us@test.txt": "default",
+  "i18n://en-us@test.txt": "other default",
 }
 `);
 });

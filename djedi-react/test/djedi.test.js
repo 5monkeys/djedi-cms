@@ -13,15 +13,11 @@ import {
 
 jest.useFakeTimers();
 
-console.warn = jest.fn();
-console.error = jest.fn();
 jest.spyOn(Date, "now");
 jest.spyOn(djedi, "addNodes");
 
 beforeEach(() => {
   resetAll();
-  console.warn.mockReset();
-  console.error.mockReset();
   Date.now.mockReset();
   // Use `mockClear` rather than `mockReset` here to keep the default
   // implementation. (We only spy on `addNodes` and don't mock it).
@@ -29,6 +25,12 @@ beforeEach(() => {
   document.body.textContent = "";
   document.domain = "site.example.com";
 });
+
+class LRUCache extends LRU {
+  delete(...args) {
+    return super.del(...args);
+  }
+}
 
 // `addNodes` is tested together with `get` and `getBatched`.
 // `reportPrefetchableNode` is tested together with `prefetch`.
@@ -211,42 +213,22 @@ Array [
 });
 
 describe("reportPrefetchableNode", () => {
-  test("it warns about reporting nodes with different defaults", async () => {
+  test("it re-fetches after reporting nodes with different defaults", async () => {
+    djedi.addNodes(simpleNodeResponse("test", "default"));
     djedi.reportPrefetchableNode({ uri: "test", value: "default" });
-    djedi.reportPrefetchableNode({
-      uri: "en-us@test",
-      value: "other default",
-    });
     djedi.reportPrefetchableNode({
       uri: "i18n://test.txt",
       value: undefined,
     });
-
-    expect(console.warn.mock.calls).toMatchInlineSnapshot(`
-Array [
-  Array [
-    "djedi-react: Encountered two nodes with the same URI but with different default values. Using the previous value and ignoring the next.",
-    Object {
-      "next": "other default",
-      "prev": "default",
-      "uri": "i18n://en-us@test.txt",
-    },
-  ],
-  Array [
-    "djedi-react: Encountered two nodes with the same URI but with different default values. Using the previous value and ignoring the next.",
-    Object {
-      "next": undefined,
-      "prev": "default",
-      "uri": "i18n://en-us@test.txt",
-    },
-  ],
-]
-`);
+    djedi.reportPrefetchableNode({
+      uri: "en-us@test",
+      value: "other default",
+    });
 
     await djedi.prefetch();
     expect(fetch.calls()).toMatchInlineSnapshot(`
 Object {
-  "i18n://en-us@test.txt": "default",
+  "i18n://en-us@test.txt": "other default",
 }
 `);
   });
@@ -444,7 +426,7 @@ Object {
 
   test("it refetches if custom cache has expired", async () => {
     const ttl = 10e3;
-    await prefetchRefetchTest(ttl, new LRU({ maxAge: ttl }));
+    await prefetchRefetchTest(ttl, new LRUCache({ maxAge: ttl }));
   });
 
   networkTests(callback => {
@@ -580,35 +562,14 @@ Object {
 `);
   });
 
-  test("reportRenderedNode warns about rendering nodes with different defaults", () => {
+  test("reportRenderedNode uses the last default when rendering nodes with different defaults", () => {
     djedi.reportRenderedNode({ uri: "test", value: "default" });
-    djedi.reportRenderedNode({ uri: "en-us@test", value: "other default" });
     djedi.reportRenderedNode({ uri: "i18n://test.txt", value: undefined });
-
-    expect(console.warn.mock.calls).toMatchInlineSnapshot(`
-Array [
-  Array [
-    "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
-    Object {
-      "next": "other default",
-      "prev": "default",
-      "uri": "i18n://en-us@test.txt",
-    },
-  ],
-  Array [
-    "djedi-react: Rendering a node with with a different default value. That default will be ignored.",
-    Object {
-      "next": undefined,
-      "prev": "default",
-      "uri": "i18n://en-us@test.txt",
-    },
-  ],
-]
-`);
+    djedi.reportRenderedNode({ uri: "en-us@test", value: "other default" });
 
     expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
 Object {
-  "i18n://en-us@test.txt": "default",
+  "i18n://en-us@test.txt": "other default",
 }
 `);
   });
