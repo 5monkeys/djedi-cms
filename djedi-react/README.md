@@ -16,7 +16,8 @@ npm install djedi-react react react-dom
 import { Node, djedi, md } from "djedi-react";
 ```
 
-Optional [Babel] plugin (for [server-side rendering]):
+Optional [Babel] plugin (for better errors, prefetching and [server-side
+rendering]):
 
 ```json5
 // .babelrc
@@ -292,7 +293,7 @@ for markdown:
 
 <!-- prettier-ignore -->
 ```js
-// DON'T DO THIS!
+// DON’T DO THIS!
 <Node uri="uri.md">{`
     This will be a code block in markdown! (The line starts with 4 spaces.)
 `}</Node>
@@ -338,7 +339,7 @@ function.
 Use cases for this prop include:
 
 - Using a node for something that isn’t an element, such as an attribute. See
-  the [Search](components/Search.js) example component for an example. prop.
+  the [Search](components/Search.js) example component for an example.
 - Parsing a node value and rendering a custom component. See the
   [Toplist](components/Toplist.js) example component for an example.
 - Customizing the loading and error states for a specific node.
@@ -506,7 +507,7 @@ For example, to set it to `sv-se`:
 djedi.options.uri.namespaceByScheme.i18n = "sv-se";
 ```
 
-You might also want to set it conditionally if you support several languages.
+You might want to set it conditionally if you support several languages.
 
 The Django backend also allows customizing defaults and separators for the node
 URIs. If you do that, you need to make the same customizations in djedi-react.
@@ -678,24 +679,24 @@ The first time this is rendered on the server, neither the page nor
 inserted by the Babel plugin are executed. This way `djedi.prefetch()` knows
 about both the page node and the help text node.
 
-The next time this is rendered on the server, the JavaScript files have already
-been run and as such won’t run again – including the
+The next time this is rendered on the server, the JavaScript files in question
+have already been run and as such won’t run again – including the
 `djedi.reportPrefetchableNode()` calls. Rendering `<SomePage>` causes its node
 to be rendered too, reporting that its contents should be serialized and served
-to the browser. (This is the mutation case described above.) But rendering
-`<HelpPopup>` won’t render its help text node (since it isn’t shown until
-hovering the question mark icon). So that node won’t be sent down to the
-browser.
+to the browser. (This is the mutation case described in the previous section.)
+But rendering `<HelpPopup>` won’t render its help text node (since it isn’t
+shown until hovering the question mark icon). So that node won’t be sent down to
+the browser.
 
 This means that after the first server render, the help text node would be
 available immediately when the `<HelpPopup>` opens. But after the next server
 render, the help text node would starting loading when the `<HelpPopup>` opens.
 
-For example `<HelpPopup>` might make DOM measurements to position the popup. In
-this case it is not safe to rely on the node content being available straight
-away – it might load later. This is a case where using the [render](#render)
-prop can be helpful. Using it, you can make the node load earlier and/or update
-things when `state.type` changes.
+`<HelpPopup>` might make DOM measurements to position the popup. In this case it
+is not safe to rely on the node content being available straight away – it might
+load later. This is a case where using the [render](#render) prop can be
+helpful. Using it, you can make the node load earlier and/or update things when
+`state.type` changes.
 
 ##### `djedi.addNodes(nodes: Nodes): void`
 
@@ -853,9 +854,9 @@ Some **bold** text.
 ```
 
 So why is it called `md` and not `dedent`? If you use [Prettier], it will
-automatically format the contents of the template literal as markdown, which is
-very convenient. This is useful even if the value is plain text (markdown
-formatting usually works well there too).
+automatically format the contents of template literal tagged with `md` as
+markdown, which is very convenient. This is useful even if the value is plain
+text (markdown formatting usually works well there too).
 
 As an extra bonus, the [Babel] plugin mentioned in [Installation](#installation)
 optimizes the tag away (`` md`text` `` → `"text"`) when used inside a `<Node>`.
@@ -970,10 +971,12 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
 [djedi cms]: https://djedi-cms.org/
 [docker]: https://www.docker.com/community-edition
-[document.domain]: https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
+[document.domain]:
+  https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
 [eslint]: https://eslint.org/
 [jest]: https://jestjs.io/
-[language_code]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
+[language_code]:
+  https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
 [lru-cache]: https://github.com/isaacs/node-lru-cache
 [next.js]: https://nextjs.org/
 [node.js]: https://nodejs.org/en/
