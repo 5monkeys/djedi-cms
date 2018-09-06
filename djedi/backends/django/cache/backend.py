@@ -4,6 +4,8 @@ from djedi.utils.encoding import smart_str, smart_unicode
 from cio.backends.base import CacheBackend
 from django.core.cache.backends.locmem import LocMemCache
 
+from djedi.compat import get_cache
+
 
 class DjangoCacheBackend(CacheBackend):
 
@@ -14,10 +16,9 @@ class DjangoCacheBackend(CacheBackend):
         super(DjangoCacheBackend, self).__init__(**config)
 
         try:
-            from django.core.cache import get_cache
             cache_name = self.config.get('NAME', 'djedi')
             cache = get_cache(cache_name)
-        except (InvalidCacheBackendError, ValueError, ImportError):
+        except (InvalidCacheBackendError, ValueError):
             from django.core.cache import cache
 
         self._cache = cache
