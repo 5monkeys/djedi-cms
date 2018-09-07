@@ -2,6 +2,8 @@
 
 - Fixed: Dedenting is now more intuitive. This is a breaking change. See below
   for more information.
+- Changed: Custom caches must now implement a `delete(uri: string): void`
+  method. This is a breaking change.
 - Fixed: Changes to `<Node>` defaults now update correctly during development.
   As a side effect, rendering the same node URI twice with different defaults no
   longer logs a warning (instead, the newer default replaces the old one).
