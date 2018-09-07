@@ -734,7 +734,7 @@ class CustomCache {
 djedi.setCache(new CustomCache());
 ```
 
-For example, `new Map()` is a valid cache that has a TTL of 0.
+For example, `new Map()` is a valid cache that has an infinite TTL.
 
 Note that when replacing the cache, items from the old cache is not transferred
 to the new one.
