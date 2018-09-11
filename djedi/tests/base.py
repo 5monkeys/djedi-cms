@@ -50,7 +50,7 @@ class AssertionMixin(object):
         self.assertEqual(set(dict.keys()), set(keys))
 
     @contextmanager
-    def assertCache(self, calls=-1, hits=-1, misses=-1):
+    def assertCache(self, calls=-1, hits=-1, misses=-1, sets=-1):
         from cio.backends import cache
 
         _cache = cache.backend._cache
@@ -58,15 +58,18 @@ class AssertionMixin(object):
         _cache.calls = 0
         _cache.hits = 0
         _cache.misses = 0
+        _cache.sets = 0
 
         yield
 
         if calls >= 0:
-            assert _cache.calls == calls
+            assert _cache.calls == calls, '%s != %s' % (_cache.calls, calls)
         if hits >= 0:
-            assert _cache.hits == hits
+            assert _cache.hits == hits, '%s != %s' % (_cache.hits, hits)
         if misses >= 0:
-            assert _cache.misses == misses
+            assert _cache.misses == misses, '%s != %s' % (_cache.misses, misses)
+        if sets >= 0:
+            assert _cache.sets == sets, '%s != %s' % (_cache.sets, sets)
 
     @contextmanager
     def assertDB(self, calls=-1, selects=-1, inserts=-1, updates=-1):
@@ -83,16 +86,16 @@ class AssertionMixin(object):
         setattr(connection, DEBUG_CURSOR_ATTR, pre_debug_cursor)
 
         if calls >= 0:
-            assert num_queries == calls
+            assert num_queries == calls, '%s != %s' % (num_queries, calls)
         if selects >= 0:
             num_selects = len([q for q in queries if q['sql'].startswith('SELECT')])
-            assert num_selects == selects
+            assert num_selects == selects, '%s != %s' % (num_selects, selects)
         if inserts >= 0:
             num_inserts = len([q for q in queries if q['sql'].startswith('INSERT')])
-            assert num_inserts == inserts
+            assert num_inserts == inserts, '%s != %s' % (num_inserts, inserts)
         if updates >= 0:
             num_updates = len([q for q in queries if q['sql'].startswith('UPDATE')])
-            assert num_updates == updates
+            assert num_updates == updates, '%s != %s' % (num_updates, updates)
 
     def assertRenderedMarkdown(self, value, source):
         if cio.PY26:

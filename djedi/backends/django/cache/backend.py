@@ -2,6 +2,7 @@ import six
 from django.core.cache import InvalidCacheBackendError
 from djedi.utils.encoding import smart_str, smart_unicode
 from cio.backends.base import CacheBackend
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache.backends.locmem import LocMemCache
 
 from djedi.compat import get_cache
@@ -69,6 +70,7 @@ class DebugLocMemCache(LocMemCache):
         self.calls = 0
         self.hits = 0
         self.misses = 0
+        self.sets = 0
         super(DebugLocMemCache, self).__init__(*args, **kwargs)
 
     def get(self, key, default=None, version=None, **kwargs):
@@ -92,3 +94,16 @@ class DebugLocMemCache(LocMemCache):
         self.hits += hits
         self.misses += (len(keys) - hits)
         return d
+
+    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        super(DebugLocMemCache, self).set(key, value, timeout=timeout, version=version)
+        self.calls += 1
+        self.sets += 1
+
+    def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
+        result = super(DebugLocMemCache, self).set_many(
+            data, timeout=timeout, version=version
+        )
+        self.calls -= len(data)  # Remove calls from set()
+        self.calls += 1
+        return result
