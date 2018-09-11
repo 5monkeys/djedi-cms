@@ -296,18 +296,19 @@ class PublicRestTest(ClientTest):
         self.assertEqual(response.status_code, 403)
 
     def test_nodes(self):
-        cio.set('sv-se@label/email', u'E-post')
+        with self.assertCache(sets=1):
+            cio.set('sv-se@rest/label/email', u'E-post')
 
-        with self.assertDB(calls=1):
+        with self.assertDB(calls=1), self.assertCache(calls=1, misses=1, hits=1, sets=0):
             url = reverse('admin:djedi:rest:nodes')
             response = self.client.post(url, json.dumps({
-                'page/body.md': u'# Foo Bar',
-                'label/email': u'E-mail',
+                'rest/page/body.md': u'# Foo Bar',
+                'rest/label/email': u'E-mail',
             }), content_type='application/json')
 
         json_content = json.loads(response.content)
 
-        self.assertIn('i18n://sv-se@page/body.md', json_content.keys())
-        self.assertEqual(json_content['i18n://sv-se@page/body.md'], u'<h1>Foo Bar</h1>')
-        self.assertIn('i18n://sv-se@label/email.txt#1', json_content.keys())
-        self.assertEqual(json_content['i18n://sv-se@label/email.txt#1'], u'E-post')
+        self.assertIn('i18n://sv-se@rest/page/body.md', json_content.keys())
+        self.assertEqual(json_content['i18n://sv-se@rest/page/body.md'], u'<h1>Foo Bar</h1>')
+        self.assertIn('i18n://sv-se@rest/label/email.txt#1', json_content.keys())
+        self.assertEqual(json_content['i18n://sv-se@rest/label/email.txt#1'], u'E-post')
