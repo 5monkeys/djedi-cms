@@ -95,15 +95,13 @@ class DebugLocMemCache(LocMemCache):
         self.misses += (len(keys) - hits)
         return d
 
-    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        super(DebugLocMemCache, self).set(key, value, timeout=timeout, version=version)
+    def set(self, *args, **kwargs):
+        super(DebugLocMemCache, self).set(*args, **kwargs)
         self.calls += 1
         self.sets += 1
 
-    def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
-        result = super(DebugLocMemCache, self).set_many(
-            data, timeout=timeout, version=version
-        )
+    def set_many(self, data, *args, **kwargs):
+        result = super(DebugLocMemCache, self).set_many(data, *args, **kwargs)
         self.calls -= len(data)  # Remove calls from set()
         self.calls += 1
         return result
