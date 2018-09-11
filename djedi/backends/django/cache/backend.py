@@ -2,7 +2,6 @@ import six
 from django.core.cache import InvalidCacheBackendError
 from djedi.utils.encoding import smart_str, smart_unicode
 from cio.backends.base import CacheBackend
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache.backends.locmem import LocMemCache
 
 from djedi.compat import get_cache
