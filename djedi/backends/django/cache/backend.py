@@ -69,6 +69,7 @@ class DebugLocMemCache(LocMemCache):
         self.calls = 0
         self.hits = 0
         self.misses = 0
+        self.sets = 0
         super(DebugLocMemCache, self).__init__(*args, **kwargs)
 
     def get(self, key, default=None, version=None, **kwargs):
@@ -92,3 +93,14 @@ class DebugLocMemCache(LocMemCache):
         self.hits += hits
         self.misses += (len(keys) - hits)
         return d
+
+    def set(self, *args, **kwargs):
+        super(DebugLocMemCache, self).set(*args, **kwargs)
+        self.calls += 1
+        self.sets += 1
+
+    def set_many(self, data, *args, **kwargs):
+        result = super(DebugLocMemCache, self).set_many(data, *args, **kwargs)
+        self.calls -= len(data)  # Remove calls from set()
+        self.calls += 1
+        return result

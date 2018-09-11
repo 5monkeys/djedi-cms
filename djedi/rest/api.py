@@ -36,6 +36,16 @@ class NodesApi(APIView):
     """
     @never_cache
     def post(self, request):
+        # Disable caching gets in CachePipe, defaults through this api is not trusted
+        cio.conf.settings.configure(
+            local=True,
+            CACHE={
+                'PIPE': {
+                    'CACHE_ON_GET': False
+                }
+            }
+        )
+
         nodes = []
         for uri, default in six.iteritems(json.loads(request.body)):
             node = cio.get(uri, default=default)
