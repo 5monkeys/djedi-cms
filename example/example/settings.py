@@ -121,25 +121,7 @@ CORS_ORIGIN_WHITELIST = (
 
 CORS_ALLOW_CREDENTIALS = True
 
-# Cache
-# https://docs.djangoproject.com/en/dev/ref/settings/#caches
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    },
-    'dummy': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    },
-}
-
 # Djedi
 # http://djedi-cms.org/settings.html
 
 DJEDI_XSS_DOMAIN = 'localhost'
-
-# Turn off cache during development to allow easily changing node defaults.
-DJEDI_CACHE = {
-   'BACKEND': 'djedi.backends.django.cache.Backend',
-   'NAME': 'dummy' if DEBUG else 'default',
-}

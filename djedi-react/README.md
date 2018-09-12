@@ -4,7 +4,7 @@
 
 [React] client for [Djedi CMS].
 
-Requires djedi-cms version 1.2.0 or later.
+Requires djedi-cms version 1.2.1 or later.
 
 ## Installation
 
@@ -195,6 +195,36 @@ loading all nodes starting with for example `home/` might work out.
 
 Finally, you probably want to check out
 [djedi.setCache](#djedisetcachevalue-number--cache-void) as well.
+
+### Security
+
+Note that the cache of fetched nodes is global and thus **shared across
+different users!**
+
+This means that if you use any kind of _dynamic_ nodes you need to be careful.
+There are two things an attacker could do otherwise:
+
+1.  Put a bad default in the cache. Never use dynamic defaults. That’s a
+    [bad idea](#variables) anyway.
+2.  Fill up the cache with junk. Validate the dynamic parts of URI:s.
+
+For example:
+
+```js
+// Make sure to check that `storeId` is an existing store ID before rendering!
+// Imagine `storeId` coming from a URL parameter: `?store=12`. Then somebody
+// could request `?store=10001`, `?store=10002`, `?store=10003` …
+// `?store=999999` progressively filling up the cache with junk "Welcome to our
+// store!" nodes.
+<Node uri={`store/${storeId}/intro`}>Welcome to our store!</Node>
+```
+
+Also be careful with the following methods, since they put nodes into the cache:
+
+- `djedi.prefetch({ extra: [...] })`
+- `djedi.get`
+- `djedi.getBatched`
+- `djedi.addNodes`
 
 ## Reference
 
