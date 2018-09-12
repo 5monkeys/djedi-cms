@@ -537,7 +537,8 @@ For example, to set it to `sv-se`:
 djedi.options.uri.namespaceByScheme.i18n = "sv-se";
 ```
 
-You might want to set it conditionally if you support several languages.
+A future version of djedi-react might support changing the language through
+React Context if you support several languages.
 
 The Django backend also allows customizing defaults and separators for the node
 URIs. If you do that, you need to make the same customizations in djedi-react.
