@@ -100,7 +100,22 @@ class window.Editor
 
   constructor: (@config) ->
 #    console.log 'Editor.constructor', @
-    @initialize @config
+
+    # cms.coffee waits for the 'load' event of the editor iframe (in which this
+    # file runs). Then, cms.coffee has access to the jQuery of the editor iframe
+    # (and this file) and can attach listeners using it on the editor iframe's
+    # `document`, such as the 'page:node:fetch' event. This runs before the
+    # 'load' event (but I added a `document.readyState` check just in case), and
+    # the 'page:node:fetch' event is fired as soon as the `Client#load` request
+    # finishes. If that happens sooner than the 'load' event, cms.coffee won't
+    # have had a chance to attach its listeners yet. So we have a race
+    # condition. To avoid that, delay initialization here until the 'load' event
+    # and then a little bit more to make sure that the 'load' listener in
+    # cms.coffee runs before this one.
+    if document.readyState == 'complete'
+      @initialize @config
+    else
+      $(window).one 'load', => setTimeout (=> @initialize @config), 0
 
   initialize: (config) ->
 #    console.log 'Editor.initialize'
