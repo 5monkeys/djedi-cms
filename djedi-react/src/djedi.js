@@ -28,9 +28,9 @@ export class Djedi {
     // has reported. The nodes contain default values (if any).
     this._prefetchableNodes = new Map();
 
-    // `{ [uri: string]: string }`. The return value of the last `prefetch` call.
+    // `{ [uri: string]: string }`. The return value of the last `track` call.
     // Mutated by `get` and `getBatched`. The values come from fetched nodes.
-    this._lastPrefetch = {};
+    this._lastTrack = {};
 
     // Queue for `getBatched`.
     this._batch = makeEmptyBatch();
@@ -73,7 +73,7 @@ export class Djedi {
 
     this._nodes = new Cache({ ttl: DEFAULT_CACHE_TTL });
     this._prefetchableNodes = new Map();
-    this._lastPrefetch = {};
+    this._lastTrack = {};
     this._batch = makeEmptyBatch();
     this._renderedNodes = new Map();
     this._DJEDI_NODES = {};
@@ -209,10 +209,12 @@ export class Djedi {
         ? Promise.resolve({})
         : this._fetchMany(nodes);
 
-    return promise.then(results => {
-      this._lastPrefetch = results;
-      return results;
-    });
+    return promise.then(() => undefined);
+  }
+
+  track() {
+    this._lastTrack = {};
+    return this._lastTrack;
   }
 
   // Needed to pick up the results from `prefetch` after server-side rendering.
@@ -320,11 +322,10 @@ export class Djedi {
   }
 
   // Calls `callback(node)` and also updates the last return value of
-  // `djedi.prefetch()`. This is really ugly but needed for server-side
-  // rendering.
+  // `djedi.track()`. This is really ugly but needed for server-side rendering.
   _callback(callback, node) {
     if (!(node instanceof Error)) {
-      this._lastPrefetch[node.uri] = node.value;
+      this._lastTrack[node.uri] = node.value;
     }
     callback(node);
   }

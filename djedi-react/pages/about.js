@@ -1,14 +1,9 @@
-import { Node, djedi } from "djedi-react";
+import { Node } from "djedi-react";
 import Head from "next/head";
 import Link from "next/link";
 import React from "react";
 
 export default class Home extends React.Component {
-  static async getInitialProps() {
-    const nodes = await djedi.prefetch();
-    return { nodes };
-  }
-
   state = {
     showText: false,
   };

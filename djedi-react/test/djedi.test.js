@@ -237,14 +237,7 @@ describe("prefetch", () => {
     });
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.reportPrefetchableNode({ uri: "other", value: "default" });
-    const nodes = await djedi.prefetch();
-
-    expect(nodes).toMatchInlineSnapshot(`
-Object {
-  "i18n://en-us@other.txt": "other",
-  "i18n://en-us@test.txt": "test",
-}
-`);
+    await djedi.prefetch();
 
     expect(fetch.calls()).toMatchInlineSnapshot(`
 Object {
@@ -272,13 +265,7 @@ Array [
     const filter = jest.fn(uri => uri.path.startsWith("test"));
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.reportPrefetchableNode({ uri: "other", value: "default" });
-    const nodes = await djedi.prefetch({ filter });
-
-    expect(nodes).toMatchInlineSnapshot(`
-Object {
-  "i18n://en-us@test.txt": "test",
-}
-`);
+    await djedi.prefetch({ filter });
 
     expect(fetch.calls()).toMatchInlineSnapshot(`
 Object {
@@ -318,20 +305,12 @@ Array [
     });
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.reportPrefetchableNode({ uri: "other", value: "default" });
-    const nodes = await djedi.prefetch({
+    await djedi.prefetch({
       extra: [
         { uri: "test.txt", value: undefined },
         { uri: "extra", value: "extra" },
       ],
     });
-
-    expect(nodes).toMatchInlineSnapshot(`
-Object {
-  "i18n://en-us@extra.txt": "extra",
-  "i18n://en-us@other.txt": "other",
-  "i18n://en-us@test.txt": "test",
-}
-`);
 
     expect(fetch.calls()).toMatchInlineSnapshot(`
 Object {
@@ -349,20 +328,13 @@ Object {
     });
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.reportPrefetchableNode({ uri: "other", value: "default" });
-    const nodes = await djedi.prefetch({
+    await djedi.prefetch({
       filter: () => false,
       extra: [
         { uri: "test.txt", value: undefined },
         { uri: "extra", value: "extra" },
       ],
     });
-
-    expect(nodes).toMatchInlineSnapshot(`
-Object {
-  "i18n://en-us@extra.txt": "extra",
-  "i18n://en-us@test.txt": "test",
-}
-`);
 
     expect(fetch.calls()).toMatchInlineSnapshot(`
 Object {
@@ -373,45 +345,14 @@ Object {
   });
 
   test("it makes no request if there are no nodes to prefetch", async () => {
-    const nodes1 = await djedi.prefetch();
-    expect(nodes1).toEqual({});
-
     djedi.addNodes({ existing: "default" });
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
-    const nodes2 = await djedi.prefetch({
+    await djedi.prefetch({
       filter: () => false,
       extra: [{ uri: "existing.txt", value: "default" }],
     });
-    expect(nodes2).toEqual({});
 
     expect(fetch.mockFn).toHaveBeenCalledTimes(0);
-  });
-
-  test('it "returns" all "rendered" nodes even if no request', async () => {
-    fetch({
-      ...simpleNodeResponse("1", "1"),
-      ...simpleNodeResponse("2", "2"),
-    });
-
-    djedi.reportPrefetchableNode({ uri: "1", value: undefined });
-    djedi.reportPrefetchableNode({ uri: "2", value: undefined });
-
-    const nodes1 = await djedi.prefetch();
-
-    expect(fetch.calls()).toMatchInlineSnapshot(`
-Object {
-  "i18n://en-us@1.txt": null,
-  "i18n://en-us@2.txt": null,
-}
-`);
-
-    const nodes2 = await djedi.prefetch();
-    const callback = jest.fn();
-    djedi.get({ uri: "1", value: undefined }, callback);
-    djedi.getBatched({ uri: "2", value: undefined }, callback);
-    expect(fetch.mockFn).toHaveBeenCalledTimes(1);
-    expect(callback).toHaveBeenCalledTimes(2);
-    expect(nodes2).toEqual(nodes1);
   });
 
   test("it does not refetch if cache has expired", async () => {
@@ -449,6 +390,57 @@ Array [
   networkTests(callback => {
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.prefetch().then(callback, callback);
+  });
+});
+
+describe("track", () => {
+  test("it works", async () => {
+    fetch(simpleNodeResponse("get1", "get1"));
+    fetch(simpleNodeResponse("get2", "get2"));
+    fetch({
+      ...simpleNodeResponse("getBatched1", "getBatched1"),
+      ...simpleNodeResponse("getBatched2", "getBatched2"),
+    });
+    fetch(simpleNodeResponse("get3", "get3"));
+
+    const nodes = djedi.track();
+    expect(nodes).toEqual({});
+
+    const callback = jest.fn();
+    djedi.get({ uri: "get1", value: undefined }, callback);
+    djedi.get({ uri: "get2", value: undefined }, callback);
+    djedi.getBatched({ uri: "getBatched1", value: undefined }, callback);
+    djedi.getBatched({ uri: "getBatched2", value: undefined }, callback);
+    djedi.get({ uri: "i18n://get1.txt", value: undefined }, callback);
+
+    await wait();
+
+    expect(nodes).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@get1.txt": "get1",
+  "i18n://en-us@get2.txt": "get2",
+  "i18n://en-us@getBatched1.txt": "getBatched1",
+  "i18n://en-us@getBatched2.txt": "getBatched2",
+}
+`);
+    expect(callback).toHaveBeenCalledTimes(5);
+
+    const nodesCopy = { ...nodes };
+    const nodes2 = djedi.track();
+    const callback2 = jest.fn();
+    djedi.get({ uri: "get3", value: undefined }, callback2);
+
+    await wait();
+
+    // `nodes` is not further mutated.
+    expect(nodes).toEqual(nodesCopy);
+
+    expect(nodes2).toMatchInlineSnapshot(`
+Object {
+  "i18n://en-us@get3.txt": "get3",
+}
+`);
+    expect(callback2).toHaveBeenCalledTimes(1);
   });
 });
 

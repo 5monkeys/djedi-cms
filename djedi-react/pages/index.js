@@ -20,7 +20,7 @@ export default class Home extends React.Component {
     // contents, but for server-side rendering it is required to prefetch them.
     // (That can also be useful for non-server rendered cases to avoid excessive
     // loading indicators to be displayed.)
-    const nodes = await djedi.prefetch({
+    await djedi.prefetch({
       extra: [specialOfferNode(storeSlug)],
     });
     // If `djedi.prefetch` fails (for example if the API is down), Next.js will
@@ -32,7 +32,7 @@ export default class Home extends React.Component {
     // for the nodes again (which also would cause “server and client did not
     // match” warnings from React). You need to call `djedi.addNodes(nodes)`
     // somewhere. In this example that is done in _app.js.
-    return { nodes, storeSlug };
+    return { storeSlug };
   }
 
   render() {

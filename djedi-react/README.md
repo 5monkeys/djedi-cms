@@ -86,7 +86,8 @@ function Home() {
 
 // Optional: For server-side rendering (Next.js example).
 Page.getInitialProps = async () => {
-  const nodes = await djedi.prefetch();
+  await djedi.prefetch();
+  const nodes = djedi.track();
   return { nodes };
   // (You also need to call `djedi.addNodes(nodes)` somewhere.)
 };
@@ -109,22 +110,15 @@ The idea is to call `await djedi.prefetch()` before rendering. That will fetch
 needed nodes and put them in the cache. Then, when rendering, they’ll all be
 available straight away. ([Mostly.](#nodes-behind-conditionals))
 
-`djedi.prefetch` also returns the nodes it fetched:
-`const nodes = await djedi.prefetch()`. You need to serialize those and pass
-them along in the HTML response. Then, in the browser, you need to call
-`djedi.addNodes(nodes)` to put them into cache again. Otherwise you’d end up
-fetching all the nodes again from the browser. You’d also get “server and client
-did not match” warnings from React since the actual node contents would be
-rendered on the server, but “Loading…” would be rendered in the browser (during
-the initial render).
-
-**Note:** There’s a weird quirk about the `nodes` object in
-`const nodes = await djedi.prefetch()`. **The returned object will be mutated.**
-All `djedi.get` and `djedi.getBatched` calls update the `nodes` from the last
-`djedi.prefetch()` call. This is needed on the server to make sure that all
-rendered nodes actually end up in the object you send down to the browser (due
-to caching and renders of different pages). Be sure not to serialize `nodes`
-until _after_ you’ve rendered the page.
+The next step is to track which nodes are rendered. Before rendering, call
+`const nodes = djedi.track()`. The returned `nodes` is an object **that will be
+mutated during rendering.** You need to serialize `nodes` (_after_ rendering)
+and pass it along in the HTML response. Then, in the browser, you need to call
+`djedi.addNodes(nodes)` to put the rendered nodes into cache again. Otherwise
+you’d end up fetching all the nodes again from the browser. You’d also get
+“server and client did not match” warnings from React since the actual node
+contents would be rendered on the server, but “Loading…” would be rendered in
+the browser (during the initial render).
 
 So, how exactly does `djedi.prefetch` know what to fetch? It’s all thanks to the
 [Babel] plugin mentioned in [Installation](#installation).
@@ -178,7 +172,7 @@ The Babel plugin has some constraints, though:
 
 There’s a fine detail to keep in mind about the prefetching. Remember how
 `import`ing a file is enough to let djedi-react know about the nodes in there?
-For an SPA you might end up `import`ing every page and component of you whole
+For an SPA you might end up `import`ing every page and component of your whole
 site at startup. That means that calling `djedi.prefetch()` will try to load
 every single node of the whole site just to render a single page. The best way
 to solve this is to use code splitting ([Next.js] does that by default), which
@@ -613,12 +607,12 @@ inserted, or rejects with an error if the request fails.
 
 On the server, this method no-ops and always returns `Promise<false>`.
 
-##### `djedi.prefetch({ filter?: Uri => boolean, extra?: Array<Node> } = {}): Promise<Nodes>`
+##### `djedi.prefetch({ filter?: Uri => boolean, extra?: Array<Node> } = {}): Promise<void>`
 
-Fetches and returns all nodes that
+Fetches all nodes that
 [djedi.reportPrefetchableNode](#djedireportprefetchablenodenode-node-void) has
-reported. It also automatically adds the nodes to the cache. Useful for
-[server-side rendering], and for avoiding excessive loading indicators.
+reported, and adds the nodes to the cache. Useful for [server-side rendering],
+and for avoiding excessive loading indicators.
 
 By calling this before rendering, node contents will be available straight away.
 ([Mostly.](#nodes-behind-conditionals)) No loading indicators. No re-renders.
@@ -668,10 +662,6 @@ function Page({ storeId }) {
 }
 ```
 
-**Note:** The nodes object that the promise resolves to can be mutated by
-subsequent `djedi.get` and `djedi.getBatched` calls. See [server-side
-rendering].
-
 ###### Nodes behind conditionals
 
 There’s a scenario where you cannot rely on all nodes on a page being available
@@ -684,8 +674,8 @@ import React from "react";
 import { Node } from "djedi-react";
 import HelpPopup from "../components/HelpPopup";
 
-// Imagine `djedi.prefetch()` and `djedi.addNodes(nodes)` have been called
-// before this renders (as expected).
+// Imagine `djedi.prefetch()`, `djedi.track()` and `djedi.addNodes(nodes)` have
+// been called before this renders (as expected).
 
 export default function SomePage() {
   return (
@@ -707,18 +697,14 @@ The first time this is rendered on the server, neither the page nor
 inserted by the Babel plugin are executed. This way `djedi.prefetch()` knows
 about both the page node and the help text node.
 
+But `djedi.track()` will only catch the nodes that were actually rendered. That
+is, the page node but not the HelpPopup node. This is to keep things consistent.
+
 The next time this is rendered on the server, the JavaScript files in question
 have already been run and as such won’t run again – including the
-`djedi.reportPrefetchableNode()` calls. Rendering `<SomePage>` causes its node
-to be rendered too, reporting that its contents should be serialized and served
-to the browser. (This is the mutation case described in the previous section.)
-But rendering `<HelpPopup>` won’t render its help text node (since it isn’t
-shown until hovering the question mark icon). So that node won’t be sent down to
-the browser.
-
-This means that after the first server render, the help text node would be
-available immediately when the `<HelpPopup>` opens. But after the next server
-render, the help text node would starting loading when the `<HelpPopup>` opens.
+`djedi.reportPrefetchableNode()` calls. So on a second render the server
+wouldn’t know that the `<HelpPopup />` could potentially be used. To avoid
+surprises, the same nodes should always returned to the browser.
 
 `<HelpPopup>` might make DOM measurements to position the popup. In this case it
 is not safe to rely on the node content being available straight away – it might
@@ -726,9 +712,15 @@ load later. This is a case where using the [render](#render) prop can be
 helpful. Using it, you can make the node load earlier and/or update things when
 `state.type` changes.
 
+##### `djedi.track(): Object`
+
+Returns an object that will be mutated by all subsequent `djedi.get` and
+`djedi.getBatched` calls – until the next `djedi.track` call. Used to track
+which nodes are actually rendered during [server-side rendering].
+
 ##### `djedi.addNodes(nodes: Nodes): void`
 
-Adds the given nodes to the cache. Usually comes from `djedi.prefetch` and done
+Adds the given nodes to the cache. Usually comes from `djedi.track` and done
 in the browser after [server-side rendering].
 
 ##### `djedi.setCache(ttl: number): void`

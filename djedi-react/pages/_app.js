@@ -21,15 +21,23 @@ export default class MyApp extends App {
       pageProps = await Component.getInitialProps(ctx);
     }
 
-    return { pageProps };
+    // Prefetch on all pages. If the page itself has already prefetched (like
+    // index.js does) this is basically a no-op. If a page absolutely must not
+    // make network requests, set `.skipDjediPrefetch = true` on it.
+    if (!Component.skipDjediPrefetch) {
+      await djedi.prefetch();
+    }
+
+    // Track which nodes are actually rendered.
+    const nodes = djedi.track();
+
+    return { pageProps, nodes };
   }
 
-  // Add in nodes loaded by `djedi.prefetch` server-side. This uses a convention
-  // where `getInitialProps` of all pages return a key called `nodes`, so that
-  // we don’t have to call `djeid.addNodes` in every page component. Convenient!
+  // Add in nodes loaded by `djedi.track` server-side.
   constructor(props) {
     super(props);
-    const { nodes } = props.pageProps;
+    const { nodes } = props;
     if (nodes != null) {
       djedi.addNodes(nodes);
     }

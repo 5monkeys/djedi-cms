@@ -72,7 +72,8 @@ test("it renders synchronously if the node is already in cache", async () => {
     value: "Welcome",
   });
 
-  const nodes = await djedi.prefetch();
+  await djedi.prefetch();
+  const nodes = djedi.track();
 
   expect(fetch.calls()).toMatchInlineSnapshot(`
 Object {
@@ -80,15 +81,15 @@ Object {
 }
 `);
 
+  const component = renderer.create(
+    <Node uri="home/intro">Hello, World!</Node>
+  );
+
   expect(nodes).toMatchInlineSnapshot(`
 Object {
   "i18n://en-us@home/intro.txt": "Welcome to our amazing website!",
 }
 `);
-
-  const component = renderer.create(
-    <Node uri="home/intro">Hello, World!</Node>
-  );
 
   const serverRendered = component.toJSON();
   expect(serverRendered).toMatchInlineSnapshot(`
