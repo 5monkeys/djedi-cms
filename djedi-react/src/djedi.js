@@ -84,34 +84,42 @@ export class Djedi {
     }
   }
 
-  setCache(value) {
-    if (typeof value === "number") {
-      if (this._nodes instanceof Cache) {
-        this._nodes.ttl = value;
-      } else {
-        this._nodes = new Cache({ ttl: value });
-      }
-    } else {
-      this._nodes = value;
-    }
+  setCache(ttl) {
+    this._nodes.ttl = ttl;
   }
 
   get(passedNode, callback) {
     const node = this._normalizeNode(passedNode);
     const { uri } = node;
-    const existingNode = this._nodes.get(uri);
+    const existing = this._nodes.get(uri);
 
-    if (existingNode != null) {
-      this._callback(callback, existingNode);
-      return;
+    if (existing != null) {
+      this._callback(callback, existing.node);
+
+      if (!existing.needsRefresh) {
+        return;
+      }
     }
 
     this._fetchMany({ [node.uri]: node.value }).then(
       () => {
-        this._callback(callback, this._nodes.get(uri) || missingUriError(uri));
+        if (existing == null) {
+          const maybeNode = this._nodes.get(uri);
+          this._callback(
+            callback,
+            maybeNode == null ? missingUriError(uri) : maybeNode.node
+          );
+        } else {
+          // The node needed refresh and has now been refreshed and put into
+          // cache. Nothing more to do.
+        }
       },
       error => {
-        this._callback(callback, error);
+        if (existing == null) {
+          this._callback(callback, error);
+        } else {
+          console.warn("djedi-react: Failed to refresh node", node, error);
+        }
       }
     );
   }
@@ -123,18 +131,36 @@ export class Djedi {
     }
 
     const node = this._normalizeNode(passedNode);
-    const existingNode = this._nodes.get(node.uri);
+    const existing = this._nodes.get(node.uri);
 
-    if (existingNode != null) {
-      this._callback(callback, existingNode);
-      return;
+    if (existing != null) {
+      this._callback(callback, existing.node);
+
+      if (!existing.needsRefresh) {
+        return;
+      }
     }
 
     const previous = this._batch.queue.get(node.uri) || {
       node,
       callbacks: [],
     };
-    previous.callbacks.push(callback);
+    previous.callbacks.push(
+      existing == null
+        ? callback
+        : maybeNode => {
+            if (maybeNode instanceof Error) {
+              console.warn(
+                "djedi-react: Failed to refresh node",
+                node,
+                maybeNode
+              );
+            } else {
+              // The node needed refresh and has now been refreshed and put into
+              // cache. Nothing more to do.
+            }
+          }
+    );
     this._batch.queue.set(node.uri, previous);
 
     if (this._batch.timeoutId != null) {
@@ -344,7 +370,9 @@ export class Djedi {
     this._fetchMany(nodes).then(
       () => {
         queue.forEach((data, uri) => {
-          const node = this._nodes.get(uri) || missingUriError(uri);
+          const maybeNode = this._nodes.get(uri);
+          const node =
+            maybeNode == null ? missingUriError(uri) : maybeNode.node;
           data.callbacks.forEach(callback => {
             this._callback(callback, node);
           });

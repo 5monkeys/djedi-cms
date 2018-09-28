@@ -193,9 +193,6 @@ Using Djedi, it is common practice to group nodes by page. For example,
 `home/title.txt`, `home/text.md`, `about/title.txt`, `about/text.md`, etc. So
 loading all nodes starting with for example `home/` might work out.
 
-Finally, you probably want to check out
-[djedi.setCache](#djedisetcachevalue-number--cache-void) as well.
-
 ### Security
 
 Note that the cache of fetched nodes is global and thus **shared across
@@ -734,41 +731,42 @@ helpful. Using it, you can make the node load earlier and/or update things when
 Adds the given nodes to the cache. Usually comes from `djedi.prefetch` and done
 in the browser after [server-side rendering].
 
-##### `djedi.setCache(value: number | Cache): void`
+##### `djedi.setCache(ttl: number): void`
 
-`number | Cache` Default: See below.
+`number` Default: 20e3 (20 seconds) on the server, Infinity in the browser.
 
-djedi-react comes with a very basic in-memory cache for fetched nodes by
-default. It has no max-size, but each node has a max-age. Default:
+The ttl specifies how often to refresh a node. When the ttl has passed the node
+is still used, but a request to refresh it is made, so that future lookups get a
+fresh value. This means that the cache may serve stale nodes, and nothing is
+ever deleted from the cache, only added. The cache must be able to fit all of
+your nodes in memory.
 
-- Server: 20 seconds
-- Browser: Unlimited
+The cache needs to work this way due to `djedi.prefetch()`. When the server
+starts, `djedi.prefetch` does not know about any nodes of your site. During the
+first request, `djedi.reportPrefetchableNode` will be called for the pages and
+components imported to render that request. So `djedi.prefetch` will prefetch
+those. When somebody visits another page, `djedi.reportPrefetchableNode` will be
+called for all new nodes of that page, making `djedi.prefetch` learn about those
+as well. `djedi.prefetch` will go through all of the nodes it knows about, but
+only request those not in the cache.
 
-By passing a number to `djedi.setCache` you can change the above default
-max-age. The number should be in milliseconds.
+If nodes were deleted from the cache when the ttl had passed, `djedi.prefetch()`
+could eventually refetch _all_ nodes on your entire site when visiting any page!
 
-The point of the default cache is to avoid unnecessary requests from the
-browser. The reason for the short max-age on the server is to make sure that if
-nodes are edited in the admin sidebar they show up pretty quickly (instead of
-being stuck on an older version until you restart the server).
+When somebody requests a page for the second time, no
+`djedi.reportPrefetchableNode` calls will be made. They only run when a module
+is imported the first time. So `djedi.prefetch` won’t do anything. The page will
+be rendered with whatever nodes are in cache, but all rendered nodes will be
+refetched for future use if the ttl has passed.
 
-If your app has tons of nodes and the cache eats up all your memory, you can
-pass in a custom cache, such as [lru-cache]. It needs to look like this:
+The goal with the server side rendering is to never render “Loading…”. Any other
+text is better, even if it is stale. The only way to achieve this is to make
+sure that all nodes always have _something_ in the cache.
 
-```js
-class CustomCache {
-  get(uri: string): Node;
-  set(uri: string, node: Node): void;
-  delete(uri: string): void;
-}
-
-djedi.setCache(new CustomCache());
-```
-
-For example, `new Map()` is a valid cache that has an infinite TTL.
-
-Note that when replacing the cache, items from the old cache is not transferred
-to the new one.
+Previous versions of djedi-react allowed passing a custom cache to this method.
+This has been removed since the caching has gotten the very specific behavior
+mentioned above and it’s not clear if it’s an actual use case to provide your
+own cache.
 
 #### Less common methods
 

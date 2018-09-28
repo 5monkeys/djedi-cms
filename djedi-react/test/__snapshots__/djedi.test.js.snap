@@ -105,6 +105,57 @@ Array [
 ]
 `;
 
+exports[`get it warns about rejected refresh requests: callback1 1`] = `
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "one",
+    },
+  ],
+]
+`;
+
+exports[`get it warns about rejected refresh requests: callback2 1`] = `
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "one",
+    },
+  ],
+]
+`;
+
+exports[`get it warns about rejected refresh requests: callback3 1`] = `
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "two",
+    },
+  ],
+]
+`;
+
+exports[`get it warns about rejected refresh requests: warning 1`] = `
+Array [
+  Array [
+    "djedi-react: Failed to refresh node",
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": undefined,
+    },
+    [Error: Djedi API error for request: POST /djedi/nodes/
+RequestData sent: {
+  "i18n://en-us@test.txt": null
+}
+Response: undefined
+Error: Network error],
+  ],
+]
+`;
+
 exports[`getBatched it calls the callback synchronously if the node already exists: simple 1`] = `
 Object {
   "uri": "i18n://en-us@test.txt",
@@ -206,6 +257,57 @@ Array [
       },
       "method": "POST",
     },
+  ],
+]
+`;
+
+exports[`getBatched it warns about rejected refresh requests: callback1 1`] = `
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "one",
+    },
+  ],
+]
+`;
+
+exports[`getBatched it warns about rejected refresh requests: callback2 1`] = `
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "one",
+    },
+  ],
+]
+`;
+
+exports[`getBatched it warns about rejected refresh requests: callback3 1`] = `
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "two",
+    },
+  ],
+]
+`;
+
+exports[`getBatched it warns about rejected refresh requests: warning 1`] = `
+Array [
+  Array [
+    "djedi-react: Failed to refresh node",
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": undefined,
+    },
+    [Error: Djedi API error for request: POST /djedi/nodes/
+RequestData sent: {
+  "i18n://en-us@test.txt": null
+}
+Response: undefined
+Error: Network error],
   ],
 ]
 `;

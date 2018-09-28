@@ -11,12 +11,9 @@ export default class Cache {
       return undefined;
     }
 
-    if (Date.now() - item.timestamp > this.ttl) {
-      this._cache.delete(key);
-      return undefined;
-    }
+    const needsRefresh = Date.now() - item.timestamp > this.ttl;
 
-    return item.value;
+    return { node: item.value, needsRefresh };
   }
 
   set(key, value) {

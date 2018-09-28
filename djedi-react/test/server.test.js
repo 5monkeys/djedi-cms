@@ -119,24 +119,63 @@ test("when rendering the same view twice, djedi.prefetch results in the same nod
 });
 
 test("cache ttl", async () => {
-  fetch(simpleNodeResponse("test", "test"));
+  fetch(simpleNodeResponse("test", "two"));
 
   const start = new Date("2018-01-01").getTime();
 
   Date.now.mockReturnValue(start);
-  djedi.addNodes(simpleNodeResponse("test", "test"));
+  djedi.addNodes(simpleNodeResponse("test", "one"));
 
   // We just added the node so it hasn't expired and the callback is called
   // immediately.
   const callback1 = jest.fn();
   djedi.get({ uri: "test", value: "test" }, callback1);
-  expect(callback1).toHaveBeenCalledTimes(1);
+  expect(callback1.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "one",
+    },
+  ],
+]
+`);
 
   // The default server ttl is short.
   const callback2 = jest.fn();
   Date.now.mockReturnValue(start + 60e3);
-  djedi.get({ uri: "test", value: "test" }, callback2);
-  expect(callback2).toHaveBeenCalledTimes(0);
+  djedi.get({ uri: "test", value: "one" }, callback2);
+
+  // The callback is called immediately with the old value, but sends a request
+  // to refresh.
+  expect(callback2.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "one",
+    },
+  ],
+]
+`);
+
   await wait();
+
+  // The callbacks aren’t called again.
+  expect(callback1).toHaveBeenCalledTimes(1);
   expect(callback2).toHaveBeenCalledTimes(1);
+
+  // The new, refreshed value is now available.
+  const callback3 = jest.fn();
+  djedi.get({ uri: "test", value: "test" }, callback3);
+  expect(callback3.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    Object {
+      "uri": "i18n://en-us@test.txt",
+      "value": "two",
+    },
+  ],
+]
+`);
 });
