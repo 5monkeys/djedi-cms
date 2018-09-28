@@ -253,7 +253,7 @@ class Plugin
 
     # Create iframe
     @$el = $ '<iframe>'
-    @$el.on 'load', @connect
+    @$el.one 'load', @connect
     @navigate @uri
 
   navigate: (uri) ->
@@ -267,16 +267,14 @@ class Plugin
       alert 'Failed to load node'
       return
 
-    @window.$ =>
-      console.log 'Plugin.connect().loaded'
-      @$doc = @window.$ @window.document  # Local iframe jQuery document
+    @$doc = @window.$ @window.document  # Local iframe jQuery document
 
-      # Bind and catch/forward events from plugin
-      @$doc.on 'node:render', Events.handler
-      @$doc.on 'node:resize', Events.handler
-      @$doc.on 'page:node:fetch', (event, uri, callback) => callback data: @node.data, content: @node.getContent()
+    # Bind and catch/forward events from plugin
+    @$doc.on 'node:render', Events.handler
+    @$doc.on 'node:resize', Events.handler
+    @$doc.on 'page:node:fetch', (event, uri, callback) => callback data: @node.data, content: @node.getContent()
 
-      @render()
+    @render()
 
   render: ->
     # Resize and show frame

@@ -155,6 +155,7 @@
 
   window.Editor = (function() {
     function Editor(config) {
+      var _this = this;
       this.config = config;
       this.discard = __bind(this.discard, this);
       this.publish = __bind(this.publish, this);
@@ -162,7 +163,15 @@
       this.onSave = __bind(this.onSave, this);
       this.onFormChange = __bind(this.onFormChange, this);
       this.onLoad = __bind(this.onLoad, this);
-      this.initialize(this.config);
+      if (document.readyState === 'complete') {
+        this.initialize(this.config);
+      } else {
+        $(window).one('load', function() {
+          return setTimeout((function() {
+            return _this.initialize(_this.config);
+          }), 0);
+        });
+      }
     }
 
     Editor.prototype.initialize = function(config) {
