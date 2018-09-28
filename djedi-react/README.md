@@ -441,7 +441,7 @@ These are the toplevel keys:
 - [baseUrl](#baseUrl)
 - [batchInterval](#batchInterval)
 - [defaultRender](#defaultrender)
-- [uri](#uri)
+- [uri](#uri-1)
 
 ##### `baseUrl`
 
