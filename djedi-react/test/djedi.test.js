@@ -77,6 +77,10 @@ Object {
   networkTests(callback => {
     djedi.get({ uri: "test", value: "default" }, callback);
   });
+
+  unknownLanguageTest(language => {
+    djedi.get({ uri: "test", value: null }, noop, { language });
+  });
 });
 
 describe("getBatched", () => {
@@ -205,6 +209,10 @@ Array [
   networkTests(callback => {
     djedi.getBatched({ uri: "test", value: "default" }, callback);
   });
+
+  unknownLanguageTest(language => {
+    djedi.getBatched({ uri: "test", value: null }, noop, { language });
+  });
 });
 
 describe("reportPrefetchableNode", () => {
@@ -212,15 +220,16 @@ describe("reportPrefetchableNode", () => {
     djedi.addNodes(simpleNodeResponse("test", "default"));
     djedi.reportPrefetchableNode({ uri: "test", value: "default" });
     djedi.reportPrefetchableNode({
-      uri: "i18n://test.txt",
+      uri: "test",
       value: undefined,
     });
     djedi.reportPrefetchableNode({
-      uri: "en-us@test",
+      uri: "test",
       value: "other default",
     });
 
-    await djedi.prefetch();
+    // The `filter` does not interfere when re-fetching is needed.
+    await djedi.prefetch({ filter: () => false });
     expect(fetch.calls()).toMatchInlineSnapshot(`
 Object {
   "i18n://en-us@test.txt": "other default",
@@ -387,9 +396,56 @@ Array [
 `);
   });
 
+  test("it re-fetches after using a different language", async () => {
+    fetch({
+      "i18n://en-us@welcome.txt": "Welcome!",
+      "i18n://en-us@extra.txt": "Extra text",
+    });
+    fetch({
+      "i18n://sv-se@welcome.txt": "Välkommen!",
+      "i18n://sv-se@extra.txt": "Extra-text",
+    });
+
+    const extra = [{ uri: "extra", value: "extra" }];
+
+    djedi.options.languages = {
+      default: "en-us",
+      additional: ["sv-se"],
+    };
+
+    djedi.reportPrefetchableNode({ uri: "welcome", value: "Welcome" });
+
+    await djedi.prefetch({ extra });
+    expect(fetch.mockFn).toHaveBeenCalledTimes(1);
+
+    await djedi.prefetch({ extra, language: "sv-se" });
+    expect(fetch.mockFn).toHaveBeenCalledTimes(2);
+
+    // The first call has "en-us", while the second has "sv-se". Both use the
+    // same defaults, though (nodes can only have one default, and thus in only
+    // one language.).
+    expect(fetch.calls()).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "i18n://en-us@extra.txt": "extra",
+    "i18n://en-us@welcome.txt": "Welcome",
+  },
+  Object {
+    "i18n://sv-se@extra.txt": "extra",
+    "i18n://sv-se@welcome.txt": "Welcome",
+  },
+]
+`);
+  });
+
   networkTests(callback => {
     djedi.reportPrefetchableNode({ uri: "test", value: undefined });
     djedi.prefetch().then(callback, callback);
+  });
+
+  unknownLanguageTest(language => {
+    djedi.reportPrefetchableNode({ uri: "test", value: undefined });
+    djedi.prefetch({ language });
   });
 });
 
@@ -515,15 +571,25 @@ Array [
 
 describe("reportRenderedNode and reportRemovedNode", () => {
   test("they work", () => {
+    djedi.options.languages = {
+      default: "en-us",
+      additional: ["sv-se", "de-de"],
+    };
+
     expect(window.DJEDI_NODES).toMatchInlineSnapshot(`Object {}`);
 
     djedi.reportRenderedNode({ uri: "first", value: "first" });
     djedi.reportRenderedNode({ uri: "first", value: "first" });
     djedi.reportRenderedNode({ uri: "second", value: "second" });
+    djedi.reportRenderedNode(
+      { uri: "third", value: "third" },
+      { language: "sv-se" }
+    );
     expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
 Object {
   "i18n://en-us@first.txt": "first",
   "i18n://en-us@second.txt": "second",
+  "i18n://sv-se@third.txt": "third",
 }
 `);
 
@@ -532,6 +598,7 @@ Object {
 Object {
   "i18n://en-us@first.txt": "first",
   "i18n://en-us@second.txt": "second",
+  "i18n://sv-se@third.txt": "third",
 }
 `);
 
@@ -539,10 +606,20 @@ Object {
     expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
 Object {
   "i18n://en-us@second.txt": "second",
+  "i18n://sv-se@third.txt": "third",
 }
 `);
 
     djedi.reportRemovedNode("second");
+    djedi.reportRemovedNode("third");
+    djedi.reportRemovedNode("third", { language: "de-de" });
+    expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
+Object {
+  "i18n://sv-se@third.txt": "third",
+}
+`);
+
+    djedi.reportRemovedNode("third", { language: "sv-se" });
     expect(window.DJEDI_NODES).toMatchInlineSnapshot(`Object {}`);
   });
 
@@ -652,6 +729,14 @@ Object {
     await wait();
     assert();
   });
+
+  unknownLanguageTest(language => {
+    djedi.reportRenderedNode({ uri: "test", value: "test" }, { language });
+  });
+
+  unknownLanguageTest(language => {
+    djedi.reportRemovedNode("test", { language });
+  });
 });
 
 describe("element", () => {
@@ -758,7 +843,7 @@ describe("options.uri", () => {
         version: "version",
       },
       namespaceByScheme: {
-        scheme2: "namespace2",
+        scheme2: "{namespace2}",
       },
       separators: {
         scheme: "<SCHEME>",
@@ -830,7 +915,7 @@ Array [
   ],
   Array [
     Object {
-      "uri": "scheme2<SCHEME>namespace2<NAMESPACE>test<EXT>ext<VERSION>version",
+      "uri": "scheme2<SCHEME>{namespace2}<NAMESPACE>test<EXT>ext<VERSION>version",
       "value": "text3",
     },
   ],
@@ -944,6 +1029,24 @@ function getTests(fn) {
     fn({ uri: "test", value: undefined }, callback3);
     expect(callback3.mock.calls).toMatchSnapshot("callback3");
   });
+
+  test("it handles the language option", done => {
+    djedi.options.languages = {
+      default: "en-us",
+      additional: ["sv-se"],
+    };
+
+    fetch({ "i18n://sv-se@test.txt": "test" });
+    fn(
+      { uri: "test", value: "default" },
+      node => {
+        expect(node).toMatchSnapshot();
+        done();
+      },
+      { language: "sv-se" }
+    );
+    jest.runAllTimers();
+  });
 }
 
 function networkTests(fn) {
@@ -982,4 +1085,28 @@ function networkTests(fn) {
     expect(fetch.mockFn.mock.calls).toMatchSnapshot();
     expect(callback).toHaveBeenCalledTimes(1);
   });
+}
+
+function unknownLanguageTest(fn) {
+  test("it warns if passing an unknown language", async () => {
+    djedi.options.languages = {
+      default: "en",
+      additional: ["fi", "dk"],
+    };
+
+    fn("sv");
+    fn("sv");
+    fn("no");
+
+    await wait;
+
+    // The warning is only logged once per language.
+    expect(console.warn).toHaveBeenCalledTimes(2);
+
+    expect(console.warn.mock.calls).toMatchSnapshot();
+  });
+}
+
+function noop() {
+  // Do nothing.
 }

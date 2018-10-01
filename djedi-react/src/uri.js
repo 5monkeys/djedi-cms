@@ -22,7 +22,14 @@ export function stringifyUri(uriObject, separators) {
     .join("");
 }
 
-export function applyUriDefaults(uriObject, defaults, namespaceByScheme) {
+const PLACEHOLDER = /^\{(\w+)\}$/;
+
+export function applyUriDefaults(
+  uriObject,
+  defaults,
+  namespaceByScheme,
+  placeholders
+) {
   const defaulted = Object.keys(uriObject).reduce(
     (result, key) => {
       result[key] = uriObject[key] === "" ? defaults[key] : uriObject[key];
@@ -33,7 +40,13 @@ export function applyUriDefaults(uriObject, defaults, namespaceByScheme) {
   const namespace = namespaceByScheme[defaulted.scheme];
   const namespaced =
     namespace != null && uriObject.namespace === ""
-      ? { ...defaulted, namespace }
+      ? {
+          ...defaulted,
+          namespace: namespace.replace(
+            PLACEHOLDER,
+            (match, name) => placeholders[name] || match
+          ),
+        }
       : defaulted;
   return namespaced;
 }

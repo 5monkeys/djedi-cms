@@ -88,6 +88,13 @@ Error: Network error",
 }
 `;
 
+exports[`get it handles the language option 1`] = `
+Object {
+  "uri": "i18n://sv-se@test.txt",
+  "value": "test",
+}
+`;
+
 exports[`get it respects options.baseUrl 1`] = `
 Array [
   Array [
@@ -152,6 +159,35 @@ RequestData sent: {
 }
 Response: undefined
 Error: Network error],
+  ],
+]
+`;
+
+exports[`get it warns if passing an unknown language 1`] = `
+Array [
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "sv",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
+    },
+  ],
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "no",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
+    },
   ],
 ]
 `;
@@ -244,6 +280,13 @@ Error: Network error",
 }
 `;
 
+exports[`getBatched it handles the language option 1`] = `
+Object {
+  "uri": "i18n://sv-se@test.txt",
+  "value": "test",
+}
+`;
+
 exports[`getBatched it respects options.baseUrl 1`] = `
 Array [
   Array [
@@ -312,6 +355,35 @@ Error: Network error],
 ]
 `;
 
+exports[`getBatched it warns if passing an unknown language 1`] = `
+Array [
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "sv",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
+    },
+  ],
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "no",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
+    },
+  ],
+]
+`;
+
 exports[`prefetch it handles error status codes 1`] = `
 Object {
   "message": "Djedi API error for request: POST /djedi/nodes/
@@ -363,6 +435,93 @@ Array [
         "Content-Type": "application/json",
       },
       "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`prefetch it warns if passing an unknown language 1`] = `
+Array [
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "sv",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
+    },
+  ],
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "no",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
+    },
+  ],
+]
+`;
+
+exports[`reportRenderedNode and reportRemovedNode it warns if passing an unknown language 1`] = `
+Array [
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "sv",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
+    },
+  ],
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "no",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
+    },
+  ],
+]
+`;
+
+exports[`reportRenderedNode and reportRemovedNode it warns if passing an unknown language 2`] = `
+Array [
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "sv",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
+    },
+  ],
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "no",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
     },
   ],
 ]

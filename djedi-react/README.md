@@ -162,7 +162,7 @@ The Babel plugin has some constraints, though:
 - Nodes with dynamic `uri` (such as `` uri={`store/${storeId}/intro`} ``) are
   not supported. They still work in the browser, but will render “Loading…” on
   the server. You can use `djedi.prefetch({ extra: [...] })` for this case – see
-  [djedi.prefetch](#djediprefetch-filter-uri--boolean-extra-arraynode----promisenodes).
+  [djedi.prefetch].
 - Nodes with dynamic `children` are not supported either. That’s a
   [bad idea](#variables) anyway.
 - You cannot rename `Node` to something else when importing it. It must be
@@ -224,6 +224,7 @@ import { Node, djedi, md } from "djedi-react";
 ```
 
 - [Node](#node)
+- [NodeContext](#nodecontext)
 - [djedi](#djedi)
 - [md](#md)
 
@@ -351,8 +352,9 @@ do that in React.
 
 `function` Default: [djedi.options.defaultRender](#defaultrender)
 
-The function receives one argument (the current state) and must return a React
-node (in other words, anything that you can return from a React component).
+The function receives two arguments (the current state and the current language)
+and must return a React node (in other words, anything that you can return from
+a React component).
 
 See [djedi.options.defaultRender](#defaultrender) for how to implement this
 function.
@@ -405,6 +407,18 @@ you’ve accidentally used JSX or template string interpolation instead of
 variables. That’s an anti-pattern, since it won’t work if the user edits the
 node (unlike variable props).
 
+### `NodeContext`
+
+If your site supports multiple languages, you can pass the current language to
+`NodeContext.Provider` to have all nodes re-render whenever the language changes
+(and get the correct language on the first render). See also [languages].
+
+```js
+<NodeContext.Provider value={currentLanguage}>
+  <App />
+</NodeContext.Provider>
+```
+
 ### `djedi`
 
 The `djedi` object is not React specific and lets you:
@@ -424,14 +438,15 @@ You most likely want to set these:
 
 ```js
 djedi.options.baseUrl = "/cms";
-djedi.options.uri.namespaceByScheme.i18n = "sv-se";
+djedi.options.languages.default = "sv-se";
 ```
 
 These are the toplevel keys:
 
 - [baseUrl](#baseUrl)
-- [batchInterval](#batchInterval)
+- [batchInterval](#batchinterval)
 - [defaultRender](#defaultrender)
+- [languages](#languages)
 - [uri](#uri-1)
 
 ##### `baseUrl`
@@ -455,14 +470,12 @@ the number of requests made to the backend, and to allow the backend to do more
 efficient batch database lookups.
 
 Behind the scenes, `<Node>` uses
-[djedi.getBatched](#djedigetbatchednode-node-callback-node--error--void-void),
+[djedi.getBatched][djedi.getbatched],
 so technically speaking this option only configures that method, not `<Node>` by
 itself.
 
 Setting `batchInterval: 0` disables batching altogeher, making
-[djedi.getBatched](#djedigetbatchednode-node-callback-node--error--void-void)
-behave just like
-[djedi.get](#djedigetnode-node-callback-node--error--void-void).
+[djedi.getBatched] behave just like [djedi.get].
 
 ##### `defaultRender`
 
@@ -481,7 +494,9 @@ The function receives the current state and decides what to render. Here’s the
 default implementation:
 
 ```js
-state => {
+(state, { language }) => {
+  // If you override this, you could switch on `language` as well to support
+  // multiple languages.
   switch (state.type) {
     case "loading":
       return "Loading…";
@@ -515,21 +530,41 @@ You can use this option to translate the default “Loading” and “Error” m
 to another language, or perhaps render a spinner instead of “Loading…” (maybe
 even after a small timeout).
 
-##### `uri`
+##### `languages`
 
 `object` Default: See below.
 
-The most important part of this option is setting the default namespace for the
-`i18n` scheme. In the Django backend, it defaults to the [LANGUAGE_CODE] Django
-setting, but djedi-react can’t know about that value so it defaults to `en-us`.
-For example, to set it to `sv-se`:
+The most important part of this option is setting the default language. In the
+Django backend, it defaults to the [LANGUAGE_CODE] Django setting, but
+djedi-react can’t know about that value so it needs its own defaults.
 
-```
-djedi.options.uri.namespaceByScheme.i18n = "sv-se";
+This is the default value:
+
+```js
+{
+  default: "en-us",
+  additional: [],
+}
 ```
 
-A future version of djedi-react might support changing the language through
-React Context if you support several languages.
+For example, to set the default to `sv-se` while keeping `en-us` as an
+additional language:
+
+```js
+{
+  default: "sv-se",
+  additional: ["en-us"],
+}
+```
+
+The above allows passing `en-us` as language to some of the `djedi` methods, as
+well as to [NodeContext](#nodecontext). The full list of available languages
+must be passed explicitly, to avoid accidentally allowing hackers to fill up the
+cache with nodes for bogus languages.
+
+##### `uri`
+
+`object` Default: See below.
 
 The Django backend also allows customizing defaults and separators for the node
 URIs. If you do that, you need to make the same customizations in djedi-react.
@@ -546,7 +581,7 @@ This is the default value:
     version: "",
   },
   namespaceByScheme: {
-    i18n: "en-us",
+    i18n: "{language}",
     l10n: "local",
     g11n: "global",
   },
@@ -559,6 +594,9 @@ This is the default value:
   },
 });
 ```
+
+In `namespaceByScheme`, the special value `"{language}"` is replaced with the
+language passed to some of the `djedi` methods.
 
 #### Common methods
 
@@ -607,12 +645,11 @@ inserted, or rejects with an error if the request fails.
 
 On the server, this method no-ops and always returns `Promise<false>`.
 
-##### `djedi.prefetch({ filter?: Uri => boolean, extra?: Array<Node> } = {}): Promise<void>`
+##### `djedi.prefetch({ filter?: Uri => boolean, extra?: Array<Node>, language?: string } = {}): Promise<void>`
 
-Fetches all nodes that
-[djedi.reportPrefetchableNode](#djedireportprefetchablenodenode-node-void) has
-reported, and adds the nodes to the cache. Useful for [server-side rendering],
-and for avoiding excessive loading indicators.
+Fetches all nodes that [djedi.reportPrefetchableNode] has reported, and adds the
+nodes to the cache. Useful for [server-side rendering], and for avoiding
+excessive loading indicators.
 
 By calling this before rendering, node contents will be available straight away.
 ([Mostly.](#nodes-behind-conditionals)) No loading indicators. No re-renders.
@@ -661,6 +698,12 @@ function Page({ storeId }) {
   return <Node uri={node.uri}>{node.value}</Node>;
 }
 ```
+
+By passing in `language`, you can choose which [language][languages] to use.
+Note that the first prefetch with a new language will request _all_ nodes
+reported by [djedi.reportPrefetchableNode], not just the ones for the current
+page (because djedi-react can’t know which nodes are required for the current
+page).
 
 ###### Nodes behind conditionals
 
@@ -766,7 +809,7 @@ These methods are useful if you need to manually fetch nodes (rather than using
 the `<Node>` component). (Don’t forget that you also can use the
 [render](#render) prop.)
 
-##### `djedi.get(node: Node, callback: (Node | Error) => void): void`
+##### `djedi.get(node: Node, callback: (Node | Error) => void, options = {}): void`
 
 Fetch a single node. This takes a callback instead of a `Promise`, so the
 callback can be invoked synchronously if the node already exists in cache
@@ -776,7 +819,11 @@ rendering] support.
 Note that the callback is called with either a `Node` or an `Error`. You can use
 `node instanceof Error` as a check.
 
-##### `djedi.getBatched(node: Node, callback: (Node | Error) => void): void`
+Options:
+
+- language: `string`. Which [language][languages] to use.
+
+##### `djedi.getBatched(node: Node, callback: (Node | Error) => void, options = {}): void`
 
 Like `djedi.get`, but doesn’t make a network request straight away, batching up
 with other `djedi.getBatched` requests made during
@@ -785,7 +832,7 @@ with other `djedi.getBatched` requests made during
 ##### `djedi.reportPrefetchableNode(node: Node): void`
 
 Registers the passed node as available for
-[prefetching](#djediprefetch-filter-uri--boolean-extra-arraynode----promisenodes).
+[prefetching][djedi.prefetch].
 You most likely won’t use this method directly. Instead, it will be
 automatically inserted into your code by a [Babel] plugin. See [server-side
 rendering].
@@ -796,15 +843,23 @@ These methods are used by the `<Node>` implementation, and would be useful for
 other rendering integrations than React. You will probably never call these
 yourself.
 
-##### `djedi.reportRenderedNode(node: Node): void`
+##### `djedi.reportRenderedNode(node: Node, options = {}): void`
 
 Report that a node has been rendered, so that `window.DJEDI_NODES` and the admin
 sidebar can be kept up-to-date.
 
-##### `djedi.reportRemovedNode(uri: string): void`
+Options:
+
+- language: `string`. Which [language][languages] to use.
+
+##### `djedi.reportRemovedNode(uri: string, options = {}): void`
 
 Report that a node has been removed, so that `window.DJEDI_NODES` and the admin
 sidebar can be kept up-to-date.
+
+Options:
+
+- language: `string`. Which [language][languages] to use.
 
 ##### `djedi.element(uri: string): object`
 
@@ -841,8 +896,7 @@ This is a template literal tag. It’s meant to be used for the `children` of
 - When your default text contains characters that are annoying to escape in JSX.
 - When your default is markdown.
 - When you define the default as a string outside `<Node>`, as in the
-  [djedi.prefetch](#djediprefetch-filter-uri--boolean-extra-arraynode----promisenodes)
-  example.
+  [djedi.prefetch] example.
 
 Why tag the template literal with `md`? Because `md` dedents your string, so
 that you can format it nicely without worrying about extraneous whitespace
@@ -900,10 +954,9 @@ lives on `api.example.com`. Then you need two things:
   for more information.
 
 - `SESSION_COOKIE_DOMAIN = '.example.com'` in your Django settings file.
-  [djedi.injectAdmin](#djediinjectadmin-promiseboolean) needs to make a request
-  for the admin sidebar, and has to send along the session cookie created when
-  logging in to the Django admin on `api.example.com`. This makes the cookie
-  available on both domains.
+  [djedi.injectAdmin] needs to make a request for the admin sidebar, and has to
+  send along the session cookie created when logging in to the Django admin on
+  `api.example.com`. This makes the cookie available on both domains.
 
 If the two domains do not share the same super domain (such as `site.com` and
 `api.com`) you need to set up a proxy server on the React frontend domain. For
@@ -989,15 +1042,18 @@ because of permissions. One solution is to remove the owned-by-root files first:
 
 [babel]: https://babeljs.io/
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+[djedi.get]: #djedigetnode-Node-callback-Node--Error--void-options---void
+[djedi.getbatched]: #djedigetBatchednode-Node-callback-Node--Error--void-options---void
+[djedi.injectadmin]: #djediinjectadmin-promiseboolean
+[djedi.prefetch]: #djediprefetch-filter-Uri--boolean-extra-ArrayNode-language-string----Promisevoid
+[djedi.reportprefetchablenode]: #djedireportprefetchablenodenode-node-void
 [django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
 [djedi cms]: https://djedi-cms.org/
 [docker]: https://www.docker.com/community-edition
-[document.domain]:
-  https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
+[document.domain]: https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
 [eslint]: https://eslint.org/
 [jest]: https://jestjs.io/
-[language_code]:
-  https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
+[language_code]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
 [lru-cache]: https://github.com/isaacs/node-lru-cache
 [next.js]: https://nextjs.org/
 [node.js]: https://nodejs.org/en/

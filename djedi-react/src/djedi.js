@@ -24,8 +24,10 @@ export class Djedi {
     // `Cache<uri: string, Node>`. Cache of all fetched nodes.
     this._nodes = new Cache({ ttl: DEFAULT_CACHE_TTL });
 
-    // `Map<uri: string, Node>`. Tracks everything that `reportPrefetchableNode`
-    // has reported. The nodes contain default values (if any).
+    // `Map<uri: string, { node: Node, needsRefresh: boolean }>`. Tracks
+    // everything that `reportPrefetchableNode` has reported. The nodes contain
+    // default values (if any). The boolean tells whether the node should be
+    // re-fetched.
     this._prefetchableNodes = new Map();
 
     // `{ [uri: string]: string }`. The return value of the last `track` call.
@@ -48,6 +50,9 @@ export class Djedi {
     // Whenever a node is rendered or removed the admin sidebar needs to be
     // refreshed. This is used to batch that refreshing.
     this._updateAdminSidebarTimeoutId = undefined;
+
+    // Used to only warn about unknown languages once.
+    this._warnedLanguages = new Set();
 
     if (typeof window !== "undefined") {
       if (window.DJEDI_NODES == null) {
@@ -78,6 +83,7 @@ export class Djedi {
     this._renderedNodes = new Map();
     this._DJEDI_NODES = {};
     this._updateAdminSidebarTimeoutId = undefined;
+    this._warnedLanguages = new Set();
 
     if (typeof window !== "undefined") {
       window.DJEDI_NODES = this._DJEDI_NODES;
@@ -88,8 +94,8 @@ export class Djedi {
     this._nodes.ttl = ttl;
   }
 
-  get(passedNode, callback) {
-    const node = this._normalizeNode(passedNode);
+  get(passedNode, callback, { language = undefined } = {}) {
+    const node = this._normalizeNode(passedNode, { language });
     const { uri } = node;
     const existing = this._nodes.get(uri);
 
@@ -124,13 +130,13 @@ export class Djedi {
     );
   }
 
-  getBatched(passedNode, callback) {
+  getBatched(passedNode, callback, { language = undefined } = {}) {
     if (this.options.batchInterval <= 0) {
-      this.get(passedNode, callback);
+      this.get(passedNode, callback, { language });
       return;
     }
 
-    const node = this._normalizeNode(passedNode);
+    const node = this._normalizeNode(passedNode, { language });
     const existing = this._nodes.get(node.uri);
 
     if (existing != null) {
@@ -173,32 +179,31 @@ export class Djedi {
     );
   }
 
-  reportPrefetchableNode(passedNode) {
-    const node = this._normalizeNode(passedNode);
+  reportPrefetchableNode(node) {
     const previous = this._prefetchableNodes.get(node.uri);
 
-    // During development, it is not uncommon to change defaults. If so, delete
-    // the cached entry so the node can be re-fetched.
-    if (previous != null && previous.value !== node.value) {
-      this._nodes.delete(previous.uri);
-    }
+    // During development, it is not uncommon to change defaults. If so, mark
+    // the node re-fetching.
+    const needsRefresh = previous != null && previous.node.value !== node.value;
 
-    this._prefetchableNodes.set(node.uri, node);
+    this._prefetchableNodes.set(node.uri, { node, needsRefresh });
   }
 
-  prefetch({ filter = undefined, extra = [] } = {}) {
+  prefetch({ filter = undefined, extra = [], language = undefined } = {}) {
     const nodes = {};
-    this._prefetchableNodes.forEach(node => {
+    this._prefetchableNodes.forEach(item => {
+      const node = this._normalizeNode(item.node, { language });
       if (
-        this._nodes.get(node.uri) == null &&
-        (filter == null ||
-          filter(this._parseUri(node.uri, { applyDefaults: false })))
+        item.needsRefresh ||
+        (this._nodes.get(node.uri) == null &&
+          (filter == null ||
+            filter(this._parseUri(node.uri, { applyDefaults: false }))))
       ) {
         nodes[node.uri] = node.value;
       }
     });
     extra.forEach(node => {
-      const uri = this._normalizeUri(node.uri);
+      const uri = this._normalizeUri(node.uri, { language });
       if (this._nodes.get(uri) == null) {
         nodes[uri] = node.value;
       }
@@ -277,8 +282,8 @@ export class Djedi {
     });
   }
 
-  reportRenderedNode(passedNode) {
-    const node = this._normalizeNode(passedNode);
+  reportRenderedNode(passedNode, { language = undefined } = {}) {
+    const node = this._normalizeNode(passedNode, { language });
     const previous = this._renderedNodes.get(node.uri);
     const numInstances = previous == null ? 1 : previous + 1;
 
@@ -287,8 +292,8 @@ export class Djedi {
     this._updateAdminSidebar();
   }
 
-  reportRemovedNode(passedUri) {
-    const uri = this._normalizeUri(passedUri);
+  reportRemovedNode(passedUri, { language = undefined } = {}) {
+    const uri = this._normalizeUri(passedUri, { language });
     const previous = this._renderedNodes.get(uri);
 
     if (previous == null) {
@@ -330,26 +335,56 @@ export class Djedi {
     callback(node);
   }
 
-  _parseUri(uri, { applyDefaults = true } = {}) {
+  _parseUri(
+    uri,
+    {
+      applyDefaults = true,
+      language: passedLanguage = this.options.languages.default,
+    } = {}
+  ) {
     const { defaults, namespaceByScheme, separators } = this.options.uri;
     const uriObject = parseUri(uri, separators);
-    return applyDefaults
-      ? applyUriDefaults(uriObject, defaults, namespaceByScheme)
-      : uriObject;
+
+    if (!applyDefaults) {
+      return uriObject;
+    }
+
+    let language = passedLanguage;
+    const allLanguages = [
+      this.options.languages.default,
+      ...this.options.languages.additional,
+    ];
+
+    if (allLanguages.indexOf(language) === -1) {
+      const fallback = this.options.languages.default;
+      if (!this._warnedLanguages.has(language)) {
+        this._warnedLanguages.add(language);
+        console.warn("djedi-react: Ignoring unknown language", {
+          actual: language,
+          expected: allLanguages,
+          fallback,
+        });
+      }
+      language = fallback;
+    }
+
+    return applyUriDefaults(uriObject, defaults, namespaceByScheme, {
+      language,
+    });
   }
 
   _stringifyUri(uriObject) {
     return stringifyUri(uriObject, this.options.uri.separators);
   }
 
-  _normalizeUri(uri) {
-    return this._stringifyUri(this._parseUri(uri));
+  _normalizeUri(uri, { language = undefined }) {
+    return this._stringifyUri(this._parseUri(uri, { language }));
   }
 
-  _normalizeNode(node) {
+  _normalizeNode(node, { language = undefined }) {
     return {
       ...node,
-      uri: this._normalizeUri(node.uri),
+      uri: this._normalizeUri(node.uri, { language }),
     };
   }
 
@@ -498,6 +533,10 @@ function makeDefaultOptions() {
           return null;
       }
     },
+    languages: {
+      default: "en-us",
+      additional: [],
+    },
     uri: {
       defaults: {
         scheme: "i18n",
@@ -507,7 +546,7 @@ function makeDefaultOptions() {
         version: "",
       },
       namespaceByScheme: {
-        i18n: "en-us",
+        i18n: "{language}",
         l10n: "local",
         g11n: "global",
       },

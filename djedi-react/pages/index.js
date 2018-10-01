@@ -1,9 +1,9 @@
 import { Node, djedi, md } from "djedi-react";
 import Head from "next/head";
-import Link from "next/link";
 import PropTypes from "prop-types";
 import React from "react";
 
+import Link from "../components/Link";
 import Search from "../components/Search";
 import Toplist from "../components/Toplist";
 
@@ -12,7 +12,7 @@ export default class Home extends React.Component {
     storeSlug: PropTypes.string.isRequired,
   };
 
-  static async getInitialProps() {
+  static async getInitialProps({ language }) {
     // Imagine this coming from the URL or something.
     const storeSlug = "andys-tools";
 
@@ -22,6 +22,7 @@ export default class Home extends React.Component {
     // loading indicators to be displayed.)
     await djedi.prefetch({
       extra: [specialOfferNode(storeSlug)],
+      language,
     });
     // If `djedi.prefetch` fails (for example if the API is down), Next.js will
     // show its 500 page (in production mode). You can also choose to catch the
@@ -57,7 +58,7 @@ export default class Home extends React.Component {
         `}</Node>
 
         <p>
-          <Link href="/about">
+          <Link href={{ pathname: "/about" }}>
             <a>About us</a>
           </Link>
         </p>

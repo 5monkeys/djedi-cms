@@ -1,7 +1,8 @@
 import { Node } from "djedi-react";
 import Head from "next/head";
-import Link from "next/link";
 import React from "react";
+
+import Link from "../components/Link";
 
 export default class Home extends React.Component {
   state = {
@@ -22,7 +23,7 @@ export default class Home extends React.Component {
         </Head>
 
         <p>
-          <Link href="/">
+          <Link href={{ pathname: "/" }}>
             <a>Home</a>
           </Link>
         </p>

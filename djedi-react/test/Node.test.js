@@ -2,7 +2,7 @@ import React from "react";
 import dedent from "dedent-js";
 import renderer from "react-test-renderer";
 
-import { Node, djedi, md } from "../src";
+import { Node, NodeContext, djedi, md } from "../src";
 
 import {
   errorDetails,
@@ -15,10 +15,12 @@ import {
 
 jest.useFakeTimers();
 
+console.warn = jest.fn();
 console.error = jest.fn();
 
 beforeEach(() => {
   resetAll();
+  console.warn.mockReset();
   console.error.mockReset();
   // The `prop-types` package only logs the exact same error once. As a
   // workaround, tests that need to check for logged errors temporarily assign
@@ -633,9 +635,15 @@ test("custom render function", async () => {
   fetch({});
   fetch(simpleNodeResponse("4", "returned value"));
   fetch(simpleNodeResponse("5", null));
+  fetch({ "i18n://sv-se@6.txt": "Swedish" });
 
-  function render1(state) {
-    return state.type;
+  djedi.options.languages = {
+    default: "en-us",
+    additional: ["sv-se"],
+  };
+
+  function render1(state, { language }) {
+    return `${state.type}/${language}`;
   }
 
   function render2(state) {
@@ -653,12 +661,14 @@ test("custom render function", async () => {
 
   djedi.options.defaultRender = render1;
 
-  const Wrapper = withState(({ uri = "1" }) => (
-    <div>
-      <Node uri={uri} />
-      <hr />
-      <Node uri={uri} render={render2} />
-    </div>
+  const Wrapper = withState(({ uri = "1", language = undefined }) => (
+    <NodeContext.Provider value={language}>
+      <div>
+        <Node uri={uri} />
+        <hr />
+        <Node uri={uri} render={render2} />
+      </div>
+    </NodeContext.Provider>
   ));
 
   const component = renderer.create(<Wrapper />);
@@ -667,7 +677,7 @@ test("custom render function", async () => {
   // Loading.
   expect(component.toJSON()).toMatchInlineSnapshot(`
 <div>
-  loading
+  loading/en-us
   <hr />
   LOADING
 </div>
@@ -677,7 +687,7 @@ test("custom render function", async () => {
   await wait();
   expect(component.toJSON()).toMatchInlineSnapshot(`
 <div>
-  error
+  error/en-us
   <hr />
   <div
     data-details={
@@ -703,7 +713,7 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
   await wait();
   expect(component.toJSON()).toMatchInlineSnapshot(`
 <div>
-  error
+  error/en-us
   <hr />
   <div
     data-details={
@@ -729,7 +739,7 @@ Error: Network error",
   await wait();
   expect(component.toJSON()).toMatchInlineSnapshot(`
 <div>
-  error
+  error/en-us
   <hr />
   <div
     data-details={
@@ -750,7 +760,7 @@ Error: Network error",
   await wait();
   expect(component.toJSON()).toMatchInlineSnapshot(`
 <div>
-  success
+  success/en-us
   <hr />
   <article>
     <span
@@ -767,13 +777,30 @@ Error: Network error",
   await wait();
   expect(component.toJSON()).toMatchInlineSnapshot(`
 <div>
-  success
+  success/en-us
   <hr />
   <article>
     <span
       data-i18n="en-us@5"
     >
       
+    </span>
+  </article>
+</div>
+`);
+
+  // Different language.
+  instance.setState({ uri: "6", language: "sv-se" });
+  await wait();
+  expect(component.toJSON()).toMatchInlineSnapshot(`
+<div>
+  success/sv-se
+  <hr />
+  <article>
+    <span
+      data-i18n="sv-se@6"
+    >
+      Swedish
     </span>
   </article>
 </div>
@@ -789,17 +816,24 @@ test("it handles window.DJEDI_NODES", async () => {
     ...simpleNodeResponse("changing3", "changing3"),
   });
 
-  const Wrapper = withState(({ remove = false, changingUri = "changing1" }) => (
-    <div>
-      <Node uri="removed" />
-      {!remove && <Node uri="removed" />}
+  djedi.options.languages = {
+    default: "en-us",
+    additional: ["sv-se"],
+  };
 
-      {!remove && <Node uri="loneRemoved">loneRemoved</Node>}
+  const Wrapper = withState(
+    ({ remove = false, changingUri = "changing1", language = undefined }) => (
+      <NodeContext.Provider value={language}>
+        <Node uri="removed" />
+        {!remove && <Node uri="removed" />}
 
-      <Node uri="changing1" />
-      <Node uri={changingUri} />
-    </div>
-  ));
+        {!remove && <Node uri="loneRemoved">loneRemoved</Node>}
+
+        <Node uri="changing1" />
+        <Node uri={changingUri} />
+      </NodeContext.Provider>
+    )
+  );
 
   expect(window.DJEDI_NODES).toMatchInlineSnapshot(`Object {}`);
 
@@ -830,6 +864,15 @@ Object {
   "i18n://en-us@changing1.txt": undefined,
   "i18n://en-us@changing3.txt": undefined,
   "i18n://en-us@removed.txt": undefined,
+}
+`);
+
+  instance.setState({ language: "sv-se" });
+  expect(window.DJEDI_NODES).toMatchInlineSnapshot(`
+Object {
+  "i18n://sv-se@changing1.txt": undefined,
+  "i18n://sv-se@changing3.txt": undefined,
+  "i18n://sv-se@removed.txt": undefined,
 }
 `);
 
@@ -890,4 +933,99 @@ Array [
   },
 ]
 `);
+});
+
+describe("NodeContext", () => {
+  test("it allows passing a different language", async () => {
+    fetch({ "i18n://en-us@welcome.txt": "Welcome!" });
+    fetch({ "i18n://sv-se@welcome.txt": "Välkommen!" });
+
+    djedi.options.languages = {
+      default: "en-us",
+      additional: ["sv-se"],
+    };
+
+    const Wrapper = withState(({ language = undefined }) => (
+      <NodeContext.Provider value={language}>
+        <Node uri="welcome" />
+      </NodeContext.Provider>
+    ));
+    const component = renderer.create(<Wrapper />);
+    const instance = component.getInstance();
+
+    await wait();
+    expect(component.toJSON()).toMatchInlineSnapshot(`
+<span
+  data-i18n="en-us@welcome"
+>
+  Welcome!
+</span>
+`);
+
+    instance.setState({ language: "sv-se" });
+    await wait();
+    expect(component.toJSON()).toMatchInlineSnapshot(`
+<span
+  data-i18n="sv-se@welcome"
+>
+  Välkommen!
+</span>
+`);
+  });
+
+  test("it warns if using an unknown language", async () => {
+    fetch({ "i18n://en@test.txt": "English fallback" });
+
+    djedi.options.languages = {
+      default: "en",
+      additional: ["fi", "dk"],
+    };
+
+    const component = renderer.create(
+      <NodeContext.Provider value="sv">
+        <Node uri="test" />
+      </NodeContext.Provider>
+    );
+
+    await wait();
+
+    expect(component.toJSON()).toMatchInlineSnapshot(`
+<span
+  data-i18n="en@test"
+>
+  English fallback
+</span>
+`);
+
+    expect(console.warn.mock.calls).toMatchInlineSnapshot(`
+Array [
+  Array [
+    "djedi-react: Ignoring unknown language",
+    Object {
+      "actual": "sv",
+      "expected": Array [
+        "en",
+        "fi",
+        "dk",
+      ],
+      "fallback": "en",
+    },
+  ],
+]
+`);
+  });
+
+  test("it picks up a customized default language without an explicit provider", async () => {
+    fetch({ "i18n://sv-se@test.txt": "Swedish" });
+    djedi.options.languages.default = "sv-se";
+    const component = renderer.create(<Node uri="test" />);
+    await wait();
+    expect(component.toJSON()).toMatchInlineSnapshot(`
+<span
+  data-i18n="sv-se@test"
+>
+  Swedish
+</span>
+`);
+  });
 });
