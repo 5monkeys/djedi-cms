@@ -13,7 +13,7 @@ npm install djedi-react react react-dom
 ```
 
 ```js
-import { Node, djedi, md } from "djedi-react";
+import { Node, NodeContext, djedi, md } from "djedi-react";
 ```
 
 Optional [Babel] plugin (for better errors, prefetching and [server-side
@@ -220,7 +220,7 @@ Also be careful with the following methods, since they put nodes into the cache:
 ## Reference
 
 ```js
-import { Node, djedi, md } from "djedi-react";
+import { Node, NodeContext, djedi, md } from "djedi-react";
 ```
 
 - [Node](#node)
