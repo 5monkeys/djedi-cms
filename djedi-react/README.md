@@ -411,13 +411,16 @@ node (unlike variable props).
 
 If your site supports multiple languages, you can pass the current language to
 `NodeContext.Provider` to have all nodes re-render whenever the language changes
-(and get the correct language on the first render). See also [languages].
+(and get the correct language on the first render). See also
+[languages](#languages).
 
 ```js
 <NodeContext.Provider value={currentLanguage}>
   <App />
 </NodeContext.Provider>
 ```
+
+[**Next.js example**](pages/_app.js)
 
 ### `djedi`
 
@@ -469,9 +472,8 @@ milliseconds are batched together into a single request. This is to cut down on
 the number of requests made to the backend, and to allow the backend to do more
 efficient batch database lookups.
 
-Behind the scenes, `<Node>` uses
-[djedi.getBatched][djedi.getbatched],
-so technically speaking this option only configures that method, not `<Node>` by
+Behind the scenes, `<Node>` uses [djedi.getBatched][djedi.getbatched], so
+technically speaking this option only configures that method, not `<Node>` by
 itself.
 
 Setting `batchInterval: 0` disables batching altogeher, making
@@ -481,8 +483,9 @@ Setting `batchInterval: 0` disables batching altogeher, making
 
 `function` Default: See below.
 
-The function receives one argument (the current state) and must return anything
-that the rendering implementation allows (such as a React node).
+The function receives two arguments (the current state and the current language)
+and must return anything that the rendering implementation allows (such as a
+React node).
 
 Nodes can be in one of three states: `loading`, `error` or `success`. They start
 out in the `loading` state, and then progress into either `error` (if fetching
@@ -490,8 +493,7 @@ the node content failed) or `success` (if fetching the node content succeeded).
 If a node was already in the cache, the `loading` state is skipped, going
 straight to `success`.
 
-The function receives the current state and decides what to render. Here’s the
-default implementation:
+Here’s the default implementation:
 
 ```js
 (state, { language }) => {
@@ -547,17 +549,17 @@ This is the default value:
 }
 ```
 
-For example, to set the default to `sv-se` while keeping `en-us` as an
-additional language:
+For example, to set the default to `sv-se` and adding `de-de` as an additional
+language:
 
 ```js
 {
   default: "sv-se",
-  additional: ["en-us"],
+  additional: ["de-de"],
 }
 ```
 
-The above allows passing `en-us` as language to some of the `djedi` methods, as
+The above allows passing `de-de` as language to some of the `djedi` methods, as
 well as to [NodeContext](#nodecontext). The full list of available languages
 must be passed explicitly, to avoid accidentally allowing hackers to fill up the
 cache with nodes for bogus languages.
@@ -699,7 +701,7 @@ function Page({ storeId }) {
 }
 ```
 
-By passing in `language`, you can choose which [language][languages] to use.
+By passing in `language`, you can choose which [language](#languages) to use.
 Note that the first prefetch with a new language will request _all_ nodes
 reported by [djedi.reportPrefetchableNode], not just the ones for the current
 page (because djedi-react can’t know which nodes are required for the current
@@ -747,7 +749,7 @@ The next time this is rendered on the server, the JavaScript files in question
 have already been run and as such won’t run again – including the
 `djedi.reportPrefetchableNode()` calls. So on a second render the server
 wouldn’t know that the `<HelpPopup />` could potentially be used. To avoid
-surprises, the same nodes should always returned to the browser.
+surprises, the same nodes should always be returned to the browser.
 
 `<HelpPopup>` might make DOM measurements to position the popup. In this case it
 is not safe to rely on the node content being available straight away – it might
@@ -763,8 +765,8 @@ which nodes are actually rendered during [server-side rendering].
 
 ##### `djedi.addNodes(nodes: Nodes): void`
 
-Adds the given nodes to the cache. Usually comes from `djedi.track` and done
-in the browser after [server-side rendering].
+Adds the given nodes to the cache. Usually comes from `djedi.track` and done in
+the browser after [server-side rendering].
 
 ##### `djedi.setCache(ttl: number): void`
 
@@ -821,7 +823,7 @@ Note that the callback is called with either a `Node` or an `Error`. You can use
 
 Options:
 
-- language: `string`. Which [language][languages] to use.
+- language: `string`. Which [language](#languages) to use.
 
 ##### `djedi.getBatched(node: Node, callback: (Node | Error) => void, options = {}): void`
 
@@ -831,11 +833,9 @@ with other `djedi.getBatched` requests made during
 
 ##### `djedi.reportPrefetchableNode(node: Node): void`
 
-Registers the passed node as available for
-[prefetching][djedi.prefetch].
-You most likely won’t use this method directly. Instead, it will be
-automatically inserted into your code by a [Babel] plugin. See [server-side
-rendering].
+Registers the passed node as available for [prefetching][djedi.prefetch]. You
+most likely won’t use this method directly. Instead, it will be automatically
+inserted into your code by a [Babel] plugin. See [server-side rendering].
 
 #### Methods for rendering implementations
 
@@ -850,7 +850,7 @@ sidebar can be kept up-to-date.
 
 Options:
 
-- language: `string`. Which [language][languages] to use.
+- language: `string`. Which [language](#languages) to use.
 
 ##### `djedi.reportRemovedNode(uri: string, options = {}): void`
 
@@ -859,7 +859,7 @@ sidebar can be kept up-to-date.
 
 Options:
 
-- language: `string`. Which [language][languages] to use.
+- language: `string`. Which [language](#languages) to use.
 
 ##### `djedi.element(uri: string): object`
 
@@ -1042,18 +1042,22 @@ because of permissions. One solution is to remove the owned-by-root files first:
 
 [babel]: https://babeljs.io/
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-[djedi.get]: #djedigetnode-Node-callback-Node--Error--void-options---void
-[djedi.getbatched]: #djedigetBatchednode-Node-callback-Node--Error--void-options---void
+[djedi.get]: #djedigetnode-node-callback-node--error--void-options---void
+[djedi.getbatched]:
+  #djedigetbatchednode-node-callback-node--error--void-options---void
 [djedi.injectadmin]: #djediinjectadmin-promiseboolean
-[djedi.prefetch]: #djediprefetch-filter-Uri--boolean-extra-ArrayNode-language-string----Promisevoid
+[djedi.prefetch]:
+  #djediprefetch-filter-uri--boolean-extra-arraynode-language-string----promisevoid
 [djedi.reportprefetchablenode]: #djedireportprefetchablenodenode-node-void
 [django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
 [djedi cms]: https://djedi-cms.org/
 [docker]: https://www.docker.com/community-edition
-[document.domain]: https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
+[document.domain]:
+  https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
 [eslint]: https://eslint.org/
 [jest]: https://jestjs.io/
-[language_code]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
+[language_code]:
+  https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
 [lru-cache]: https://github.com/isaacs/node-lru-cache
 [next.js]: https://nextjs.org/
 [node.js]: https://nodejs.org/en/
