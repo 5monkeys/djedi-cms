@@ -1,3 +1,28 @@
+### Version 3.0.0 (2018-10-01)
+
+- Fixed: `djedi.prefetch()` can no longer end up requesting all nodes on your
+  entire site after a while. The fix was to change how the caching works. This
+  means that the cache may now serve stale nodes, and nothing is ever deleted
+  from the cache, only added. The cache must be able to fit all of your nodes in
+  memory. This is a breaking change.
+- Removed: Support for custom caches, since the caching has gotten some very
+  specific behavior because of the above fix above and it’s not clear if it’s an
+  actual use case to provide your own cache. This is a breaking change.
+- Changed: The promise returned by `djedi.prefetch()` no longer resolves to
+  anything. Instead you need to do `const nodes = djedi.track()`, which is more
+  explicit. This is a breaking change.
+- Added: Support for multiple languages, via `<NodeContext.Provider
+  value={currentLanguage}>` and `djedi.options.languages`.
+- Added: The `render` prop and `djedi.options.defaultRender` now receive the
+  current language, allowing for translating for example “Loading…” into several
+  languages.
+- Changed: The default language is now set by doing for example
+  `djedi.options.languages.default = "sv-se"`, due to the above multiple
+  language support. The old way should still work, but is not recommended.
+- Improved: The Babel plugin now gives better errors and handles comments in
+  some cases.
+- Changed: Upgraded to isomorphic-unfetch@^3.0.0.
+
 ### Version 2.0.1 (2018-09-12)
 
 - Updated documentation with security advice. No code changes.
