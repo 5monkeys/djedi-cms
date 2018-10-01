@@ -21,27 +21,6 @@ Object {
 }
 `;
 
-exports[`get it does not update versionless nodes: versioned 1`] = `
-Object {
-  "uri": "i18n://en-us@test.txt#1",
-  "value": "edited",
-}
-`;
-
-exports[`get it does not update versionless nodes: versionless 1`] = `
-Object {
-  "uri": "i18n://en-us@test.txt",
-  "value": "default",
-}
-`;
-
-exports[`get it does not update versionless nodes: versionless unchanged 1`] = `
-Object {
-  "uri": "i18n://en-us@test.txt",
-  "value": "default",
-}
-`;
-
 exports[`get it handles auto-versioning 1`] = `
 Object {
   "uri": "i18n://en-us@test.txt#1",
@@ -210,27 +189,6 @@ exports[`getBatched it calls the callback synchronously if the node already exis
 Object {
   "uri": "i18n://en-us@edited.txt#1",
   "value": "user edited text",
-}
-`;
-
-exports[`getBatched it does not update versionless nodes: versioned 1`] = `
-Object {
-  "uri": "i18n://en-us@test.txt#1",
-  "value": "edited",
-}
-`;
-
-exports[`getBatched it does not update versionless nodes: versionless 1`] = `
-Object {
-  "uri": "i18n://en-us@test.txt",
-  "value": "default",
-}
-`;
-
-exports[`getBatched it does not update versionless nodes: versionless unchanged 1`] = `
-Object {
-  "uri": "i18n://en-us@test.txt",
-  "value": "default",
 }
 `;
 

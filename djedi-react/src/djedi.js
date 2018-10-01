@@ -239,12 +239,7 @@ export class Djedi {
           ...uriObject,
           version: "",
         });
-
-        // If the versionless URI has already been set, don’t update it so that
-        // if a node re-renders it doesn’t unexpectedly change its text.
-        if (this._nodes.get(versionlessUri) == null) {
-          this._nodes.set(versionlessUri, node);
-        }
+        this._nodes.set(versionlessUri, node);
       }
     });
   }

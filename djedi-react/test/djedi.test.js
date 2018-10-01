@@ -764,13 +764,13 @@ Object {
 
 describe("setCache", () => {
   test("it works", async () => {
-    fetch(simpleNodeResponse("test", "two"));
+    fetch({ "i18n://en-us@test.txt#1": "edited" });
 
     const start = new Date("2018-01-01").getTime();
     const end = new Date("2118-01-01").getTime();
 
     Date.now.mockReturnValue(start);
-    djedi.addNodes(simpleNodeResponse("test", "one"));
+    djedi.addNodes(simpleNodeResponse("test", "default"));
 
     // We just added the node so it hasn't expired and the callback is called
     // immediately.
@@ -794,8 +794,9 @@ describe("setCache", () => {
     djedi.get({ uri: "test", value: "test" }, callback3);
     expect(callback3).toHaveBeenCalledTimes(1);
 
-    // The callback is called immediately with the old value, but sends a
-    // request to refresh.
+    // Imagine the user having edited the node in the Djedi sidebar since the
+    // last request. The callback is called immediately with the old value, but
+    // sends a request to refresh.
     Date.now.mockReturnValue(start + ttl + 1);
     djedi.get({ uri: "test", value: "test" }, callback3);
     expect(callback3).toHaveBeenCalledTimes(2);
@@ -805,26 +806,26 @@ describe("setCache", () => {
     // The callback isn’t called again.
     expect(callback3).toHaveBeenCalledTimes(2);
 
-    // The new, refreshed value is now available.
+    // The new, refreshed (user edited) value is now available.
     djedi.get({ uri: "test", value: "test" }, callback3);
     expect(callback3.mock.calls).toMatchInlineSnapshot(`
 Array [
   Array [
     Object {
       "uri": "i18n://en-us@test.txt",
-      "value": "one",
+      "value": "default",
     },
   ],
   Array [
     Object {
       "uri": "i18n://en-us@test.txt",
-      "value": "one",
+      "value": "default",
     },
   ],
   Array [
     Object {
-      "uri": "i18n://en-us@test.txt",
-      "value": "two",
+      "uri": "i18n://en-us@test.txt#1",
+      "value": "edited",
     },
   ],
 ]
@@ -964,30 +965,6 @@ function getTests(fn) {
     called = false;
     fn({ uri: "edited#1", value: "default" }, node => {
       expect(node).toMatchSnapshot("versioned");
-      called = true;
-    });
-    expect(called).toBe(true);
-  });
-
-  test("it does not update versionless nodes", async () => {
-    fetch(simpleNodeResponse("test", "default"));
-    fetch({ "i18n://en-us@test.txt#1": "edited" });
-
-    fn({ uri: "test", value: undefined }, node => {
-      expect(node).toMatchSnapshot("versionless");
-    });
-
-    await wait();
-
-    fn({ uri: "test#1", value: undefined }, node => {
-      expect(node).toMatchSnapshot("versioned");
-    });
-
-    await wait();
-
-    let called = false;
-    fn({ uri: "test", value: undefined }, node => {
-      expect(node).toMatchSnapshot("versionless unchanged");
       called = true;
     });
     expect(called).toBe(true);
