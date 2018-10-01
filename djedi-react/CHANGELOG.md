@@ -1,3 +1,8 @@
+### Version 3.0.1 (2018-10-01)
+
+- Fixed: There was an error in the new 3.0.0 cache that caused edited nodes
+  never to be updated when server-rendered.
+
 ### Version 3.0.0 (2018-10-01)
 
 - Fixed: `djedi.prefetch()` can no longer end up requesting all nodes on your
