@@ -147,10 +147,17 @@ function maybeGetLoneChild(jsxElementPath, t) {
   for (const child of children) {
     // There can be whitespace-only JSXText nodes around an
     // JSXExpressionContainer. Ignore those, just like Babel does.
-    if (!isEmptyJSXText(child.node, t)) {
+    // Also ignore `{/* comments */}`.
+    if (!(isEmptyJSXText(child.node, t) || isJSXComment(child.node, t))) {
+      if (t.isJSXElement(child.node)) {
+        throw child.buildCodeFrameError(
+          `<${COMPONENT_NAME}> only takes a single string as children. Wrap the default value in the \`md\` template tag to include HTML.`
+        );
+      }
+
       if (result != null) {
         throw child.buildCodeFrameError(
-          `<${COMPONENT_NAME}> only takes a single child. Did you mean to use \`[foo]\` instead of \`{foo}\`?`
+          `<${COMPONENT_NAME}> only takes a single string as children. Did you mean to use \`[foo]\` instead of \`{foo}\`?`
         );
       }
       result = child;
@@ -162,6 +169,15 @@ function maybeGetLoneChild(jsxElementPath, t) {
 
 function isEmptyJSXText(node, t) {
   return t.isJSXText(node) && node.value.trim() === "";
+}
+
+function isJSXComment(node, t) {
+  return (
+    t.isJSXExpressionContainer(node) &&
+    t.isJSXEmptyExpression(node.expression) &&
+    node.expression.innerComments != null &&
+    node.expression.innerComments.length > 0
+  );
 }
 
 function getDefaultValue(valuePath, t) {

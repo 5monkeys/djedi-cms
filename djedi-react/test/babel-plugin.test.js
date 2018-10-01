@@ -40,6 +40,33 @@ test("it does not affect files with no <Node>s", () => {
   );
 });
 
+// Comments at the start and end are currently supported, but not comments
+// _between_ two JSXText nodes.
+test("comments", () => {
+  const code = dedent`
+    <Node uri="uri">
+      {/* comment */}
+      value
+      {
+        // comment
+        // comment
+      }
+    </Node>
+  `;
+  expect(transform(code)).toMatchInlineSnapshot(`
+var _djedi_uri = "uri",
+    _djedi_default = "value";
+import { djedi as _djedi } from "djedi-react";
+
+_djedi.reportPrefetchableNode({
+  uri: _djedi_uri,
+  value: _djedi_default
+});
+
+<Node uri={_djedi_uri}>{_djedi_default}</Node>;
+`);
+});
+
 describe("it throws helpful errors", () => {
   test("duplicate uri prop", () => {
     expect(() => transform('<Node uri="overwritten uri" uri />'))
@@ -63,9 +90,18 @@ undefined: <Node> must not have \`children\` as a prop.
   test("jsx interpolation", () => {
     expect(() => transform('<Node uri="uri">JSX interpolation {nope}</Node>'))
       .toThrowErrorMatchingInlineSnapshot(`
-undefined: <Node> only takes a single child. Did you mean to use \`[foo]\` instead of \`{foo}\`?
+undefined: <Node> only takes a single string as children. Did you mean to use \`[foo]\` instead of \`{foo}\`?
 > 1 | <Node uri="uri">JSX interpolation {nope}</Node>
     |                                   ^
+`);
+  });
+
+  test("empty jsx interpolation", () => {
+    expect(() => transform('<Node uri="uri">empty {}</Node>'))
+      .toThrowErrorMatchingInlineSnapshot(`
+undefined: <Node> only takes a single string as children. Did you mean to use \`[foo]\` instead of \`{foo}\`?
+> 1 | <Node uri="uri">empty {}</Node>
+    |                       ^
 `);
   });
 
@@ -92,6 +128,24 @@ undefined: Using \`\${foo}\` in a <Node> default value is an anti-pattern: it wo
 undefined: Using \`\${foo}\` in a <Node> default value is an anti-pattern: it won't work if the user edits the node. Did you mean to use \`{foo}\` (without the \`$\`) or \`[foo]\`?
 > 1 | <Node uri="uri">{md\`template literal with interpolation \${nope}\`}</Node>
     |                                                           ^
+`);
+  });
+
+  test("accidental JSX children", () => {
+    expect(() => transform('<Node uri="uri">A <em>mistake</em></Node>'))
+      .toThrowErrorMatchingInlineSnapshot(`
+undefined: <Node> only takes a single string as children. Wrap the default value in the \`md\` template tag to include HTML.
+> 1 | <Node uri="uri">A <em>mistake</em></Node>
+    |                   ^
+`);
+  });
+
+  test("single JSX child", () => {
+    expect(() => transform('<Node uri="uri"><em>mistake</em></Node>'))
+      .toThrowErrorMatchingInlineSnapshot(`
+undefined: <Node> only takes a single string as children. Wrap the default value in the \`md\` template tag to include HTML.
+> 1 | <Node uri="uri"><em>mistake</em></Node>
+    |                 ^
 `);
   });
 });
