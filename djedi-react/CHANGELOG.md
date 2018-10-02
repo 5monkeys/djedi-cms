@@ -1,3 +1,8 @@
+### Version 3.0.2 (2018-10-02)
+
+- Added: react@">=16.3.0" as a peer dependency. At least 16.3.0 has been
+  required since 3.0.0 – this makes it explicit.
+
 ### Version 3.0.1 (2018-10-01)
 
 - Fixed: There was an error in the new 3.0.0 cache that caused edited nodes
@@ -17,7 +22,9 @@
   anything. Instead you need to do `const nodes = djedi.track()`, which is more
   explicit. This is a breaking change.
 - Added: Support for multiple languages, via `<NodeContext.Provider
-  value={currentLanguage}>` and `djedi.options.languages`.
+  value={currentLanguage}>` and `djedi.options.languages`. This uses React’s new
+  Context API added in 16.3.0, so at least that version of React is now
+  required, which makes this a breaking change.
 - Added: The `render` prop and `djedi.options.defaultRender` now receive the
   current language, allowing for translating for example “Loading…” into several
   languages.
