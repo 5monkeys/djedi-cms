@@ -30,6 +30,7 @@ class PanelTest(ClientTest):
         response = self.client.get(url)
         self.assertIn(u'<title>djedi cms</title>', smart_unicode(response.content))
         self.assertNotIn(u'document.domain', smart_unicode(response.content))
+        self.assertNotIn(u'None', smart_unicode(response.content))
 
         with cio.conf.settings(XSS_DOMAIN='foobar.se'):
             response = self.client.get(url)
