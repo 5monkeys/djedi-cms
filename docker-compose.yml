@@ -14,7 +14,6 @@ services:
   node:
     build: ./djedi-react
     image: djedi-react
-    tty: true
     ports:
       - "3000:3000"
     volumes:
