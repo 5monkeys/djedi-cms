@@ -5,15 +5,14 @@ import djedi from "./djedi";
 
 const POTENTIAL_HTML = /[<&]/;
 
+export const NodeContext = React.createContext();
+
 const propTypes = {
   uri: PropTypes.string.isRequired,
   children: PropTypes.string, // Yes, a *string*!
   edit: PropTypes.bool,
   render: PropTypes.func,
   // ...variables: {[string]: any}.
-  // “Private” prop used to make the language from the context available in
-  // lifecycle methods:
-  // _language: PropTypes.string.isRequired,
 };
 
 const defaultProps = {
@@ -22,13 +21,16 @@ const defaultProps = {
   render: undefined,
 };
 
-class Node extends React.Component {
+export default class Node extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       node: undefined,
     };
+
+    this.language = djedi.options.languages.default;
+    this.lastLanguage = this.language;
 
     this.mounted = false;
 
@@ -44,31 +46,39 @@ class Node extends React.Component {
   }
 
   componentDidMount() {
+    this.language =
+      this.context == null ? djedi.options.languages.default : this.context;
+    this.lastLanguage = this.language;
+
     this.mounted = true;
+
     djedi.reportRenderedNode(
       {
         uri: this.props.uri,
         value: this._getDefault(),
       },
-      { language: this.props._language }
+      { language: this.language }
     );
   }
 
   componentDidUpdate(prevProps) {
+    this.language =
+      this.context == null ? djedi.options.languages.default : this.context;
+
     if (
       this.props.uri !== prevProps.uri ||
-      this.props._language !== prevProps._language
+      this.language !== this.lastLanguage
     ) {
       this._get();
       djedi.reportRemovedNode(prevProps.uri, {
-        language: prevProps._language,
+        language: this.lastLanguage,
       });
       djedi.reportRenderedNode(
         {
           uri: this.props.uri,
           value: this._getDefault(),
         },
-        { language: this.props._language }
+        { language: this.language }
       );
     }
 
@@ -81,11 +91,13 @@ class Node extends React.Component {
         { prev: prevProps.children, next: this.props.children }
       );
     }
+
+    this.lastLanguage = this.language;
   }
 
   componentWillUnmount() {
     this.mounted = false;
-    djedi.reportRemovedNode(this.props.uri, { language: this.props._language });
+    djedi.reportRemovedNode(this.props.uri, { language: this.language });
   }
 
   _get() {
@@ -103,7 +115,7 @@ class Node extends React.Component {
           this.state.node = node;
         }
       },
-      { language: this.props._language }
+      { language: this.language }
     );
   }
 
@@ -120,12 +132,12 @@ class Node extends React.Component {
       // Using a destructuring default rather than `defaultProps` for `render`,
       // since `djedi.options` may change.
       render = djedi.options.defaultRender,
-      _language: language,
       // Make sure to destructure all props above (even ones unused in this
       // method) so that `variables` only contains non-props.
       ...variables
     } = this.props;
     const { node } = this.state;
+    const { language } = this;
 
     if (node == null) {
       return render({ type: "loading" }, { language });
@@ -164,20 +176,9 @@ class Node extends React.Component {
   }
 }
 
-NodeWithContext.propTypes = propTypes;
-NodeWithContext.defaultProps = defaultProps;
-
-export const NodeContext = React.createContext();
-
-export default function NodeWithContext(props) {
-  return (
-    <NodeContext.Consumer>
-      {(language = djedi.options.languages.default) => (
-        <Node {...props} _language={language} />
-      )}
-    </NodeContext.Consumer>
-  );
-}
+Node.propTypes = propTypes;
+Node.defaultProps = defaultProps;
+Node.contextType = NodeContext;
 
 const INNER = /[^{}[\]\s]+/.source;
 const INTERPOLATION_REGEX = RegExp(`\\{${INNER}\\}|\\[${INNER}\\]`, "g");
