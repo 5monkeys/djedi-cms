@@ -33,7 +33,13 @@ class Node extends React.Component {
     this.mounted = false;
 
     // Must be done in the constructor rather than `componentDidMount` because
-    // of server-side rendering.
+    // of server-side rendering. In React’s StrictMode/ConcurrentMode,
+    // components may be instantiated multiple times, which means that
+    // `this._get()` might be called several times for a single `<Node>`. It
+    // doesn’t matter though, because it does not cause any extra fetching. And
+    // the callback will just do `this.state.node = node` (`this.mounted` stays
+    // `false`) on a dead instance which should be harmless (and not cause any
+    // extra rendering or so).
     this._get();
   }
 

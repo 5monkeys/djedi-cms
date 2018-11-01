@@ -75,13 +75,15 @@ export default class MyApp extends App {
     const { Component, pageProps, language } = this.props;
 
     return (
-      <Container>
-        {/* Provide the current language to all `<Node>`s. */}
-        <NodeContext.Provider value={language}>
-          <LanguageChooser current={language} />
-          <Component {...pageProps} />
-        </NodeContext.Provider>
-      </Container>
+      <React.StrictMode>
+        <Container>
+          {/* Provide the current language to all `<Node>`s. */}
+          <NodeContext.Provider value={language}>
+            <LanguageChooser current={language} />
+            <Component {...pageProps} />
+          </NodeContext.Provider>
+        </Container>
+      </React.StrictMode>
     );
   }
 }
