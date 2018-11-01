@@ -1,3 +1,30 @@
+### Version 4.0.0 (2018-11-01)
+
+- Improved: `<Node>` now uses
+  [contextType](https://reactjs.org/docs/context.html#classcontexttype). This
+  reduces the nesting visible in the React devtools. This is a breaking change
+  since React 16.6.0 or later is now required.
+
+  Before:
+
+  ```js
+  <NodeWithContext>
+    <NodeContext.Consumer>
+      <Node>
+        <span>Your text</span>
+      </Node>
+    </NodeContext.Consumer>
+  </NodeWithContext>
+  ```
+
+  After:
+
+  ```js
+  <Node>
+    <span>Your text</span>
+  </Node>
+  ```
+
 ### Version 3.0.2 (2018-10-02)
 
 - Added: react@">=16.3.0" as a peer dependency. At least 16.3.0 has been
@@ -21,8 +48,7 @@
 - Changed: The promise returned by `djedi.prefetch()` no longer resolves to
   anything. Instead you need to do `const nodes = djedi.track()`, which is more
   explicit. This is a breaking change.
-- Added: Support for multiple languages, via `<NodeContext.Provider
-  value={currentLanguage}>` and `djedi.options.languages`. This uses React’s new
+- Added: Support for multiple languages, via `<NodeContext.Provider value={currentLanguage}>` and `djedi.options.languages`. This uses React’s new
   Context API added in 16.3.0, so at least that version of React is now
   required, which makes this a breaking change.
 - Added: The `render` prop and `djedi.options.defaultRender` now receive the
