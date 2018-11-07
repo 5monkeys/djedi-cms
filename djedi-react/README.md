@@ -938,6 +938,8 @@ optimizes the tag away (`` md`text` `` → `"text"`) when used inside a `<Node>`
 
 ## Django settings
 
+### Cross-domain
+
 If you run your React frontend and your Django backend on different domains, you
 need to add some extra settings on the Django side.
 
@@ -961,6 +963,22 @@ lives on `api.example.com`. Then you need two things:
 If the two domains do not share the same super domain (such as `site.com` and
 `api.com`) you need to set up a proxy server on the React frontend domain. For
 example, you could proxy `site.com/djedi` to `api.com/djedi`.
+
+### [Prettier] and markdown
+
+One of the reasons to use the [md](#md) tag is that it allows [Prettier] to
+automatically format your markdown.
+
+Djedi uses [Python-Markdown], which unfortunately handles list items differently
+from [CommonMark] \(which Prettier uses): [Python-Markdown/markdown#751].
+
+To work around this issue, you can add the [mdx_truly_sane_lists] extension to
+your requirements and configure Djedi to use it:
+
+```py
+# https://github.com/Python-Markdown/markdown/issues/751
+DJEDI = {"MD": {"EXTENSIONS": ["mdx_truly_sane_lists"]}}
+```
 
 ## Development
 
@@ -1041,7 +1059,10 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [BSD-3-Clause](LICENSE)
 
 [babel]: https://babeljs.io/
+[commonmark]: https://commonmark.org/
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+[django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
+[djedi cms]: https://djedi-cms.org/
 [djedi.get]: #djedigetnode-node-callback-node--error--void-options---void
 [djedi.getbatched]:
   #djedigetbatchednode-node-callback-node--error--void-options---void
@@ -1049,8 +1070,6 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [djedi.prefetch]:
   #djediprefetch-filter-uri--boolean-extra-arraynode-language-string----promisevoid
 [djedi.reportprefetchablenode]: #djedireportprefetchablenodenode-node-void
-[django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
-[djedi cms]: https://djedi-cms.org/
 [docker]: https://www.docker.com/community-edition
 [document.domain]:
   https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
@@ -1058,10 +1077,13 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [jest]: https://jestjs.io/
 [language_code]:
   https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
-[lru-cache]: https://github.com/isaacs/node-lru-cache
+[mdx_truly_sane_lists]: https://github.com/radude/mdx_truly_sane_lists
 [next.js]: https://nextjs.org/
 [node.js]: https://nodejs.org/en/
 [npm]: https://www.npmjs.com/
 [prettier]: https://prettier.io/
+[python-markdown/markdown#751]:
+  https://github.com/Python-Markdown/markdown/issues/751
+[python-markdown]: https://python-markdown.github.io/
 [react]: https://reactjs.org/
 [server-side rendering]: #server-side-rendering
