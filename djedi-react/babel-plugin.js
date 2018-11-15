@@ -196,8 +196,8 @@ function getDefaultValue(valuePath, t) {
         t.isIdentifier(valuePath.node.expression.tag, {
           name: TEMPLATE_TAG_NAME,
         })
-        ? valuePath.get("expression.quasi")
-        : undefined;
+      ? valuePath.get("expression.quasi")
+      : undefined;
 
     if (templateLiteral != null) {
       const expressions = templateLiteral.get("expressions");
