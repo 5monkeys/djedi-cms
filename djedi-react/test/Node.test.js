@@ -1,9 +1,8 @@
-import React from "react";
 import dedent from "dedent-js";
+import React from "react";
 import renderer from "react-test-renderer";
 
 import { Node, NodeContext, djedi, md } from "../src";
-
 import {
   errorDetails,
   fetch,

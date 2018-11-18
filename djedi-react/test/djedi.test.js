@@ -1,5 +1,4 @@
 import { djedi } from "../src";
-
 import {
   errorDetails,
   fetch,

@@ -6,8 +6,8 @@
 
 import unfetch from "isomorphic-unfetch";
 
-import { applyUriDefaults, parseUri, stringifyUri } from "./uri";
 import Cache from "./Cache";
+import { applyUriDefaults, parseUri, stringifyUri } from "./uri";
 
 const DEFAULT_CACHE_TTL = typeof window === "undefined" ? 20e3 : Infinity; // ms
 const DOCUMENT_DOMAIN_REGEX = /\bdocument\.domain\s*=\s*(["'])([^'"\s]+)\1/;

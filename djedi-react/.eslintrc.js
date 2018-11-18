@@ -1,7 +1,8 @@
 const baseRules = require("eslint-config-lydell");
 
 module.exports = {
-  plugins: ["import", "react", "prettier", "sort-imports-es6-autofix", "jest"],
+  root: true,
+  plugins: ["import", "react", "prettier", "simple-import-sort", "jest"],
   parser: "babel-eslint",
   env: { es6: true },
   globals: {
@@ -14,7 +15,7 @@ module.exports = {
   },
   rules: Object.assign({}, baseRules({ import: true, react: true }), {
     "prettier/prettier": "error",
-    "sort-imports-es6-autofix/sort-imports-es6": "error",
+    "simple-import-sort/sort": "error",
   }),
   overrides: [
     {

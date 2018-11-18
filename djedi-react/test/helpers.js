@@ -1,5 +1,5 @@
-import React from "react";
 import unfetch from "isomorphic-unfetch";
+import React from "react";
 
 import { djedi } from "../src";
 

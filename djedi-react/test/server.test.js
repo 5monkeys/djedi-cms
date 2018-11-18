@@ -2,12 +2,11 @@
  * @jest-environment node
  */
 
-import React from "react";
 import dedent from "dedent-js";
+import React from "react";
 import renderer from "react-test-renderer";
 
 import { Node, djedi, md } from "../src";
-
 import { fetch, resetAll, simpleNodeResponse, wait } from "./helpers";
 
 jest.useFakeTimers();
