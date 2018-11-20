@@ -50,5 +50,6 @@ clean:
 	rm -rf .tox/ dist/ *.egg *.egg-info .coverage* .eggs
 
 .PHONY: compile
-compile:
-	coffee -cw .
+compile: # compile .coffee to .js
+	docker-compose run --rm node coffee -c .
+# Note: CoffeeScript files are watched and automatically compiled in docker.

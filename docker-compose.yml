@@ -13,7 +13,7 @@ services:
 
   node:
     build: ./djedi-react
-    image: djedi-react
+    command: ["npm", "start"]
     ports:
       - "3000:3000"
     volumes:
@@ -21,3 +21,11 @@ services:
       - /code/node_modules
     environment:
       - SERVER_BASE_URL=http://django:8000/djedi/api
+
+  # Piggy-backing on djedi-react’s image and node_modules to watch CoffeeScript files.
+  coffee:
+    build: ./djedi-react
+    command: ["coffee", "-cw", "."]
+    volumes:
+      - .:/code
+      - /code/djedi-react/node_modules

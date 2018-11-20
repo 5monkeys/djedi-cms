@@ -1,0 +1,12 @@
+{
+  "ignore": {
+    "prop-types": {
+      "versions": "*",
+      "reason": "No reason to bump this dependency"
+    },
+    "coffeescript": {
+      "versions": "*",
+      "reason": "Not compatible with newer versions"
+    }
+  }
+}
