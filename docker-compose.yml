@@ -28,4 +28,4 @@ services:
     command: ["coffee", "-cw", "."]
     volumes:
       - .:/code
-      - /code/djedi-react/node_modules
+      - /code/node_modules
