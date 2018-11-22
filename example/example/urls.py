@@ -16,9 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.shortcuts import render_to_response
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', lambda r: render_to_response('index.html', {'request': r}), name='index'),
     path('admin/', admin.site.urls),
     path('djedi/', include('djedi.urls')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
