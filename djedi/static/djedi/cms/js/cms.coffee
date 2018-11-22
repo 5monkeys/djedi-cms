@@ -285,7 +285,7 @@ class Plugin
 
   resize: (height) ->
     console.log 'Plugin.resize()'
-    @$el.animate {height: "#{height}px"}, 400
+    @$el.animate {height: "100vh"}, 400
 
   close: ->
     @node.deselect()
@@ -366,7 +366,7 @@ class CMS
 
   open: (animate) ->
     @page.shrink @width, animate
-    @css {height: '100%'}
+    @css {height: '100vh'}
     @css {right: 0}, animate
     @page.$cms.removeClass 'closed'
     @$body.removeClass 'closed'
@@ -379,7 +379,7 @@ class CMS
     $brand = $ 'header'  # .navbar-brand'
     brandHeight = $brand.outerHeight yes
     brandWidth = brandHeight  # $brand.outerWidth yes
-    @css {height: "#{brandHeight}px"}
+    @css {height: "100vh"}
     @css {right: "#{brandWidth-@width}px"}, animate
     @page.$cms.addClass 'closed'
     @page.$cms.removeClass 'fullscreen'
