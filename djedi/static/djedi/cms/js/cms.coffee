@@ -1,4 +1,4 @@
-console.log = () ->
+# console.log = () ->
 
 ################################################[  EVENTS  ]############################################################
 Events = $ {}
@@ -123,7 +123,6 @@ class Node
     if @preview
       @selected = yes
       @$outline.addClass 'selected'
-      console.log 'select node'
       Events.trigger 'node:edit', @
   #    $('.djedi-overlay').show()
     @
@@ -254,7 +253,7 @@ class Plugin
 
     # Create iframe
     @$el = $ '<iframe>'
-    @$el.one 'load', @connect
+    @$el.on 'load', @connect
     @navigate @uri
 
   navigate: (uri) ->
@@ -268,14 +267,16 @@ class Plugin
       alert 'Failed to load node'
       return
 
-    @$doc = @window.$ @window.document  # Local iframe jQuery document
+    @window.$ =>
+      console.log 'Plugin.connect().loaded'
+      @$doc = @window.$ @window.document  # Local iframe jQuery document
 
-    # Bind and catch/forward events from plugin
-    @$doc.on 'node:render', Events.handler
-    @$doc.on 'node:resize', Events.handler
-    @$doc.on 'page:node:fetch', (event, uri, callback) => callback data: @node.data, content: @node.getContent()
+      # Bind and catch/forward events from plugin
+      @$doc.on 'node:render', Events.handler
+      @$doc.on 'node:resize', Events.handler
+      @$doc.on 'page:node:fetch', (event, uri, callback) => callback data: @node.data, content: @node.getContent()
 
-    @render()
+      @render()
 
   render: ->
     # Resize and show frame
@@ -341,6 +342,7 @@ class CMS
     @plugin.close() if @plugin
     @plugin = new Plugin node
     @panels.editor.append @plugin.$el
+
     @openPanel 'editor'
 
   openPanel: (name) ->

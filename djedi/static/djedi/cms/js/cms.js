@@ -5,8 +5,6 @@
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  console.log = function() {};
-
   Events = $({});
 
   Events.handler = (function(_this) {
@@ -159,7 +157,6 @@
       if (this.preview) {
         this.selected = true;
         this.$outline.addClass('selected');
-        console.log('select node');
         Events.trigger('node:edit', this);
       }
       return this;
@@ -340,7 +337,7 @@
       this.connect = __bind(this.connect, this);
       this.uri = this.node.uri.valueOf();
       this.$el = $('<iframe>');
-      this.$el.one('load', this.connect);
+      this.$el.on('load', this.connect);
       this.navigate(this.uri);
     }
 
@@ -355,18 +352,21 @@
         alert('Failed to load node');
         return;
       }
-      this.$doc = this.window.$(this.window.document);
-      this.$doc.on('node:render', Events.handler);
-      this.$doc.on('node:resize', Events.handler);
-      this.$doc.on('page:node:fetch', (function(_this) {
-        return function(event, uri, callback) {
-          return callback({
-            data: _this.node.data,
-            content: _this.node.getContent()
+      return this.window.$((function(_this) {
+        return function() {
+          console.log('Plugin.connect().loaded');
+          _this.$doc = _this.window.$(_this.window.document);
+          _this.$doc.on('node:render', Events.handler);
+          _this.$doc.on('node:resize', Events.handler);
+          _this.$doc.on('page:node:fetch', function(event, uri, callback) {
+            return callback({
+              data: _this.node.data,
+              content: _this.node.getContent()
+            });
           });
+          return _this.render();
         };
       })(this));
-      return this.render();
     };
 
     Plugin.prototype.render = function() {

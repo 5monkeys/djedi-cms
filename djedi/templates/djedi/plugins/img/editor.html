@@ -6,35 +6,29 @@
     <link href="{% static 'djedi/plugins/img/css/img.css' %}?v={{ VERSION }}" rel="stylesheet" media="screen">
 {% endblock %}
 
-{% block tabs %}
-    <ul class="nav navbar-default nav-tabs">
-      <li class="active"><a href="#image-pane" data-toggle="tab"><i class="icon-camera"></i> Image</a></li>
-      <li><a href="#resize-pane" data-toggle="tab"><i class="icon-resize-full"></i> Resize</a></li>
-      <li><a href="#html-pane" data-toggle="tab"><i class="icon-code"></i> Html</a></li>
-    </ul>
-{% endblock tabs %}
-
 {% block editor %}
     <div class="tab-content">
         <div id="image-pane" class="tab-pane active">
             <input type="hidden" name="data[filename]">
             <input type="file" id="image" name="data[file]">
             <div id="preview" data-url="{{ data.url }}"></div>
-            <div id="dropzone"><section></section></div>
+            <div id="dropzone">
+                <section></section>
+            </div>
         </div>
-        <div id="resize-pane" class="tab-pane">
             <fieldset class="form-horizontal">
+                <h5><i class="icon-resize-full"></i> Resize:</h5>
                 <div class="form-group">
                     <label class="col-xs-2 control-label">Width</label>
                     <div class="col-xs-3">
                         <input type="text" name="data[width]" id="field-width" class="form-control dimension">
                     </div>
-                    <div class="col-xs-2">
-                        <button type="button" id="ar-lock" class="btn btn-default" data-toggle="button" title="Maintain aspect ratio" data-placement="bottom"><i class="icon-link"></i></button>
-                    </div>
                     <label class="col-xs-2 control-label">Height</label>
                     <div class="col-xs-3">
                         <input type="text" name="data[height]" id="field-height" class="form-control dimension">
+                    </div>
+                    <div class="col-xs-2">
+                        <button type="button" id="ar-lock" class="btn btn-default" data-toggle="button" title="Maintain aspect ratio" data-placement="bottom"><i class="icon-link"></i></button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -44,9 +38,9 @@
                     </div>
                 </div>
             </fieldset>
-        </div>
-        <div id="html-pane" class="tab-pane">
+
             <fieldset class="form-horizontal">
+                <h5><i class="icon-code"></i> HTML:</h5>
                 <div class="form-group">
                     <label class="col-xs-2 control-label">ID:</label>
                     <div class="col-xs-10">
@@ -66,6 +60,7 @@
                     </div>
                 </div>
             </fieldset>
+        </div>
         </div>
     </div>
 {% endblock editor %}

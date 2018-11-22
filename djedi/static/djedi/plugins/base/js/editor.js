@@ -4,8 +4,6 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
-  console.log = function() {};
-
   $.fn.enable = function() {
     return this.removeAttr('disabled');
   };
@@ -243,7 +241,7 @@
       if (initial) {
         this.trigger('page:node:fetch', node.uri.valueOf(), (function(_this) {
           return function(node) {
-            console.log('Editor.inititial data', node);
+            console.log('Editor.initial data', node);
             return _this.initial = node;
           };
         })(this));

@@ -3676,7 +3676,7 @@ textarea.input-group-sm > .input-group-btn > .btn {
 }
 .navbar-fixed-top,
 .navbar-fixed-bottom {
-  position: fixed;
+  position: relative;
   right: 0;
   left: 0;
   border-width: 0 0 1px;
@@ -6297,11 +6297,10 @@ body.open .navbar-brand > a > i.dc-djedi-icon {
   background: #428bca;
 }
 #editor {
-  height: 360px;
   padding: 20px 20px 54px 20px;
 }
 #editor textarea {
-  height: 100%;
+  height: 160px;
 }
 .node-title {
   font-size: 12px;

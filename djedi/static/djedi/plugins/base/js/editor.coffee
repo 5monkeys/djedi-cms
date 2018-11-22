@@ -1,4 +1,4 @@
-console.log = () ->
+# console.log = () ->
 
 $.fn.enable = -> @removeAttr 'disabled'
 $.fn.disable = -> @attr 'disabled', 'disabled'
@@ -177,7 +177,7 @@ class window.Editor
     # Fetch default node data from embedder
     if initial
       @trigger 'page:node:fetch', node.uri.valueOf(), (node) =>
-        console.log 'Editor.inititial data', node
+        console.log 'Editor.initial data', node
         @initial = node
 
     node = @setNode node
