@@ -89,7 +89,11 @@
         display: 'inline-block'
       });
       this.previewContainer.append(image);
-      return this.$img.trigger('crop:preview', this.previewContainer);
+      return delay(100, (function(_this) {
+        return function() {
+          return _this.$img.trigger('crop:preview', _this.previewContainer);
+        };
+      })(this));
     };
 
     CropTool.prototype.setPreviewAttributes = function(attrs) {
