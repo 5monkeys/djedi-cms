@@ -33,7 +33,7 @@
                     }
                 });
 
-                editor.$textarea.on('keypress', function () {
+                editor.$textarea.on('input', function () {
                     editor.setState('dirty');
                 });
             },
