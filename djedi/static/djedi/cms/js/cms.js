@@ -377,7 +377,7 @@
     Plugin.prototype.resize = function(height) {
       console.log('Plugin.resize()');
       return this.$el.animate({
-        height: "" + height + "px"
+        height: "100vh"
       }, 400);
     };
 
@@ -476,7 +476,7 @@
     CMS.prototype.open = function(animate) {
       this.page.shrink(this.width, animate);
       this.css({
-        height: '100%'
+        height: '100vh'
       });
       this.css({
         right: 0
@@ -495,7 +495,7 @@
       brandHeight = $brand.outerHeight(true);
       brandWidth = brandHeight;
       this.css({
-        height: "" + brandHeight + "px"
+        height: "100vh"
       });
       this.css({
         right: "" + (brandWidth - this.width) + "px"
