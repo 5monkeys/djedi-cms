@@ -7,8 +7,7 @@ body {
 }
 
 #dropzone {
-    position: absolute;
-    top: 68px;
+    position: relative;
     left: 0;
     width: 100%;
 }
@@ -51,7 +50,7 @@ body {
 #dropzone section.drag-over .uploading,
 #dropzone section.drop .drag,
 #dropzone section.drop .drop {
-    display: none;
+    /* display: none; */
 }
 
 #dropzone section.drag-over .drop,
@@ -62,7 +61,6 @@ body {
 #preview {
     width: 100%;
     /*min-height: 200px;*/
-    margin-bottom: 20px;
 }
 
 #preview img {
