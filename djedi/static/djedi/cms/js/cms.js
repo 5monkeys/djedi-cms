@@ -85,7 +85,10 @@
 
     Node.prototype.setContent = function(content, silent) {
       if (this.preview) {
-        this.$el.html($($.parseHTML(content)));
+        if (typeof content === "string") {
+          content = $($.parseHTML(content));
+        }
+        this.$el.html(content);
         return this.render();
       }
     };

@@ -59,7 +59,8 @@ class Node
 
   setContent: (content, silent) ->
     if @preview
-      @$el.html $($.parseHTML(content))
+      content = $($.parseHTML(content)) if typeof content is "string"
+      @$el.html content
       @render()
 
   render: ->
