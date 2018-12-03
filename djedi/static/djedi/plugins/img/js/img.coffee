@@ -66,7 +66,7 @@ class CropTool
       display: 'inline-block'
     @previewContainer.append image
 
-    @$img.trigger 'crop:preview', @previewContainer
+    image.onload = () => @$img.trigger 'crop:preview', @previewContainer
 
   setPreviewAttributes: (attrs) ->
     if not @preview?
