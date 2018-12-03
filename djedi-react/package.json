@@ -28,7 +28,7 @@
     "jest": "jest",
     "coverage": "jest --coverage",
     "build": "babel --env-name test --delete-dir-on-start src --out-dir dist",
-    "test": "npm run lint && npm run coverage && npm run build",
+    "test": "npm run eslint && npm run coverage && npm run build",
     "prepublishOnly": "npm test"
   },
   "dependencies": {
