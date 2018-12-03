@@ -1055,13 +1055,6 @@ docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/no
 
 ### Notes
 
-#### npm install
-
-`npm start` creates `node_modules/djedi-react` – a symlink to this directory.
-This is so that the example app can use `import "djedi-react"`. However,
-`npm install` gets confused by that symlink. If you need to install or remove
-dependencies, run `npm run fix-install` first to remove the symlink.
-
 #### Test changes in example
 
 If you make changes to the library and want to try them out on
@@ -1075,6 +1068,15 @@ docker-compose exec node npm run build
 # Restart:
 npm start # But kill old server first :)
 docker-compose restart node
+```
+
+This is because the example runs against the built code, as an integration test.
+If you get tired of rebuilding, you can run the example against the source code
+instead:
+
+```
+DJEDI_REACT_DIR=src npm start
+DJEDI_REACT_DIR=src docker-compose up -d node
 ```
 
 #### docker and permissions

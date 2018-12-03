@@ -20,6 +20,7 @@ services:
       - ./djedi-react/:/code
       - /code/node_modules
     environment:
+      - DJEDI_REACT_DIR=${DJEDI_REACT_DIR:-}
       - SERVER_BASE_URL=http://django:8000/djedi/api
 
   # Piggy-backing on djedi-react’s image and node_modules to watch CoffeeScript files.

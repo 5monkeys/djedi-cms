@@ -18,8 +18,7 @@
     "react"
   ],
   "scripts": {
-    "fix-install": "rm -f node_modules/djedi-react",
-    "start": "ln -fsrn . node_modules/djedi-react && next",
+    "start": "next",
     "watch": "jest --watchAll",
     "eslint": "eslint .",
     "eslint:fix": "eslint . --fix",

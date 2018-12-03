@@ -2,11 +2,11 @@
   "env": {
     "development": {
       "presets": ["next/babel"],
-      "plugins": ["djedi-react/babel-plugin"]
+      "plugins": ["./babel-plugin"]
     },
     "production": {
       "presets": ["next/babel"],
-      "plugins": ["djedi-react/babel-plugin"]
+      "plugins": ["./babel-plugin"]
     },
     "test": {
       "presets": [
