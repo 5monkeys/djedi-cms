@@ -6,6 +6,36 @@
 
 Requires djedi-cms version 1.2.1 or later.
 
+## Contents
+
+<!-- prettier-ignore-start -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Installation](#installation)
+- [Browser support](#browser-support)
+- [Usage](#usage)
+- [Server-side rendering](#server-side-rendering)
+  - [Security](#security)
+- [Reference](#reference)
+  - [`Node`](#node)
+  - [`NodeContext`](#nodecontext)
+  - [`djedi`](#djedi)
+  - [`md`](#md)
+- [Django settings](#django-settings)
+  - [Cross-domain](#cross-domain)
+  - [Prettier and markdown](#prettier-and-markdown)
+- [Development](#development)
+  - [npm scripts](#npm-scripts)
+  - [docker](#docker)
+  - [Directories](#directories)
+  - [Notes](#notes)
+- [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!-- prettier-ignore-end -->
+
 ## Installation
 
 ```
@@ -964,7 +994,7 @@ If the two domains do not share the same super domain (such as `site.com` and
 `api.com`) you need to set up a proxy server on the React frontend domain. For
 example, you could proxy `site.com/djedi` to `api.com/djedi`.
 
-### [Prettier] and markdown
+### Prettier and markdown
 
 One of the reasons to use the [md](#md) tag is that it allows [Prettier] to
 automatically format your markdown.
@@ -989,8 +1019,10 @@ You can either install [Node.js] 10 (with npm 6) or use [docker].
 - `npm start`: Start the [Next.js] example dev server. <http://localhost:3000>
 - `npm run watch`: Start [Jest] in watch mode. Outside docker you can use
   `npm run jest -- --watch` instead.
-- `npm run lint`: Run [ESLint] \(including [Prettier]).
-- `npm run lint:fix`: Autofix [ESLint] errors.
+- `npm run eslint`: Run [ESLint] \(including [Prettier]).
+- `npm run eslint:fix`: Autofix [ESLint] errors.
+- `npm run prettier`: Run [Prettier] for files other than JS.
+- `npm run doctoc`: Run [doctoc] on README.md.
 - `npm run jest`: Run unit tests.
 - `npm run coverage`: Run unit tests with code coverage.
 - `npm build`: Compile with [Babel].
@@ -1058,32 +1090,30 @@ because of permissions. One solution is to remove the owned-by-root files first:
 
 [BSD-3-Clause](LICENSE)
 
+<!-- prettier-ignore-start -->
 [babel]: https://babeljs.io/
 [commonmark]: https://commonmark.org/
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
 [djedi cms]: https://djedi-cms.org/
 [djedi.get]: #djedigetnode-node-callback-node--error--void-options---void
-[djedi.getbatched]:
-  #djedigetbatchednode-node-callback-node--error--void-options---void
+[djedi.getbatched]: #djedigetbatchednode-node-callback-node--error--void-options---void
 [djedi.injectadmin]: #djediinjectadmin-promiseboolean
-[djedi.prefetch]:
-  #djediprefetch-filter-uri--boolean-extra-arraynode-language-string----promisevoid
+[djedi.prefetch]: #djediprefetch-filter-uri--boolean-extra-arraynode-language-string----promisevoid
 [djedi.reportprefetchablenode]: #djedireportprefetchablenodenode-node-void
 [docker]: https://www.docker.com/community-edition
-[document.domain]:
-  https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
+[doctoc]: https://github.com/thlorenz/doctoc/
+[document.domain]: https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
 [eslint]: https://eslint.org/
 [jest]: https://jestjs.io/
-[language_code]:
-  https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
+[language_code]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
 [mdx_truly_sane_lists]: https://github.com/radude/mdx_truly_sane_lists
 [next.js]: https://nextjs.org/
 [node.js]: https://nodejs.org/en/
 [npm]: https://www.npmjs.com/
 [prettier]: https://prettier.io/
-[python-markdown/markdown#751]:
-  https://github.com/Python-Markdown/markdown/issues/751
+[python-markdown/markdown#751]: https://github.com/Python-Markdown/markdown/issues/751
 [python-markdown]: https://python-markdown.github.io/
 [react]: https://reactjs.org/
 [server-side rendering]: #server-side-rendering
+<!-- prettier-ignore-end -->

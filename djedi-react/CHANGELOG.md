@@ -48,9 +48,11 @@
 - Changed: The promise returned by `djedi.prefetch()` no longer resolves to
   anything. Instead you need to do `const nodes = djedi.track()`, which is more
   explicit. This is a breaking change.
-- Added: Support for multiple languages, via `<NodeContext.Provider value={currentLanguage}>` and `djedi.options.languages`. This uses React’s new
-  Context API added in 16.3.0, so at least that version of React is now
-  required, which makes this a breaking change.
+- Added: Support for multiple languages, via
+  `<NodeContext.Provider value={currentLanguage}>` and
+  `djedi.options.languages`. This uses React’s new Context API added in 16.3.0,
+  so at least that version of React is now required, which makes this a breaking
+  change.
 - Added: The `render` prop and `djedi.options.defaultRender` now receive the
   current language, allowing for translating for example “Loading…” into several
   languages.
