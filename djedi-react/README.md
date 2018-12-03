@@ -1042,7 +1042,7 @@ docker-compose up -d
 docker-compose exec node npm test
 
 # Run Jest in watch mode:
-docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/node_modules djedi-react run watch
+docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/node_modules djedi-cms_node npm run watch
 ```
 
 ### Directories
