@@ -1075,8 +1075,8 @@ If you get tired of rebuilding, you can run the example against the source code
 instead:
 
 ```
-DJEDI_REACT_DIR=src npm start
-DJEDI_REACT_DIR=src docker-compose up -d node
+env DJEDI_REACT_DIR=src npm start
+env DJEDI_REACT_DIR=src docker-compose up -d node
 ```
 
 #### docker and permissions
