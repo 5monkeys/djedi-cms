@@ -49,6 +49,7 @@ module.exports = {
     {
       files: ["{components,pages,test/fixtures}/*.js"],
       rules: {
+        "import/no-unresolved": ["error", { ignore: ["djedi-react"] }],
         "no-invalid-this": "off",
       },
     },

@@ -1052,8 +1052,7 @@ docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/no
 - `dist/`: Compiled code, built by `npm run build`. This is what is published in
   the npm package.
 - `pages/` and `components/`: [Next.js] example app.
-- `stub/`: An empty djedi-react package to fool ESLint and Next.js packages
-  check.
+- `stub/`: An empty djedi-react package to fool Next.js packages check.
 
 ### Notes
 
