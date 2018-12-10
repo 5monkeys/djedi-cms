@@ -1,4 +1,4 @@
-/* eslint-disable no-undef, func-style, react/jsx-no-undef */
+/* eslint-disable no-undef, react/jsx-no-undef */
 import { Node, djedi, md } from "djedi-react";
 import React from "react";
 
