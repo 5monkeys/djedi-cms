@@ -1,3 +1,8 @@
+### Version 4.0.1 (2018-12-10)
+
+- Fixed: Non-default languages now fetch the correct node content when
+  server-side rendering.
+
 ### Version 4.0.0 (2018-11-01)
 
 - Improved: `<Node>` now uses
