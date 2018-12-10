@@ -3,6 +3,7 @@ FROM node:10
 WORKDIR /code
 
 COPY package.json package-lock.json ./
+COPY stub stub
 RUN npm ci
 
 COPY . .
