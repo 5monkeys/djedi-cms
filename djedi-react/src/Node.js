@@ -31,23 +31,12 @@ export default class Node extends React.Component {
 
     this.language = djedi.options.languages.default;
     this.lastLanguage = this.language;
-
+    this.firstRender = true;
     this.mounted = false;
-
-    // Must be done in the constructor rather than `componentDidMount` because
-    // of server-side rendering. In React’s StrictMode/ConcurrentMode,
-    // components may be instantiated multiple times, which means that
-    // `this._get()` might be called several times for a single `<Node>`. It
-    // doesn’t matter though, because it does not cause any extra fetching. And
-    // the callback will just do `this.state.node = node` (`this.mounted` stays
-    // `false`) on a dead instance which should be harmless (and not cause any
-    // extra rendering or so).
-    this._get();
   }
 
   componentDidMount() {
-    this.language =
-      this.context == null ? djedi.options.languages.default : this.context;
+    this._updateLanguage();
     this.lastLanguage = this.language;
 
     this.mounted = true;
@@ -62,8 +51,7 @@ export default class Node extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    this.language =
-      this.context == null ? djedi.options.languages.default : this.context;
+    this._updateLanguage();
 
     if (
       this.props.uri !== prevProps.uri ||
@@ -124,7 +112,30 @@ export default class Node extends React.Component {
     return children == null ? undefined : String(children);
   }
 
+  _updateLanguage() {
+    this.language =
+      this.context == null ? djedi.options.languages.default : this.context;
+  }
+
   render() {
+    // The following cannot be done in `componentDidMount` because of
+    // server-side rendering. This used to be done in `constructor`, but that
+    // doesn't work since `this.context` isn't available yet.
+    //
+    // In React’s StrictMode/ConcurrentMode, components may be instantiated
+    // multiple times, which means that `this._get()` might be called several
+    // times for a single `<Node>`. It doesn’t matter though, because it does
+    // not cause any extra fetching. And the callback (in `this._get`) will just
+    // do `this.state.node = node` (`this.mounted` stays `false`) on a dead
+    // instance which should be harmless (and not cause any extra rendering or
+    // so).
+    if (this.firstRender) {
+      this._updateLanguage();
+      this.lastLanguage = this.language;
+      this.firstRender = false;
+      this._get();
+    }
+
     const {
       uri,
       children,

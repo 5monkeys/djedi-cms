@@ -972,6 +972,33 @@ describe("NodeContext", () => {
 `);
   });
 
+  test("it handles rendering a non-default language from start", async () => {
+    fetch({
+      "i18n://en-us@welcome.txt": "This should not be rendered",
+      "i18n://sv-se@welcome.txt": "Välkommen! (this should be rendered)",
+    });
+
+    djedi.options.languages = {
+      default: "en-us",
+      additional: ["sv-se"],
+    };
+
+    const component = renderer.create(
+      <NodeContext.Provider value="sv-se">
+        <Node uri="welcome" />
+      </NodeContext.Provider>
+    );
+
+    await wait();
+    expect(component.toJSON()).toMatchInlineSnapshot(`
+<span
+  data-i18n="sv-se@welcome"
+>
+  Välkommen! (this should be rendered)
+</span>
+`);
+  });
+
   test("it warns if using an unknown language", async () => {
     fetch({ "i18n://en@test.txt": "English fallback" });
 
