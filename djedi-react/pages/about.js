@@ -1,8 +1,14 @@
-import { Node } from "djedi-react";
+import { ForceNodes, Node } from "djedi-react";
 import Head from "next/head";
 import React from "react";
 
 import Link from "../components/Link";
+
+const forced = (
+  <Node uri="about/forced">
+    This node appears in the Djedi sidebar even when this section is collapsed.
+  </Node>
+);
 
 export default class Home extends React.Component {
   state = {
@@ -56,8 +62,12 @@ export default class Home extends React.Component {
             <p>
               <Node uri="about/duplicate">Duplicate node</Node>
             </p>
+
+            <p>{forced}</p>
           </div>
         )}
+
+        <ForceNodes>{forced}</ForceNodes>
       </div>
     );
   }

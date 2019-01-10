@@ -21,6 +21,7 @@ Requires djedi-cms version 1.2.1 or later.
 - [Reference](#reference)
   - [`Node`](#node)
   - [`NodeContext`](#nodecontext)
+  - [`ForceNodes`](#forcenodes)
   - [`djedi`](#djedi)
   - [`md`](#md)
 - [Django settings](#django-settings)
@@ -43,7 +44,7 @@ npm install djedi-react react react-dom
 ```
 
 ```js
-import { Node, NodeContext, djedi, md } from "djedi-react";
+import { Node, NodeContext, ForceNodes, djedi, md } from "djedi-react";
 ```
 
 Optional [Babel] plugin (for better errors, prefetching and [server-side
@@ -250,11 +251,12 @@ Also be careful with the following methods, since they put nodes into the cache:
 ## Reference
 
 ```js
-import { Node, NodeContext, djedi, md } from "djedi-react";
+import { Node, NodeContext, ForceNodes, djedi, md } from "djedi-react";
 ```
 
 - [Node](#node)
 - [NodeContext](#nodecontext)
+- [ForceNodes](#forcenodes)
 - [djedi](#djedi)
 - [md](#md)
 
@@ -451,6 +453,48 @@ If your site supports multiple languages, you can pass the current language to
 ```
 
 [**Next.js example**](pages/_app.js)
+
+### `ForceNodes`
+
+This component lets you force one or more nodes to be fetched and appear in the
+Djedi sidebar, without rendering them to the DOM. This is useful if you have a
+node that is only shown under certain circumstances or only for a short
+duration, such as an error message, and you want that node to be editable from
+the Djedi sidebar without having to trigger it first.
+
+`ForceNodes` is typically used like this:
+
+1. Save a `<Node>` into a variable.
+2. Use it where you want.
+3. Add `<ForceNodes>{yourNode}</ForceNodes>` at the end of your component.
+
+`ForceNodes` only takes the `children` prop, and all children must be `<Node>`s
+and nothing else.
+
+```js
+const ERROR_MESSAGE = <Node uri="error">Error</Node>;
+
+function SomeComponent({ error }) {
+  return (
+    <div>
+      <p>Some stuff</p>
+
+      {error && <div>{ERROR_MESSAGE}</div>}
+
+      <ForceNodes>{ERROR_MESSAGE}</ForceNodes>
+    </div>
+  );
+}
+```
+
+You can pass multiple nodes like so:
+
+```js
+<ForceNodes>
+  {node1}
+  {node2}
+</ForceNodes>
+```
 
 ### `djedi`
 
@@ -784,9 +828,9 @@ surprises, the same nodes should always be returned to the browser.
 
 `<HelpPopup>` might make DOM measurements to position the popup. In this case it
 is not safe to rely on the node content being available straight away – it might
-load later. This is a case where using the [render](#render) prop can be
-helpful. Using it, you can make the node load earlier and/or update things when
-`state.type` changes.
+load later. This is a case where using [ForceNodes](#forcenodes) or the
+[render](#render) prop can be helpful. Using them, you can make the node load
+earlier and/or update things when `state.type` changes.
 
 ##### `djedi.track(): Object`
 
