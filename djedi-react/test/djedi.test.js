@@ -828,6 +828,19 @@ Array [
   });
 });
 
+describe("options.fetch", () => {
+  test("default throws an error", () => {
+    djedi.resetOptions();
+    const callback = jest.fn();
+    expect(() =>
+      djedi.get({ uri: "test", value: "default" }, callback)
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"djedi-react: You must set \`djedi.options.fetch\`."`
+    );
+    expect(callback).not.toHaveBeenCalled();
+  });
+});
+
 describe("options.uri", () => {
   test("it works", async () => {
     djedi.options.uri = {

@@ -2,8 +2,6 @@
 // another framework this file could be extracted into its own package and be
 // re-used.
 
-import unfetch from "isomorphic-unfetch";
-
 import Cache from "./Cache";
 import { applyUriDefaults, parseUri, stringifyUri } from "./uri";
 
@@ -249,7 +247,7 @@ export class Djedi {
 
     const url = `${this.options.baseUrl}/embed/`;
 
-    return unfetch(url, { credentials: "include" }).then(response => {
+    return this._fetch(url, { credentials: "include" }).then(response => {
       if (response.status >= 200 && response.status < 400) {
         return response.text().then(html => {
           // Browsers don’t allow <script> tags inserted as part of an HTML
@@ -426,9 +424,17 @@ export class Djedi {
     });
   }
 
+  _fetch(url, options) {
+    const { fetch } = this.options;
+    // `this.options.fetch(url, options)` does not work, since it calls the
+    // function with `this.options` as context/`this` instead of `window`, which
+    // the standard `fetch` function does not support (it throws an error).
+    return fetch(url, options);
+  }
+
   _post(passedUrl, data) {
     const url = `${this.options.baseUrl}${passedUrl}`;
-    return unfetch(url, {
+    return this._fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -509,6 +515,7 @@ function makeDefaultOptions() {
           return null;
       }
     },
+    fetch: defaultFetch,
     languages: {
       default: "en-us",
       additional: [],
@@ -535,6 +542,10 @@ function makeDefaultOptions() {
       },
     },
   };
+}
+
+function defaultFetch() {
+  throw new Error("djedi-react: You must set `djedi.options.fetch`.");
 }
 
 // This is a function, not a constant, since it will be mutated.

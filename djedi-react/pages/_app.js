@@ -1,6 +1,7 @@
 /* global process */
 
 import { NodeContext, djedi } from "djedi-react";
+import unfetch from "isomorphic-unfetch";
 import App, { Container } from "next/app";
 import PropTypes from "prop-types";
 import React from "react";
@@ -27,6 +28,9 @@ djedi.options.languages = {
 djedi.options.baseUrl =
   (typeof process !== "undefined" && process.env.SERVER_BASE_URL) ||
   "http://localhost:8000/djedi/api";
+
+// Required: Set the `fetch` function to use.
+djedi.options.fetch = unfetch;
 
 // Inject the admin sidebar, if the user has permission.
 djedi.injectAdmin();

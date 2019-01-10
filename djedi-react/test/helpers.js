@@ -1,4 +1,3 @@
-import unfetch from "isomorphic-unfetch";
 import React from "react";
 
 import { djedi } from "../src";
@@ -39,8 +38,8 @@ class Response {
   }
 }
 
-// Mock `fetch` (unfetch) responses. Can be called several times to mock the
-// first, second, third, etc. call.
+// Mock `fetch` responses. Can be called several times to mock the first,
+// second, third, etc. call.
 export function fetch(
   value,
   {
@@ -49,7 +48,7 @@ export function fetch(
     contentType = typeof value === "string" ? "text/html" : "application/json",
   } = {}
 ) {
-  unfetch.mockImplementationOnce(() => {
+  fetch.mockFn.mockImplementationOnce(() => {
     if (value instanceof Error) {
       return Promise.reject(value);
     }
@@ -64,8 +63,8 @@ export function fetch(
 }
 
 fetch.reset = () => {
-  unfetch.mockReset();
-  unfetch.mockImplementation(() =>
+  fetch.mockFn.mockReset();
+  fetch.mockFn.mockImplementation(() =>
     Promise.resolve(
       new Response({
         status: 200,
@@ -75,13 +74,13 @@ fetch.reset = () => {
   );
 };
 
-fetch.mockFn = unfetch;
+fetch.mockFn = jest.fn();
 
 // A shorter version of `fetch.mockFn.mock.calls`, for shorter inline snapshots.
 // We don't need to assert the URL and headers every time. For most tests only
 // the body is interesting.
 fetch.calls = () => {
-  const calls = unfetch.mock.calls.map(args => args[1].body);
+  const calls = fetch.mockFn.mock.calls.map(args => args[1].body);
   return calls.length === 1 ? calls[0] : calls;
 };
 
@@ -107,6 +106,7 @@ export function resetAll() {
   djedi.resetOptions();
   djedi.resetState();
   fetch.reset();
+  djedi.options.fetch = fetch.mockFn;
 }
 
 /*

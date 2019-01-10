@@ -40,7 +40,7 @@ Requires djedi-cms version 1.2.1 or later.
 ## Installation
 
 ```
-npm install djedi-react react react-dom
+npm install djedi-react react react-dom isomorphic-unfetch
 ```
 
 ```js
@@ -516,6 +516,7 @@ You most likely want to set these:
 ```js
 djedi.options.baseUrl = "/cms";
 djedi.options.languages.default = "sv-se";
+djedi.options.fetch = unfetch; // From the "isomorphic-unfetch" package.
 ```
 
 These are the toplevel keys:
@@ -523,6 +524,7 @@ These are the toplevel keys:
 - [baseUrl](#baseUrl)
 - [batchInterval](#batchinterval)
 - [defaultRender](#defaultrender)
+- [fetch](#fetch)
 - [languages](#languages)
 - [uri](#uri-1)
 
@@ -593,8 +595,9 @@ These are the possible states:
 - `{ type: "loading" }`: The node is loading.
 
 - `{ type: "error", error: Error }`: Fetching the node failed. The `error`
-  property contains an `Error` instance. `error.response` is an [unfetch
-  response] with two extra properties:
+  property contains an `Error` instance. `error.response` is the `Response` from
+  the promise returned by [djedi.options.fetch](#fetch) \(if any), with two
+  extra properties:
 
   - `__input`: object. The sent JSON object.
   - `__output`: string (or any JSON type). The response body if available.
@@ -606,6 +609,36 @@ These are the possible states:
 You can use this option to translate the default “Loading” and “Error” messages
 to another language, or perhaps render a spinner instead of “Loading…” (maybe
 even after a small timeout).
+
+##### `fetch`
+
+`function` **Required.** Default: Throws an error.
+
+A function that implements the standard [fetch] interface – and works both on
+the server and in the browser. [isomorphic-unfetch] is recommended, but you can
+use anything you like.
+
+This option lets you:
+
+- Use the same `fetch` as the rest of your app.
+- Modify the requests, such as adding headers.
+
+```js
+import unfetch from "isomorphic-unfetch";
+
+// Simple version:
+djedi.options.fetch = unfetch;
+
+// Adding headers:
+djedi.options.fetch = (url, options = {}) =>
+  unfetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: AUTH,
+    },
+  });
+```
 
 ##### `languages`
 
@@ -1093,7 +1126,7 @@ docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/no
 ### Directories
 
 - `src/`: Source code.
-- `test/` and `__mocks__/`: Tests and mocks.
+- `test/`: Tests.
 - `dist/`: Compiled code, built by `npm run build`. This is what is published in
   the npm package.
 - `pages/` and `components/`: [Next.js] example app.
@@ -1153,6 +1186,8 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [doctoc]: https://github.com/thlorenz/doctoc/
 [document.domain]: https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
 [eslint]: https://eslint.org/
+[fetch]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+[isomorphic-unfetch]: https://github.com/developit/unfetch/tree/master/packages/isomorphic-unfetch
 [jest]: https://jestjs.io/
 [language_code]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
 [mdx_truly_sane_lists]: https://github.com/radude/mdx_truly_sane_lists
@@ -1164,5 +1199,4 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [python-markdown]: https://python-markdown.github.io/
 [react]: https://reactjs.org/
 [server-side rendering]: #server-side-rendering
-[unfetch response]: https://github.com/developit/unfetch#response-methods-and-attributes
 <!-- prettier-ignore-end -->
