@@ -1,5 +1,3 @@
-/* eslint-disable prefer-promise-reject-errors */
-
 // This file does not contain anything React-specific. If need JS client for
 // another framework this file could be extracted into its own package and be
 // re-used.
@@ -268,12 +266,7 @@ export class Djedi {
       if (response.status === 403) {
         return false;
       }
-      return Promise.reject(
-        createStatusCodeError(
-          response.status,
-          "200 <= status < 400 or status = 403"
-        )
-      );
+      return Promise.reject(createStatusCodeError(response));
     });
   }
 
@@ -435,17 +428,15 @@ export class Djedi {
 
   _post(passedUrl, data) {
     const url = `${this.options.baseUrl}${passedUrl}`;
-    const info = { method: "POST", apiUrl: url, data };
-
     return unfetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      // Make the body easier to read in test snapshots. It’s important to still
-      // call `JSON.stringify` so we know that `data` actually can be
-      // stringified.
       body:
+        // Make the body easier to read in test snapshots. It’s important to
+        // still call `JSON.stringify` so we know that `data` actually can be
+        // stringified.
         // istanbul ignore next
         // eslint-disable-next-line no-undef
         typeof process !== "undefined" && process.env.NODE_ENV === "test"
@@ -454,17 +445,14 @@ export class Djedi {
     })
       .then(
         response => {
-          if (response.status >= 200 && response.status < 400) {
-            return response
-              .json()
-              .catch(error => Promise.reject({ response, error }));
-          }
-          return Promise.reject({
-            response,
-            error: createStatusCodeError(
-              response.status,
-              "200 <= status < 400"
-            ),
+          response.__input = data;
+          const isJSON =
+            response.headers.get("Content-Type") === "application/json";
+          return (isJSON ? response.json() : response.text()).then(body => {
+            response.__output = body;
+            return response.status >= 200 && response.status < 400
+              ? body
+              : Promise.reject(createStatusCodeError(response));
           });
         },
         passedError => {
@@ -476,26 +464,17 @@ export class Djedi {
             passedError instanceof Error
               ? passedError
               : new Error("fetch error");
-          return Promise.reject({ response: undefined, error });
+          return Promise.reject(error);
         }
       )
-      .catch(({ response, error }) => {
-        error.message = createUpdatedErrorMessage(error, info, response);
-        error.status = response == null ? -1 : response.status;
-
-        const textPromise =
-          response == null || response.bodyUsed
-            ? Promise.resolve("")
-            : response.text().then(
-                text => text,
-                // istanbul ignore next
-                () => ""
-              );
-
-        return textPromise.then(text => {
-          error.responseText = text;
-          return Promise.reject(error);
-        });
+      .catch(error => {
+        const { response } = error;
+        error.message = `djedi-react: ${
+          response == null
+            ? "(no response)"
+            : `${response.status} ${response.statusText}`
+        } POST ${url}:\n${error.message}`;
+        return Promise.reject(error);
       });
   }
 
@@ -520,7 +499,9 @@ function makeDefaultOptions() {
         case "loading":
           return "Loading…";
         case "error":
-          return `Failed to fetch content 😞 (${state.error.status})`;
+          return `Failed to fetch content 😞 (${
+            state.error.response != null ? state.error.response.status : -1
+          })`;
         case "success":
           return state.content;
         // istanbul ignore next
@@ -564,29 +545,14 @@ function makeEmptyBatch() {
   };
 }
 
-function createStatusCodeError(status, expected) {
-  const error = new Error(
-    `Unexpected response status code. Got ${status} but expected ${expected}.`
-  );
-  error.status = status;
+function createStatusCodeError(response) {
+  const error = new Error(`Non-success status code: ${response.status}`);
+  error.response = response;
   return error;
-}
-
-function createUpdatedErrorMessage(error, info, response) {
-  return [
-    `Djedi API error for request: ${info.method} ${info.apiUrl}`,
-    `RequestData sent: ${JSON.stringify(info.data, null, 2)}`,
-    `Response: ${
-      response ? `${response.status} ${response.statusText}` : response
-    }`,
-    String(error),
-  ].join("\n");
 }
 
 function missingUriError(uri) {
-  const error = new Error(`Missing result for node: ${uri}`);
-  error.status = 1404;
-  return error;
+  return new Error(`Missing result for node: ${uri}`);
 }
 
 function updateAdminSidebar() {

@@ -307,7 +307,7 @@ test("it handles missing nodes in response", async () => {
   const component = renderer.create(<Node uri="test" />);
   await wait();
   expect(component.toJSON()).toMatchInlineSnapshot(
-    `"Failed to fetch content 😞 (1404)"`
+    `"Failed to fetch content 😞 (-1)"`
   );
 });
 
@@ -691,13 +691,12 @@ test("custom render function", async () => {
   <div
     data-details={
       Object {
-        "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@1.txt\\": null
-}
-Response: 500 <mock.statusText>
-Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.",
-        "responseText": "<h1>Server error 500</h1>",
+        "__input": Object {
+          "i18n://en-us@1.txt": null,
+        },
+        "__output": "<h1>Server error 500</h1>",
+        "message": "djedi-react: 500 <mock.statusText> POST /djedi/nodes/:
+Non-success status code: 500",
         "status": 500,
       }
     }
@@ -717,14 +716,8 @@ Error: Unexpected response status code. Got 500 but expected 200 <= status < 400
   <div
     data-details={
       Object {
-        "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@2.txt\\": null
-}
-Response: undefined
-Error: Network error",
-        "responseText": "",
-        "status": -1,
+        "message": "djedi-react: (no response) POST /djedi/nodes/:
+Network error",
       }
     }
   >
@@ -744,8 +737,6 @@ Error: Network error",
     data-details={
       Object {
         "message": "Missing result for node: i18n://en-us@3.txt",
-        "responseText": undefined,
-        "status": 1404,
       }
     }
   >

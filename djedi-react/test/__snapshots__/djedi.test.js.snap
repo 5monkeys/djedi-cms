@@ -30,40 +30,27 @@ Object {
 
 exports[`get it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@test.txt\\": \\"default\\"
-}
-Response: 500 <mock.statusText>
-Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.",
-  "responseText": "<h1>Server error 500</h1>",
+  "__input": Object {
+    "i18n://en-us@test.txt": "default",
+  },
+  "__output": "<h1>Server error 500</h1>",
+  "message": "djedi-react: 500 <mock.statusText> POST /djedi/nodes/:
+Non-success status code: 500",
   "status": 500,
 }
 `;
 
 exports[`get it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@test.txt\\": \\"default\\"
-}
-Response: 200 <mock.statusText>
-SyntaxError: Unexpected end of JSON input",
-  "responseText": "{ \\"invalid\\": true",
-  "status": 200,
+  "message": "djedi-react: (no response) POST /djedi/nodes/:
+Unexpected end of JSON input",
 }
 `;
 
 exports[`get it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@test.txt\\": \\"default\\"
-}
-Response: undefined
-Error: Network error",
-  "responseText": "",
-  "status": -1,
+  "message": "djedi-react: (no response) POST /djedi/nodes/:
+Network error",
 }
 `;
 
@@ -132,12 +119,8 @@ Array [
       "uri": "i18n://en-us@test.txt",
       "value": undefined,
     },
-    [Error: Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  "i18n://en-us@test.txt": null
-}
-Response: undefined
-Error: Network error],
+    [Error: djedi-react: (no response) POST /djedi/nodes/:
+Network error],
   ],
 ]
 `;
@@ -201,40 +184,27 @@ Object {
 
 exports[`getBatched it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@test.txt\\": \\"default\\"
-}
-Response: 500 <mock.statusText>
-Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.",
-  "responseText": "<h1>Server error 500</h1>",
+  "__input": Object {
+    "i18n://en-us@test.txt": "default",
+  },
+  "__output": "<h1>Server error 500</h1>",
+  "message": "djedi-react: 500 <mock.statusText> POST /djedi/nodes/:
+Non-success status code: 500",
   "status": 500,
 }
 `;
 
 exports[`getBatched it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@test.txt\\": \\"default\\"
-}
-Response: 200 <mock.statusText>
-SyntaxError: Unexpected end of JSON input",
-  "responseText": "{ \\"invalid\\": true",
-  "status": 200,
+  "message": "djedi-react: (no response) POST /djedi/nodes/:
+Unexpected end of JSON input",
 }
 `;
 
 exports[`getBatched it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@test.txt\\": \\"default\\"
-}
-Response: undefined
-Error: Network error",
-  "responseText": "",
-  "status": -1,
+  "message": "djedi-react: (no response) POST /djedi/nodes/:
+Network error",
 }
 `;
 
@@ -303,12 +273,8 @@ Array [
       "uri": "i18n://en-us@test.txt",
       "value": undefined,
     },
-    [Error: Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  "i18n://en-us@test.txt": null
-}
-Response: undefined
-Error: Network error],
+    [Error: djedi-react: (no response) POST /djedi/nodes/:
+Network error],
   ],
 ]
 `;
@@ -344,40 +310,27 @@ Array [
 
 exports[`prefetch it handles error status codes 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@test.txt\\": null
-}
-Response: 500 <mock.statusText>
-Error: Unexpected response status code. Got 500 but expected 200 <= status < 400.",
-  "responseText": "<h1>Server error 500</h1>",
+  "__input": Object {
+    "i18n://en-us@test.txt": null,
+  },
+  "__output": "<h1>Server error 500</h1>",
+  "message": "djedi-react: 500 <mock.statusText> POST /djedi/nodes/:
+Non-success status code: 500",
   "status": 500,
 }
 `;
 
 exports[`prefetch it handles invalid JSON 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@test.txt\\": null
-}
-Response: 200 <mock.statusText>
-SyntaxError: Unexpected end of JSON input",
-  "responseText": "{ \\"invalid\\": true",
-  "status": 200,
+  "message": "djedi-react: (no response) POST /djedi/nodes/:
+Unexpected end of JSON input",
 }
 `;
 
 exports[`prefetch it handles rejected requests 1`] = `
 Object {
-  "message": "Djedi API error for request: POST /djedi/nodes/
-RequestData sent: {
-  \\"i18n://en-us@test.txt\\": null
-}
-Response: undefined
-Error: Network error",
-  "responseText": "",
-  "status": -1,
+  "message": "djedi-react: (no response) POST /djedi/nodes/:
+Network error",
 }
 `;
 

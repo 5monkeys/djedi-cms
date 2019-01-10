@@ -47,13 +47,9 @@ Object {
   test("it handles missing node in response", done => {
     fetch({});
     djedi.get({ uri: "test", value: "default" }, node => {
-      expect(errorDetails(node)).toMatchInlineSnapshot(`
-Object {
-  "message": "Missing result for node: i18n://en-us@test.txt",
-  "responseText": undefined,
-  "status": 1404,
-}
-`);
+      expect(node).toMatchInlineSnapshot(
+        `[Error: Missing result for node: i18n://en-us@test.txt]`
+      );
       done();
     });
   });
@@ -540,7 +536,7 @@ describe("injectAdmin", () => {
     await expect(
       djedi.injectAdmin()
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Unexpected response status code. Got 500 but expected 200 <= status < 400 or status = 403."`
+      `"Non-success status code: 500"`
     );
   });
 
@@ -1045,7 +1041,11 @@ function networkTests(fn) {
   });
 
   test("it handles invalid JSON", async done => {
-    fetch('{ "invalid": true', { status: 200, stringify: false });
+    fetch('{ "invalid": true', {
+      status: 200,
+      stringify: false,
+      contentType: "application/json",
+    });
     fn(result => {
       expect(errorDetails(result)).toMatchSnapshot();
       done();

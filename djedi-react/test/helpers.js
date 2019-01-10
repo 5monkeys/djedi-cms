@@ -4,11 +4,22 @@ import React from "react";
 import { djedi } from "../src";
 
 class Response {
-  constructor({ status, body }) {
+  constructor({ status, body, contentType }) {
     this.bodyUsed = false;
     this.status = status;
     this.statusText = "<mock.statusText>";
     this._body = body;
+
+    this.headers = {
+      get: name => {
+        switch (name.toLowerCase()) {
+          case "content-type":
+            return contentType;
+          default:
+            return undefined;
+        }
+      },
+    };
   }
 
   async json() {
@@ -30,7 +41,14 @@ class Response {
 
 // Mock `fetch` (unfetch) responses. Can be called several times to mock the
 // first, second, third, etc. call.
-export function fetch(value, { status = 200, stringify = true } = {}) {
+export function fetch(
+  value,
+  {
+    status = 200,
+    stringify = true,
+    contentType = typeof value === "string" ? "text/html" : "application/json",
+  } = {}
+) {
   unfetch.mockImplementationOnce(() => {
     if (value instanceof Error) {
       return Promise.reject(value);
@@ -39,6 +57,7 @@ export function fetch(value, { status = 200, stringify = true } = {}) {
     const response = new Response({
       status,
       body: stringify ? JSON.stringify(value) : value,
+      contentType,
     });
     return Promise.resolve(response);
   });
@@ -114,7 +133,12 @@ export function withState(render) {
 export function errorDetails(error) {
   return {
     message: error.message,
-    status: error.status,
-    responseText: error.responseText,
+    ...(error.response != null
+      ? {
+          status: error.response.status,
+          __input: error.response.__input,
+          __output: error.response.__output,
+        }
+      : {}),
   };
 }

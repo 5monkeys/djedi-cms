@@ -533,7 +533,9 @@ Here’s the default implementation:
     case "loading":
       return "Loading…";
     case "error":
-      return `Failed to fetch content 😞 (${state.error.status})`;
+      return `Failed to fetch content 😞 (${
+        state.error.response != null ? state.error.response.status : -1
+      })`;
     case "success":
       return state.content;
     default:
@@ -547,12 +549,11 @@ These are the possible states:
 - `{ type: "loading" }`: The node is loading.
 
 - `{ type: "error", error: Error }`: Fetching the node failed. The `error`
-  property contains an `Error` instance with the following extra properties:
+  property contains an `Error` instance. `error.response` is an [unfetch
+  response] with two extra properties:
 
-  - `status`: number. The status code of the response. If there was no response,
-    it’s `-1`. If the response didn’t contain the requested node, it’s `1404`.
-  - `responseText`: string. The response as text if available, otherwise the
-    empty string.
+  - `__input`: object. The sent JSON object.
+  - `__output`: string (or any JSON type). The response body if available.
 
 - `{ type: "success", content: string | React.Node }`: Fetching the node
   succeeded. The `content` property is a string containing the fetched value if
@@ -1119,4 +1120,5 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [python-markdown]: https://python-markdown.github.io/
 [react]: https://reactjs.org/
 [server-side rendering]: #server-side-rendering
+[unfetch response]: https://github.com/developit/unfetch#response-methods-and-attributes
 <!-- prettier-ignore-end -->
