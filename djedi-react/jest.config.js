@@ -8,4 +8,5 @@ module.exports = {
       statements: 100,
     },
   },
+  modulePathIgnorePatterns: ["<rootDir>/stub/"],
 };
