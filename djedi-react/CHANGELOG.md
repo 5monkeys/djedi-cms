@@ -1,3 +1,20 @@
+### Version 5.0.0 (2018-01-11)
+
+- Changed: djedi-react no longer depends on
+  [isomorphic-unfetch](https://github.com/developit/unfetch/tree/master/packages/isomorphic-unfetch).
+  Instead, you must set `djedi.options.set` to a `fetch`-like function. For
+  example, you could still use isomorphic-unfetch:
+  `djedi.options.fetch = unfetch`. This lets you use the same `fetch` as the
+  rest of your app, and customize requests (such as adding headers). (Breaking
+  change.)
+- Changed: `state.error` in `defaultRender` and the `render` prop now has a
+  slightly different message and properties. `error.status` and
+  `error.responseText` have been replaced with `error.response` (which might be
+  missing). (Breaking change.)
+- Added: `<ForceNodes>`. This component lets you force nodes to load and appear
+  in the Djedi sidebar, even if the nodes are not shown usually. Useful for
+  error messages.
+
 ### Version 4.0.1 (2018-12-10)
 
 - Fixed: Non-default languages now fetch the correct node content when
