@@ -1,3 +1,7 @@
+### Version 5.1.0 (2019-01-22)
+
+- Improved: `<ForceNodes>` now accepts objects (and arrays) of nodes.
+
 ### Version 5.0.0 (2019-01-11)
 
 - Changed: djedi-react no longer depends on
