@@ -469,7 +469,7 @@ the Djedi sidebar without having to trigger it first.
 3. Add `<ForceNodes>{yourNode}</ForceNodes>` at the end of your component.
 
 `ForceNodes` only takes the `children` prop, and all children must be `<Node>`s
-and nothing else.
+or (nested) arrays/objects of `<Node>`s.
 
 ```js
 const ERROR_MESSAGE = <Node uri="error">Error</Node>;
@@ -494,6 +494,18 @@ You can pass multiple nodes like so:
   {node1}
   {node2}
 </ForceNodes>
+```
+
+Sometimes it’s nice to store a bunch of nodes in an object. `<ForceNodes>`
+accepts that as well:
+
+```js
+const ERRORS = {
+  invalid: <Node uri="error/invalid">Invalid data.</Node>,
+  missing: <Node uri="error/missing">Missing data.</Node>,
+};
+
+<ForceNodes>{ERRORS}</ForceNodes>;
 ```
 
 ### `djedi`
