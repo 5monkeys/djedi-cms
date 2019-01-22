@@ -1064,7 +1064,7 @@ If you run your React frontend and your Django backend on different domains, you
 need to add some extra settings on the Django side.
 
 Let’s say the React frontend lives on `example.com` while the Django backend
-lives on `api.example.com`. Then you need two things:
+lives on `api.example.com`. Then you need a couple of things:
 
 - [CORS] headers, for example using [django-cors-headers] or nginx. This is to
   allow djedi-react making AJAX requests to fetch nodes. You need to allow `GET`
@@ -1079,6 +1079,13 @@ lives on `api.example.com`. Then you need two things:
   [djedi.injectAdmin] needs to make a request for the admin sidebar, and has to
   send along the session cookie created when logging in to the Django admin on
   `api.example.com`. This makes the cookie available on both domains.
+
+- `MEDIA_URL = 'https://api.example.com/media/'` or similar, if you use the
+  [image plugin]. When [Serving static files during
+  development][django-serve-static] you might want to set
+  `MEDIA_URL = '/media/'` and proxy `/media/` on the frontend to the api. The
+  point here is that Djedi returns `<img src="...">` snippets to djedi-react,
+  and it is up to you to make sure that the URLs in the `src` attribute work.
 
 If the two domains do not share the same super domain (such as `site.com` and
 `api.com`) you need to set up a proxy server on the React frontend domain. For
@@ -1188,6 +1195,7 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [commonmark]: https://commonmark.org/
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [django-cors-headers]: https://github.com/OttoYiu/django-cors-headers
+[django-serve-static]: https://docs.djangoproject.com/en/stable/howto/static-files/#serving-static-files-during-development
 [djedi cms]: https://djedi-cms.org/
 [djedi.get]: #djedigetnode-node-callback-node--error--void-options---void
 [djedi.getbatched]: #djedigetbatchednode-node-callback-node--error--void-options---void
@@ -1199,9 +1207,10 @@ because of permissions. One solution is to remove the owned-by-root files first:
 [document.domain]: https://developer.mozilla.org/en-US/docs/Web/API/Document/domain
 [eslint]: https://eslint.org/
 [fetch]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+[image plugin]: https://djedi-cms.org/plugins.html#image-plugin
 [isomorphic-unfetch]: https://github.com/developit/unfetch/tree/master/packages/isomorphic-unfetch
 [jest]: https://jestjs.io/
-[language_code]: https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-LANGUAGE_CODE
+[language_code]: https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-LANGUAGE_CODE
 [mdx_truly_sane_lists]: https://github.com/radude/mdx_truly_sane_lists
 [next.js]: https://nextjs.org/
 [node.js]: https://nodejs.org/en/
