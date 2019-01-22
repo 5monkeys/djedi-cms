@@ -10,7 +10,7 @@ const forced = (
   </Node>
 );
 
-export default class Home extends React.Component {
+export default class About extends React.Component {
   state = {
     showText: false,
   };
