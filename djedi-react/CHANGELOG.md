@@ -1,4 +1,4 @@
-### Version 5.0.0 (2018-01-11)
+### Version 5.0.0 (2019-01-11)
 
 - Changed: djedi-react no longer depends on
   [isomorphic-unfetch](https://github.com/developit/unfetch/tree/master/packages/isomorphic-unfetch).
