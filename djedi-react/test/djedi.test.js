@@ -507,6 +507,23 @@ describe("injectAdmin", () => {
     );
   });
 
+  test("it removes old iframe first", async () => {
+    fetch("<iframe></iframe>", { stringify: false });
+    document.body.innerHTML = `
+<p>Some content</p>
+<iframe id="djedi-cms"></iframe>
+<span class="djedi-node-outline"></span>
+    `.trim();
+    expect(document.querySelectorAll("iframe")).toHaveLength(1);
+    const inserted = await djedi.injectAdmin();
+    expect(inserted).toBe(true);
+    expect(document.body.innerHTML).toMatchInlineSnapshot(`
+"<p>Some content</p>
+
+<iframe></iframe>"
+`);
+  });
+
   test("it sets document.domain", async () => {
     fetch(
       '<script>document.domain = "example.com";</script><iframe></iframe>',
@@ -669,6 +686,37 @@ Object {
     document.body.append(iframe);
     expect(document.getElementById("djedi-cms")).toBe(iframe);
 
+    const NODE_CLASS = "__test-node";
+
+    function makeNodeElement() {
+      const span = document.createElement("span");
+      span.setAttribute("data-i18n", "");
+      span.className = NODE_CLASS;
+      return span;
+    }
+
+    function makeNestedNodeElement() {
+      const p = document.createElement("p");
+      const em = document.createElement("em");
+      const nodeElement = makeNodeElement();
+      p.append(em);
+      p.append(document.createTextNode("some text"));
+      em.append(nodeElement);
+      return p;
+    }
+
+    function makeNodeList(nodes) {
+      const fragment = document.createDocumentFragment();
+      nodes.forEach(node => {
+        fragment.append(node);
+      });
+      return fragment.childNodes;
+    }
+
+    const nodeElement = makeNodeElement();
+    const nestedNodeElement = makeNestedNodeElement();
+    const otherElement = document.createElement("span");
+
     function reset() {
       srcSpy.mockClear();
 
@@ -685,9 +733,9 @@ Object {
       document.documentElement.style.width = "1600px";
     }
 
-    function assert() {
+    function assert(calledTimes = 1) {
       // iframe has been reloaded.
-      expect(srcSpy).toHaveBeenCalledTimes(1);
+      expect(srcSpy).toHaveBeenCalledTimes(calledTimes);
       expect(srcSpy).toHaveBeenCalledWith(iframe.src);
 
       // Outlines have been removed.
@@ -717,10 +765,57 @@ Object {
     await wait();
     expect(srcSpy).toHaveBeenCalledTimes(0);
 
+    // Mutations. There was no good way of testing `MutationObserver` when this
+    // was written, so test the internal `_onMutation` method instead.
+    reset();
+    djedi._onMutation([
+      {
+        addedNodes: makeNodeList([otherElement, nodeElement]),
+        removedNodes: makeNodeList([]),
+      },
+    ]);
+    await wait();
+    djedi._onMutation([
+      {
+        addedNodes: makeNodeList([]),
+        removedNodes: makeNodeList([nodeElement, otherElement]),
+      },
+    ]);
+    await wait();
+    djedi._onMutation([
+      {
+        addedNodes: makeNodeList([nestedNodeElement]),
+        removedNodes: makeNodeList([]),
+      },
+    ]);
+    await wait();
+    djedi._onMutation([
+      {
+        addedNodes: makeNodeList([]),
+        removedNodes: makeNodeList([otherElement, nestedNodeElement]),
+      },
+    ]);
+    await wait();
+    djedi._onMutation([
+      {
+        // No node wrappers – should not trigger an update.
+        addedNodes: makeNodeList([]),
+        removedNodes: makeNodeList([otherElement]),
+      },
+    ]);
+    await wait();
+    assert(4);
+
     // Batching.
     reset();
     djedi.reportRenderedNode({ uri: "test", value: "test" });
     djedi.reportRemovedNode("test");
+    djedi._onMutation([
+      {
+        addedNodes: makeNodeList([]),
+        removedNodes: makeNodeList([otherElement, nestedNodeElement]),
+      },
+    ]);
     await wait();
     assert();
   });

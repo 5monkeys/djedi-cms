@@ -7,7 +7,7 @@ import { applyUriDefaults, parseUri, stringifyUri } from "./uri";
 
 const DEFAULT_CACHE_TTL = typeof window === "undefined" ? 20e3 : Infinity; // ms
 const DOCUMENT_DOMAIN_REGEX = /\bdocument\.domain\s*=\s*(["'])([^'"\s]+)\1/;
-const UPDATE_ADMIN_SIDEBAR_TIMEOUT = 10; // ms
+const UPDATE_ADMIN_SIDEBAR_TIMEOUT = 100; // ms
 
 /*
 This class fetches and caches nodes, provides global options, and keeps
@@ -46,6 +46,10 @@ export class Djedi {
     // Whenever a node is rendered or removed the admin sidebar needs to be
     // refreshed. This is used to batch that refreshing.
     this._updateAdminSidebarTimeoutId = undefined;
+    // If a `<Node>` has a `runder` prop that initially returns `null`, we need
+    // to observe the DOM as well to add an outline when the `<span>` finally
+    // appears.
+    this._mutationObserver = undefined;
 
     // Used to only warn about unknown languages once.
     this._warnedLanguages = new Set();
@@ -71,6 +75,10 @@ export class Djedi {
     if (this._updateAdminSidebarTimeoutId != null) {
       clearTimeout(this._updateAdminSidebarTimeoutId);
     }
+    // istanbul ignore next
+    if (this._mutationObserver != null) {
+      this._mutationObserver.disconnect();
+    }
 
     this._nodes = new Cache({ ttl: DEFAULT_CACHE_TTL });
     this._prefetchableNodes = new Map();
@@ -79,6 +87,7 @@ export class Djedi {
     this._renderedNodes = new Map();
     this._DJEDI_NODES = {};
     this._updateAdminSidebarTimeoutId = undefined;
+    this._mutationObserver = undefined;
     this._warnedLanguages = new Set();
 
     if (typeof window !== "undefined") {
@@ -257,7 +266,13 @@ export class Djedi {
           if (domain != null) {
             document.domain = domain;
           }
+
+          // When hot-reloading code, remove any old iframe first.
+          updateAdminSidebar({ remove: true });
+
           document.body.insertAdjacentHTML("beforeend", html);
+          this._installMutationObserver();
+
           return true;
         });
       }
@@ -275,6 +290,8 @@ export class Djedi {
 
     this._renderedNodes.set(node.uri, numInstances);
     this._DJEDI_NODES[this._djediNodesUri(node.uri)] = node.value;
+
+    // Always update the sidebar, to keep outlines up-to-date.
     this._updateAdminSidebar();
   }
 
@@ -291,10 +308,12 @@ export class Djedi {
     if (numInstances <= 0) {
       this._renderedNodes.delete(uri);
       delete this._DJEDI_NODES[this._djediNodesUri(uri)];
-      this._updateAdminSidebar();
     } else {
       this._renderedNodes.set(uri, numInstances);
     }
+
+    // Always update the sidebar, to keep outlines up-to-date.
+    this._updateAdminSidebar();
   }
 
   element(uri) {
@@ -493,6 +512,56 @@ export class Djedi {
       updateAdminSidebar();
     }, UPDATE_ADMIN_SIDEBAR_TIMEOUT);
   }
+
+  // There was no good way of testing `MutationObserver` when this was written,
+  // so test the `_onMutation` method is tested instead.
+  // istanbul ignore next
+  _installMutationObserver() {
+    if (typeof MutationObserver === "undefined") {
+      return;
+    }
+
+    // When hot-reloading code, disconnect the old observer and install a new one.
+    if (this._mutationObserver != null) {
+      this._mutationObserver.disconnect();
+    }
+
+    this._mutationObserver = new MutationObserver(this._onMutation.bind(this));
+
+    this._mutationObserver.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  _onMutation(records) {
+    const element = this.element("");
+
+    function isNodeWrapper(domNode) {
+      return (
+        domNode.nodeName === element.tag.toUpperCase() &&
+        Object.keys(element.attributes).every(attribute =>
+          domNode.hasAttribute(attribute)
+        )
+      );
+    }
+
+    function needsUpdate(domNodes) {
+      return [].some.call(domNodes, domNode => {
+        return (
+          isNodeWrapper(domNode) ||
+          (domNode.querySelectorAll != null &&
+            [].some.call(domNode.querySelectorAll("*"), isNodeWrapper))
+        );
+      });
+    }
+
+    records.forEach(record => {
+      if (needsUpdate(record.addedNodes) || needsUpdate(record.removedNodes)) {
+        this._updateAdminSidebar();
+      }
+    });
+  }
 }
 
 // This is a function, not a constant, since it can be mutated by the user.
@@ -566,7 +635,7 @@ function missingUriError(uri) {
   return new Error(`Missing result for node: ${uri}`);
 }
 
-function updateAdminSidebar() {
+function updateAdminSidebar({ remove = false } = {}) {
   if (typeof document === "undefined") {
     return;
   }
@@ -585,9 +654,14 @@ function updateAdminSidebar() {
     element.parentNode.removeChild(element);
   });
 
-  // Reload the iframe.
-  // eslint-disable-next-line no-self-assign
-  iframe.src = iframe.src;
+  if (remove) {
+    // Remove the iframe.
+    iframe.parentNode.removeChild(iframe);
+  } else {
+    // Reload the iframe.
+    // eslint-disable-next-line no-self-assign
+    iframe.src = iframe.src;
+  }
 }
 
 export default new Djedi();
