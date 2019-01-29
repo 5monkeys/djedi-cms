@@ -1,3 +1,9 @@
+### Version 5.2.0 (2019-01-29)
+
+- Improved: The admin sidebar is now updated as nodes come and go on the page in
+  more cases. It also works better when hot reloading code while the sidebar is
+  open.
+
 ### Version 5.1.0 (2019-01-22)
 
 - Improved: `<ForceNodes>` now accepts objects (and arrays) of nodes.
