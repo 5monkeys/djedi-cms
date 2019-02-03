@@ -91,6 +91,10 @@ body {
   }
 }
 
+.body-bg {
+  background-color: @body-bg;
+}
+
 iframe {
   width: 100%;
   border: 0;
@@ -336,14 +340,22 @@ body {
 // --------------------------------------------------
 
 #editor-iframe {
-  height: 395px;
+  height: 434px;
   max-height: calc(100vh - 70px);
 }
 
+#form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 #editor {
-  height: 360px;
-  max-height: calc(100vh - 35px);
-  padding: 20px 20px 54px 20px;
+  flex-grow: 1;
+  height: 330px; // Fallback if no flexbox support.
+  max-height: calc(100vh - 75px);
+  padding: 20px;
+  position: relative;
 
   textarea {
     height: 100%;
@@ -449,7 +461,6 @@ body.editor {
   }
 
   #tabs {
-    padding-top: 34px;
     border-bottom: 1px solid darken(@body-bg, 5%);
 
     .nav-tabs {
@@ -480,6 +491,7 @@ body.editor {
     .navbar {
       min-height: 34px;
       padding: 0 20px;
+      margin: 0;
     }
 
     .navbar-default {

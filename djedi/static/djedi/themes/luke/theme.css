@@ -5980,6 +5980,9 @@ body.editor {
   width: 100%;
   overflow: hidden;
 }
+.body-bg {
+  background-color: #eee;
+}
 iframe {
   width: 100%;
   border: 0;
@@ -6242,13 +6245,20 @@ body.open .navbar-brand > a > i.dc-djedi-icon {
   background: #428bca;
 }
 #editor-iframe {
-  height: 395px;
+  height: 434px;
   max-height: calc(100vh - 70px);
 }
+#form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 #editor {
-  height: 360px;
-  max-height: calc(100vh - 35px);
-  padding: 20px 20px 54px 20px;
+  flex-grow: 1;
+  height: 330px;
+  max-height: calc(100vh - 75px);
+  padding: 20px;
+  position: relative;
 }
 #editor textarea {
   height: 100%;
@@ -6335,7 +6345,6 @@ body.editor header .dropdown-menu > li.published > a:hover {
   background-color: #5cb85c;
 }
 body.editor #tabs {
-  padding-top: 34px;
   border-bottom: 1px solid #e1e1e1;
 }
 body.editor #tabs .nav-tabs {
@@ -6359,6 +6368,7 @@ body.editor #tabs .nav-tabs li a {
 body.editor footer .navbar {
   min-height: 34px;
   padding: 0 20px;
+  margin: 0;
 }
 body.editor footer .navbar-default {
   background: #eee;

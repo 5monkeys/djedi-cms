@@ -24,222 +24,277 @@ class CropTool
     @api = api
     @bounds = @api.getBounds()
 
-    # Get original image width/height
-    _image = new Image
-    _image.src = @$img.attr 'src'
-    $(_image).load =>
-      @imageSize =
-        width: _image.width
-        height: _image.height
+    # Original image width/height.
+    @imageSize =
+      width: @$img.prop 'naturalWidth'
+      height: @$img.prop 'naturalHeight'
+
+    # Resized image width/height.
+    @previewSize =
+      width: @imageSize.width
+      height: @imageSize.height
+
+    # The area to crop.
+    @crop =
+      width: @imageSize.width
+      height: @imageSize.height
+      left: 0
+      top: 0
+
+    # A canvas is used to resize and crop the image, but the canvas itself is
+    # never shown. Instead, it is turned into a URL that is used for the <img> tag.
+    @canvas = document.createElement 'canvas'
+    @canvas.width = @previewSize.width
+    @canvas.height = @previewSize.height
+    @canvas.toBlob ?= @canvas.msToBlob # IE and Edge.
+    @ctx = @canvas.getContext '2d'
+    @redrawing = false
+    @queuedRedraw = false
 
   destroy: ->
     @api.ui.holder.hide()
     @api.destroy()
 
-  show: ->
-    @api.enable()
-    @api.ui.holder.show()
-    @$img.hide().css visibility: 'hidden'
-
-  hide: ->
-    @api.ui.holder.hide()
-    @api.disable()
-    @api.release()
-    @$img.show().css visibility: 'visible'
+  getCropAspectRatio: ->
+    @crop.width / @crop.height
 
   setAspectRatio: (ratio) ->
     @api.setOptions aspectRatio: ratio
 
-  disableAspectRatio: ->
-    @setAspectRatio 0
-
-  createPreview: ->
-    console.log 'new crop image preview'
-    image = new Image
-    image.src = @$img.attr 'src'
-    $image = $ image
-    @preview = $image
-
-    @previewContainer = $ '<div>'
-    @previewContainer.css
-      overflow: 'hidden'
-      display: 'inline-block'
-    @previewContainer.append image
-
-    image.onload = () => @$img.trigger 'crop:preview', @previewContainer
-
   setPreviewAttributes: (attrs) ->
     if not @preview?
-      @createPreview()
-    @previewContainer.attr attr, value for attr, value of attrs
+      @redraw()
+    @preview.attr attr, value for attr, value of attrs
 
-  resizePreview: =>
-    if not @preview?
-      @createPreview()
+  resizePreview: (@previewSize) =>
+    @redraw()
 
-    @previewSize =
-      width: parseInt $('#field-width').val() or 0, 10
-      height: parseInt $('#field-height').val() or 0, 10
+  redraw: ->
+    # If already drawing, wait for it to finish before drawing again. Otherwise
+    # the preview gets very laggy.
+    if @redrawing
+      @queuedRedraw = true
+      return
 
-    @previewContainer.css
-      width: @previewSize.width
-      height: @previewSize.height
+    @redrawing = true
+
+    hasPreview = @preview?
+    @preview = $ '<img>' unless hasPreview
+
+    # For images with transparent background it is important to clear the canvas
+    # between renders.
+    @ctx.clearRect 0, 0, @canvas.width, @canvas.height
+
+    # Disallow upscaling the image. The user might of course type in crazy sizes.
+    width = Math.min @crop.width, @previewSize.width
+    height = Math.min @crop.height, @previewSize.height
+
+    @canvas.width = width unless @canvas.width == width
+    @canvas.height = height unless @canvas.height == height
+
+    img = @preview[0]
+
+    # If the image needs neither cropping nor resizing, don’t bother with
+    # drawing on the canvas. It’s faster to just use the image as-is.
+    if width >= @imageSize.width and height >= @imageSize.height and
+       @crop.left <= 0 and @crop.top <= 0
+      img.src = @$img[0].src
+      @$img.trigger 'crop:preview', @preview unless hasPreview
+      @$img.trigger 'crop:attributes'
+      @redrawing = false
+      return
+
+    @ctx.drawImage @$img[0],
+      # Source area (of the original image).
+      @crop.left, @crop.top,
+      @crop.width, @crop.height,
+      # Destination area (one the canvas).
+      0, 0,
+      width, height
+
+    @canvas.toBlob (blob) =>
+      url = URL.createObjectURL blob
+      img.src = url
+      img.onload = =>
+        img.onload = undefined
+        URL.revokeObjectURL url
+        queued = @queuedRedraw
+        @redrawing = false
+        @queuedRedraw = false
+        @$img.trigger 'crop:preview', @preview unless hasPreview
+        @$img.trigger 'crop:attributes'
+        if queued
+          @redraw()
 
   release: =>
-    if @previewSize
-      @preview.css
-        width: @previewSize.width + 'px'
-        height: @previewSize.height + 'px'
-        marginLeft: 0
-        marginTop: 0
+    @crop =
+      width: @imageSize.width
+      height: @imageSize.height
+      left: 0
+      top: 0
+    @redraw()
 
   cropPreview: (coords) ->
-    # Fetch crop area if not given
+    # Fetch crop area if not given.
     if not coords
       coords = @api.tellSelect()
 
-    # Update "height" form field and resize preview when cropping without aspect ratio
-    if @api.getOptions().aspectRatio == 0
-      if coords.w
-        hr = coords.h / coords.w
-      else
-        hr = @bounds[1] / @bounds[0]
-      $('#field-height').val Math.round(@previewSize.width * hr)
-      @resizePreview()
+    # When just starting to drag, the first couple of events file with 0 width
+    # or height – ignore those. The canvas can't even draw that.
+    if coords.w <= 0 or coords.h <= 0
+      return
 
-    if coords.w > 0
-      # Crop image in preview, but maintain size
-      rx = @previewSize.width / coords.w
-      ry = @previewSize.height / coords.h
+    # `@bounds`  is an array (`[width, height]`) describing the CSS pixel size
+    # of the thumbnail. `coords` contain values for the chosen crop area, in
+    # terms of the `@bounds` size. If cropping the entire area, `@bounds[0] ==
+    # coords.w` and `@bounds[1] == coords.h`. `@imageSize` is the real size of
+    # the image (usually much larger). Calculate `@crop` in terms of
+    # `@imageSize`.
+    @crop =
+      width: Math.round coords.w / @bounds[0] * @imageSize.width
+      height: Math.round coords.h / @bounds[1] * @imageSize.height
+      left: Math.round coords.x / @bounds[0] * @imageSize.width
+      top: Math.round coords.y / @bounds[1] * @imageSize.height
 
-      @preview.css
-        width: Math.round(rx * @bounds[0]) + 'px'
-        height: Math.round(ry * @bounds[1]) + 'px'
-        marginLeft: '-' + Math.round(rx * coords.x) + 'px'
-        marginTop: '-' + Math.round(ry * coords.y) + 'px'
-    else
-      @release()
+    @redraw()
 
   cropHandler: (coords) =>
-    if not @preview?
-      @createPreview()
-      @resizePreview()
-    else
-      @cropPreview coords
+    @cropPreview coords
 
-    # Update "crop" form field
+    # Update the "crop" hidden form field (so the values can be sent to backend).
     $crop = $ '#field-crop'
-    if coords.w
-      rx = @imageSize.width / @bounds[0]
-      ry = @imageSize.height / @bounds[1]
-      box = [coords.x*rx, coords.y*ry, coords.x2*rx, coords.y2*ry]
-      box = (Math.round(x) for x in box).join ','
-      $crop.val box
-    else
-      $crop.val ''
+    oldVal = $crop.val()
 
-    $crop.change()
+    newVal =
+      if @crop.width >= @imageSize.width and @crop.height >= @imageSize.height and
+         @crop.left <= 0 and @crop.top <= 0
+        ''
+      else
+        [
+          @crop.left
+          @crop.top
+          @crop.left + @crop.width
+          @crop.top + @crop.height
+        ].join ','
+
+    if newVal != oldVal
+      $crop.val newVal
+      # Trigger "dirty" state.
+      $crop.trigger('change')
 
 
 ################################################[  DROPZONE  ]##########################################################
 class Dropzone
 
   constructor: (config) ->
+    @field = config.field
     @el = config.el
     @$el = $ config.el
-    @$section = @$el.find 'section'
-    @startCallback = config.start
-    @stopCallback = config.stop
+    @$span = @$el.find 'span'
 
-    # Bind drag/drop handler
-    $(document).bind 'dragover', @dragHandler
+    # Listen both in the editor iframe, as well as the full sidebar iframe. This
+    # allows disabling native browser file drop on the header at the top.
+    $windows = $(window).add(window.parent)
+    $windows.on 'dragenter dragleave drop', @dragHandler
 
-    # Disable native browser file drop
-    $(document).bind 'drop dragover', (event) -> event.preventDefault()
+    # Disable native browser file drop.
+    $windows.on 'drop dragover', (event) -> event.preventDefault()
 
-  hide: ->
+    @$el.on 'click', =>
+      if @hasError()
+        # Allow hiding the error message.
+        @$el.removeClass 'error'
+        @hide()
+      else
+        # Allow clicking the area to upload.
+        @field.trigger('click')
+
+  hide: (animate = false) ->
     console.log 'Dropzone.hide(), hasError:', @hasError()
     if not @hasError()
-      @$el.hide()
+      @$el.removeAttr('data-shown')
+      if animate
+        @$el.finish().fadeOut('fast')
+      else
+        @$el.hide()
 
-  show: ->
-    @$el.show()
+  show: (animate = false) ->
+    @$el.attr('data-shown', '')
+    if animate
+      @$el.finish().fadeIn('fast')
+    else
+      @$el.show()
 
   hasError: ->
-    @$section.hasClass 'error'
-
-  resizeTo: (target) ->
-    @$section.css
-      'height': "#{target.outerHeight()}px"
-      'line-height': "#{target.outerHeight() - 6}px"
+    @$el.hasClass 'error'
 
   dragStart: ->
-    @$section.addClass('drag').removeClass('drag-over error')
-    @$section.html '<i class="icon-circle-arrow-down"></i> Drop your image here'
+    @$el.removeClass().addClass('drag')
+    @$span.html '<i class="icon-circle-arrow-down"></i> Drop your image here'
 
   dragOver: ->
-    @$section.addClass('drag-over').removeClass('drag drop')
-    @$section.html '<i class="icon-cloud-upload"></i> Release to upload'
+    @$el.removeClass().addClass('drag-over')
+    @$span.html '<i class="icon-cloud-upload"></i> Release to upload'
 
   dragDrop: ->
-    @$section.addClass('drop').removeClass('drag-over')
-    @$section.html '<i class="icon-spinner icon-spin icon-large"></i>'
+    @$el.removeClass().addClass('drop')
+    @$span.html '<i class="icon-spinner icon-spin icon-large"></i>'
 
   dragError: ->
-    @$section.addClass('error').removeClass('drag-over drop')
-    @$section.html '<i class="icon-warning-sign"> Failed to upload image</i>'
-
-  dragStop: ->
-    if not @hasError()
-      @$section.removeClass('drag-over drop error')
-      @$section.html ''
+    @$el.removeClass().addClass('error')
+    @$span.html '<i class="icon-warning-sign"></i> Failed to upload image'
+    @show()
 
   dragHandler: (event) =>
-    @startCallback()
-    zone = @$el
+    onTarget = event.target == @$el[0]
 
-    if not @dragId
-      # Drag over window
-      @dragStart()
-      zone.fadeIn 'fast'
+    # Usually, a 'dragenter' event is dispatched (for the element we enter)
+    # immediately followed by a 'dragleave' (for the element we just left). When
+    # a 'dragenter' event _isn't_ fired just before a 'dragleave', it means that
+    # we've left the iframe. If so (and only then) we want to hide the dropzone.
+    justEntered = @timeoutId?
+    if justEntered
+      clearTimeout @timeoutId
+      @timeoutId = undefined
+
+    if event.type == 'dragenter'
+      @show true
+      if onTarget
+        @dragOver()
+      else
+        @dragStart()
+      @timeoutId = delay 0, => @timeoutId = undefined
     else
-      clearTimeout @dragId
-
-    if event.target == @$section[0]
-      # Drag over dropzone
-      @dragOver()
-    else
-      # Drag over window
-      @dragStart()
-
-    @dragId = delay 100, =>
-      # Drag outside window
-      @dragId = null
-      @hide()
-      @dragStop()
-      @stopCallback()
+      # Hide the dropzone when dropping the file (but only when dropped outside
+      # the dropzone, letting the file upload show progress and errors), or when
+      # leaving the iframe.
+      if (event.type == 'drop' and not onTarget) or
+         (event.type == 'dragleave' and not justEntered)
+        @dragStart()
+        @hide false
 
 
 ################################################[  EDITOR  ]############################################################
 class window.ImageEditor extends window.Editor
 
   initialize: (config) ->
-#    console.log 'ImageEditor.initialize', @
+    console.log 'ImageEditor.initialize', @
 
     super config
 
-    @dropzone = new Dropzone
-      el: config.dropzone
-      start: => @crop.hide() if @crop?
-      stop: => @crop.show() if @crop?
+    @firstRender = true
 
     @field = $ config.field
     @preview = $ config.preview
 
+    @dropzone = new Dropzone
+      field: @field
+      el: config.dropzone
+
     # Initialize fileupload
     @field.fileupload
       # acceptFileTypes: /(\.|\/)(jpg)$/i,  # TODO: Restrict image file types
-      dropZone: dropzone.el
+      dropZone: @dropzone.el
       drop: @prepareUpload
       send: @uploadStart
       done: @uploadComplete
@@ -251,13 +306,20 @@ class window.ImageEditor extends window.Editor
     @ratioButton = $ '#ar-lock'
 
     # Field events
-    $('.dimension').on 'input', @resizeImage
     $('#html-pane input').on 'input', => @updateImageAttributes()
+    @widthField.on 'input', =>
+      @resizeImage keepWidth: true, keepRatio: @ratioButton.hasClass 'active'
+    @widthField.on 'blur', =>
+      @widthField.val @crop.canvas.width if @crop
+    @heightField.on 'input', =>
+      @resizeImage keepWidth: false, keepRatio: @ratioButton.hasClass 'active'
+    @heightField.on 'blur', =>
+      @heightField.val @crop.canvas.height if @crop
     @ratioButton.on 'click', @toggleAspectRatio
     @ratioButton.tooltip()
 
   render: (node) ->
-    console.log 'ImageEditor.render()'
+    console.log 'ImageEditor.render()', {@firstRender, node}
     super node
 
     if node and node.data
@@ -271,8 +333,9 @@ class window.ImageEditor extends window.Editor
       @updateForm filename: '', width: '', height: '', id: '', 'class': '', alt: ''
       @removeThumbnail()
 
+    @firstRender = false
+
   updateForm: (data) ->
-#    $('#filename').html node.data.filename
     $("input[name='data[filename]']").val data.filename
     $("input[name='data[width]']").val data.width
     $("input[name='data[height]']").val data.height
@@ -280,32 +343,43 @@ class window.ImageEditor extends window.Editor
     $("input[name='data[id]']").val data.id
     $("input[name='data[class]']").val data.class
     $("input[name='data[alt]']").val data.alt
+    @ratioButton.removeClass 'active'
 
   renderThumbnail: (url) ->
-    console.log 'ImageEditor.renderThumbnail()'
+    # There's no need to redraw the first time. The image is already in place on
+    # the page. Redrawing just causes unnecessary blinking. We _do_ need to
+    # draw, however, after droppping a file or after discarding a file. For the
+    # case of having an unpublished draft, `Editor` re-renders so this gets
+    # called two times.
+    needsRedraw = not @firstRender
+    console.log 'ImageEditor.renderThumbnail()', {needsRedraw}
+
     image = new Image
     image.src = url
     image.className = 'original'
     $image = $ image
 
-    $image.load =>
+    $image.on 'load', =>
       @dropzone.hide()
       @preview.hide()
       @preview.html image
 
       @preview.fadeIn 100, =>
-#        @dropzone.resizeTo @preview
-
-        # Initialize crop tool
-        $image.on 'crop:preview', (event, html) => @triggerRender html
+        $image.on 'crop:preview', (event, html) =>
+          @crop?.setPreviewAttributes @getHtmlFields()
+          # This replaces the image on the page with the preview image.
+          @triggerRender html
+        $image.on 'crop:attributes', =>
+          @updateImageAttributes()
+          if @crop
+            @widthField.val @crop.canvas.width unless @widthField.is ':focus'
+            @heightField.val @crop.canvas.height unless @heightField.is ':focus'
         @crop = new CropTool $image
-        @updateImageAttributes()
-        @crop.resizePreview()
+        @crop.redraw() if needsRedraw
 
   removeThumbnail: ->
     console.log 'ImageEditor.removeThumbnail()'
-    if @crop
-      @crop.destroy()
+    @crop?.destroy()
     @preview.empty()
     @dropzone.show()
     @dropzone.dragStart()
@@ -315,54 +389,48 @@ class window.ImageEditor extends window.Editor
     h = parseInt(@heightField.val(), 10) or 0
     [w, h]
 
-  resizeImage: (event) =>
+  resizeImage: ({ keepWidth, keepRatio }) =>
+    return unless @crop
     [w, h] = @dimensions()
 
-    if w and h
-      keepRatio = @ratioButton.hasClass 'active'
+    if keepRatio
+      ratio = @crop.getCropAspectRatio()
 
-      if keepRatio
-        ratio = @ratioButton.data 'ratio'
-
-        if $(event.target).attr('id') == 'field-width'
-          h = Math.round w / ratio
-          @heightField.val h
-        else
-          w = Math.round h * ratio
-          @widthField.val w
-
+      if keepWidth
+        h = Math.round w / ratio
+        @heightField.val h
       else
-        ratio = w / h
+        w = Math.round h * ratio
+        @widthField.val w
 
-      # Set new crop area
-      image.crop.setAspectRatio ratio
-
-      # Disable aspect ratio
-      if not keepRatio
-        image.crop.disableAspectRatio()
-
-    @crop.resizePreview()
-    @crop.cropPreview()
-    @trigger 'node:resize'
+    @crop.resizePreview
+      width: w
+      height: h
+    @updateImageAttributes()
 
   getHtmlFields: ->
     attrs = {}
     for attr in ['id', 'class', 'alt']
-      attrs[attr] = $("input[name='data[#{attr}]']").val()
+      value = $("input[name='data[#{attr}]']").val()
+      # Don't render empty strings, except for alt to match the backend.
+      attrs[attr] = if not value and attr != 'alt' then null else value
+    if @crop
+      for attr in ['width', 'height']
+        attrs[attr] = @crop.canvas[attr]
     attrs
 
-  updateImageAttributes: ->
+  updateImageAttributes: =>
+    return unless @crop
     @crop.setPreviewAttributes @getHtmlFields()
     @trigger 'node:resize'
 
   toggleAspectRatio: =>
+    return unless @crop
     ratioInactive = @ratioButton.hasClass 'active'
-
-    [w, h] = @dimensions()
-    ratio = if w and h then w / h else 1
-
-    @ratioButton.data 'ratio', ratio
+    ratio = @crop.getCropAspectRatio()
     @crop.setAspectRatio if ratioInactive then 0 else ratio
+    unless ratioInactive
+      @resizeImage keepWidth: true, keepRatio: true
 
   prepareUpload: =>
     $('input[name="data[width]"]').val ''
@@ -373,7 +441,7 @@ class window.ImageEditor extends window.Editor
     console.log 'ImageEditor.uploadStart()'
     @dropzone.dragDrop()
     @progressbar.show()
-    @crop.destroy() if @crop
+    @crop?.destroy()
 
   uploadComplete: (event, response) =>
     console.log 'ImageEditor.uploadComplete()'

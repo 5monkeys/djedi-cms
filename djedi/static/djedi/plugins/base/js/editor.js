@@ -162,6 +162,7 @@
       this.onSave = __bind(this.onSave, this);
       this.onFormChange = __bind(this.onFormChange, this);
       this.onLoad = __bind(this.onLoad, this);
+      console.log('Editor.constructor', this);
       if (document.readyState === 'complete') {
         this.initialize(this.config);
       } else {
@@ -176,6 +177,7 @@
     }
 
     Editor.prototype.initialize = function(config) {
+      console.log('Editor.initialize');
       this.api = new Client(window.DJEDI_ENDPOINT);
       this.$doc = $(document);
       this.actions = {
@@ -253,12 +255,14 @@
         this.trigger('plugin:loaded', node.uri.valueOf());
       }
       this.render(node);
-      this.delay(0, (function(_this) {
-        return function() {
-          return _this.trigger('node:render', node.uri.valueOf(), node.content || '');
-        };
-      })(this));
-      return console.log('content', node.content || '');
+      if (!node.meta.is_published) {
+        this.delay(0, (function(_this) {
+          return function() {
+            return _this.trigger('node:render', node.uri.valueOf(), node.content || '');
+          };
+        })(this));
+      }
+      return console.log('Editor.onLoad() full node', node);
     };
 
     Editor.prototype.onFormChange = function(event) {

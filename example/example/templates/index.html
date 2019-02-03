@@ -3,6 +3,18 @@
 <html>
 <head>
     <title>Djedi Test</title>
+    <style>
+        body {
+            max-width: 400px;
+            margin: auto;
+            font-family: sans-serif;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
 <h1>{% node 'page/title.txt' default='Djedi' %}</h1>
@@ -14,6 +26,7 @@
 {% endblocknode %}
 
 {% node 'page/image.img' %}
+{% node 'page/image2.img' %}
 <hr>
 
 {% if not request.user.is_authenticated %}
