@@ -780,7 +780,7 @@ if (!jQuery) { throw new Error("Bootstrap requires jQuery") }
       selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
     }
 
-    var $parent = selector && $(selector)
+    var $parent = selector && selector !== '#' && $(selector)
 
     return $parent && $parent.length ? $parent : $this.parent()
   }
