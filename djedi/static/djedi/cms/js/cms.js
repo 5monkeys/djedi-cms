@@ -226,7 +226,7 @@
             }
             root = parts[0];
             if (!groups[root]) {
-              $panel = $("<div class=\"panel panel-default\">\n  <div class=\"panel-heading\">\n    <h4 class=\"panel-title\">\n      <a class=\"accordion-toggle collapsed\" data-toggle=\"collapse\" data-parent=\"#search-result\" href=\"#node-group-" + (root.toLowerCase()) + "\">\n        <i class=\"icon-chevron-sign-down\"></i> " + root + "\n      </a>\n    </h4>\n  </div>\n</div>");
+              $panel = $("<div class=\"panel panel-default\">\n  <a class=\"panel-heading accordion-toggle collapsed\" data-toggle=\"collapse\" data-parent=\"#search-result\" href=\"#node-group-" + (root.toLowerCase()) + "\">\n    <h4 class=\"panel-title\">\n      <i class=\"icon-chevron-sign-down\"></i> " + root + "\n    </h4>\n  </a>\n</div>");
               $group = $("<ul id=\"node-group-" + (root.toLowerCase()) + "\" class=\"panel-collapse collapse list-unstyled\">");
               groups[root] = $group;
               $panel.append($group);

@@ -165,13 +165,11 @@ class Search
         if not groups[root]
           $panel = $ """
                      <div class="panel panel-default">
-                       <div class="panel-heading">
+                       <a class="panel-heading accordion-toggle collapsed" data-toggle="collapse" data-parent="#search-result" href="#node-group-#{root.toLowerCase()}">
                          <h4 class="panel-title">
-                           <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#search-result" href="#node-group-#{root.toLowerCase()}">
-                             <i class="icon-chevron-sign-down"></i> #{root}
-                           </a>
+                           <i class="icon-chevron-sign-down"></i> #{root}
                          </h4>
-                       </div>
+                       </a>
                      </div>
                      """
           $group = $ """

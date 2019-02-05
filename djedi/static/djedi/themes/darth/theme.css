@@ -6269,17 +6269,17 @@ body.open .navbar-brand > a > i.dc-djedi-icon {
   box-shadow: inset 7px 6px 10px -10px #000000;
   color: #eeeeee;
 }
+.panel-heading {
+  display: block;
+}
+.panel-heading:hover, .panel-heading:focus {
+  text-decoration: none;
+}
 .panel-heading:hover {
   background-color: #1b1b1b;
 }
 .panel-heading .panel-title {
   font-size: 1.1em;
-}
-.panel-heading .panel-title a {
-  display: block;
-}
-.panel-heading .panel-title a:hover {
-  text-decoration: none;
 }
 .panel-collapse {
   max-height: 170px;

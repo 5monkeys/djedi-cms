@@ -295,6 +295,11 @@ body {
 }
 
 .panel-heading {
+  display: block;
+
+  &:hover, &:focus {
+    text-decoration: none;
+  }
 
   &:hover {
     background-color: darken(@panel-default-heading-bg, 2%);
@@ -302,14 +307,6 @@ body {
 
   .panel-title {
     font-size: 1.1em;
-
-    a {
-      display: block;
-
-      &:hover {
-        text-decoration: none;
-      }
-    }
   }
 }
 
