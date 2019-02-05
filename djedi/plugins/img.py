@@ -117,7 +117,7 @@ class ImagePluginBase(BasePlugin):
 
     def render(self, data):
         attrs = {
-            'src': 'http://placekitten.com/160/90',
+            'src': 'https://placekitten.com/160/90',
             'width': 160,
             'height': 90
         }

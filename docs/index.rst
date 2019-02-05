@@ -34,4 +34,4 @@ User Guide
    settings
 
 
-.. _SOUTH_MIGRATION_MODULES: http://south.readthedocs.org/en/latest/settings.html#south-migration-modules
+.. _SOUTH_MIGRATION_MODULES: https://south.readthedocs.io/en/latest/settings.html#south-migration-modules
