@@ -251,8 +251,8 @@ class window.ImageEditor extends window.Editor
     @ratioButton = $ '#ar-lock'
 
     # Field events
-    $('.dimension').on 'keyup', @resizeImage
-    $('#html-pane input').on 'keyup', => @updateImageAttributes()
+    $('.dimension').on 'input', @resizeImage
+    $('#html-pane input').on 'input', => @updateImageAttributes()
     @ratioButton.on 'click', @toggleAspectRatio
     @ratioButton.tooltip()
 

@@ -336,8 +336,8 @@
       this.widthField = $('#field-width');
       this.heightField = $('#field-height');
       this.ratioButton = $('#ar-lock');
-      $('.dimension').on('keyup', this.resizeImage);
-      $('#html-pane input').on('keyup', (function(_this) {
+      $('.dimension').on('input', this.resizeImage);
+      $('#html-pane input').on('input', (function(_this) {
         return function() {
           return _this.updateImageAttributes();
         };
