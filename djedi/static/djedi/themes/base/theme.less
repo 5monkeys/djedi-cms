@@ -98,6 +98,8 @@ iframe {
 }
 
 #search-panel {
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
 
   .search-bar {
     padding: 20px;
@@ -311,8 +313,6 @@ body {
 }
 
 .panel-collapse {
-  max-height: 170px;
-  overflow-y: scroll;
   margin-bottom: 0;
 
   &::-webkit-scrollbar {

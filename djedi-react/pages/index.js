@@ -63,6 +63,12 @@ export default class Home extends React.Component {
           </Link>
         </p>
 
+        <p>
+          <Link href={{ pathname: "/lots" }}>
+            <a>Lots of nodes</a>
+          </Link>
+        </p>
+
         {/* Image node. */}
         <Node uri="home/image.img" />
 

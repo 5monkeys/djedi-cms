@@ -6044,6 +6044,10 @@ iframe {
   border: 0;
   display: block;
 }
+#search-panel {
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
+}
 #search-panel .search-bar {
   padding: 20px;
 }
@@ -6282,8 +6286,6 @@ body.open .navbar-brand > a > i.dc-djedi-icon {
   font-size: 1.1em;
 }
 .panel-collapse {
-  max-height: 170px;
-  overflow-y: scroll;
   margin-bottom: 0;
 }
 .panel-collapse::-webkit-scrollbar {
