@@ -117,7 +117,10 @@ class ImagePluginBase(BasePlugin):
 
     def render(self, data):
         attrs = {
-            'src': 'https://placekitten.com/160/90',
+            # Use a data URI so that the image works without hassle even if the
+            # Djedi backend and frontend run on different domains.
+            # 'src': '/static/djedi/placeholder.svg',
+            'src': 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTYwIDkwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIG9wYWNpdHk9Ii4yNSIgZmlsbD0iIzIwYjJhYSIgZD0iTTAgMGgxNjB2OTBIMHoiLz48L3N2Zz4K',
             'width': 160,
             'height': 90
         }

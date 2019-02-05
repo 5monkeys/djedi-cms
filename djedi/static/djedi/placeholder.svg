@@ -1,0 +1,7 @@
+<!--
+This can be turned into base64 by running:
+svgo djedi/static/djedi/placeholder.svg -o - | openssl base64 | tr -d '\n'
+-->
+<svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="160" height="90" opacity="0.25" fill="#20b2aa" />
+</svg>
