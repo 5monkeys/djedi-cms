@@ -6025,6 +6025,7 @@ body.embedded {
   overflow: hidden;
 }
 body.embedded .embed-shadow {
+  pointer-events: none;
   width: 10px;
   height: 100%;
   position: absolute;
