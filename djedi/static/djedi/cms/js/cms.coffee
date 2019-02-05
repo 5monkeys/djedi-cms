@@ -154,7 +154,10 @@ class Search
         uri = node.uri
         color = (uri.ext[0].toUpperCase().charCodeAt() - 65) % 5 + 1
 
-        parts = (part[..0].toUpperCase() + part[1..-1] for part in uri.path.split '/')
+        parts = (
+          for part in uri.path.split '/' when part != ''
+            (part[..0].toUpperCase() + part[1..-1]).replace /[_-]/g, ' '
+        )
         path = parts[1..].join " <span class=\"plugin-fg-#{color}\">/</span> "
 
         lang = uri.namespace
