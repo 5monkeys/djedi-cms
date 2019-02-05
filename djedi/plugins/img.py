@@ -125,13 +125,12 @@ class ImagePluginBase(BasePlugin):
             url = data.get('url')
             width = data.get('width') or 0
             height = data.get('height') or 0
-            alt = data.get('alt')
+            alt = data.get('alt') or ''
             tag_id = data.get('id')
             tag_class = data.get('class')
             if url:
                 attrs['src'] = url
-            if alt:
-                attrs['alt'] = alt
+            attrs['alt'] = alt
             if width and height:
                 attrs['width'] = width
                 attrs['height'] = height
