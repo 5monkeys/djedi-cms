@@ -342,6 +342,7 @@
       this.connect = __bind(this.connect, this);
       this.uri = this.node.uri.valueOf();
       this.$el = $('<iframe>');
+      this.$el.attr('id', 'editor-iframe');
       this.$el.one('load', this.connect);
       this.navigate(this.uri);
     }
@@ -360,7 +361,7 @@
       this.$doc = this.window.$(this.window.document);
       this.$doc.on('node:render', Events.handler);
       this.$doc.on('node:resize', Events.handler);
-      this.$doc.on('page:node:fetch', (function(_this) {
+      return this.$doc.on('page:node:fetch', (function(_this) {
         return function(event, uri, callback) {
           return callback({
             data: _this.node.data,
@@ -368,19 +369,6 @@
           });
         };
       })(this));
-      return this.render();
-    };
-
-    Plugin.prototype.render = function() {
-      this.resize(this.$doc.find('#form').outerHeight(true));
-      return this.$el;
-    };
-
-    Plugin.prototype.resize = function(height) {
-      console.log('Plugin.resize()');
-      return this.$el.animate({
-        height: "" + height + "px"
-      }, 400);
     };
 
     Plugin.prototype.close = function() {

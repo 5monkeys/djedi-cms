@@ -255,6 +255,7 @@ class Plugin
 
     # Create iframe
     @$el = $ '<iframe>'
+    @$el.attr 'id', 'editor-iframe'
     @$el.one 'load', @connect
     @navigate @uri
 
@@ -275,17 +276,6 @@ class Plugin
     @$doc.on 'node:render', Events.handler
     @$doc.on 'node:resize', Events.handler
     @$doc.on 'page:node:fetch', (event, uri, callback) => callback data: @node.data, content: @node.getContent()
-
-    @render()
-
-  render: ->
-    # Resize and show frame
-    @resize @$doc.find('#form').outerHeight yes
-    @$el
-
-  resize: (height) ->
-    console.log 'Plugin.resize()'
-    @$el.animate {height: "#{height}px"}, 400
 
   close: ->
     @node.deselect()
