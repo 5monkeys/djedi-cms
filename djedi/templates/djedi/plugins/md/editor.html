@@ -12,7 +12,7 @@
                 editor = this
                 editor.$textarea = $('textarea');
 
-                editor.$textarea.keydown(function(e) {
+                editor.$textarea.on('keydown', function(e) {
                     if(e.keyCode === 9) { // tab was pressed
                         // ### Get caret position/selection
                         var start = this.selectionStart;
