@@ -10,6 +10,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/djedi-cms
+      - media-files:/media
 
   node:
     build: ./djedi-react
@@ -30,3 +31,6 @@ services:
     volumes:
       - .:/code
       - /code/node_modules
+
+volumes:
+  media-files:
