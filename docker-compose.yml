@@ -11,6 +11,8 @@ services:
     volumes:
       - .:/djedi-cms
       - media-files:/media
+    environment:
+      - DJEDI_THEME=${DJEDI_THEME:-}
 
   node:
     build: ./djedi-react

@@ -127,3 +127,6 @@ CORS_ALLOW_CREDENTIALS = True
 # https://djedi-cms.org/settings.html
 
 DJEDI_XSS_DOMAIN = 'localhost'
+
+# env DJEDI_THEME=luke docker-compose up -d django
+DJEDI_THEME = os.environ.get('DJEDI_THEME') or None
