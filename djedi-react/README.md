@@ -31,7 +31,7 @@ Requires djedi-cms version 1.2.1 or later.
   - [npm scripts](#npm-scripts)
   - [docker](#docker)
   - [Directories](#directories)
-  - [Notes](#notes)
+  - [docker and permissions](#docker-and-permissions)
 - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -1151,33 +1151,7 @@ docker run --rm -it -v /absolute/path/to/djedi-cms/djedi-react:/code -v /code/no
 - `pages/` and `components/`: [Next.js] example app.
 - `stub/`: An empty djedi-react package to fool Next.js packages check.
 
-### Notes
-
-#### Test changes in example
-
-If you make changes to the library and want to try them out on
-<http://localhost:3000> you need to:
-
-```
-# Rebuild:
-npm run build
-docker-compose exec node npm run build
-
-# Restart:
-npm start # But kill old server first :)
-docker-compose restart node
-```
-
-This is because the example runs against the built code, as an integration test.
-If you get tired of rebuilding, you can run the example against the source code
-instead:
-
-```
-env DJEDI_REACT_DIR=src npm start
-env DJEDI_REACT_DIR=src docker-compose up -d node
-```
-
-#### docker and permissions
+### docker and permissions
 
 docker runs as root, so files that it creates are owned by root. If you run
 docker and then try to run some npm scripts outside docker, they might fail
