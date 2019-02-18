@@ -154,7 +154,10 @@ class Search
         uri = node.uri
         color = (uri.ext[0].toUpperCase().charCodeAt() - 65) % 5 + 1
 
-        parts = (part[0].toUpperCase() + part[1..-1] for part in uri.path.split '/')
+        parts = (
+          for part in uri.path.split '/' when part != ''
+            (part[..0].toUpperCase() + part[1..-1]).replace /[_-]/g, ' '
+        )
         path = parts[1..].join " <span class=\"plugin-fg-#{color}\">/</span> "
 
         lang = uri.namespace
@@ -165,13 +168,11 @@ class Search
         if not groups[root]
           $panel = $ """
                      <div class="panel panel-default">
-                       <div class="panel-heading">
+                       <a class="panel-heading accordion-toggle collapsed" data-toggle="collapse" data-parent="#search-result" href="#node-group-#{root.toLowerCase()}">
                          <h4 class="panel-title">
-                           <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#search-result" href="#node-group-#{root.toLowerCase()}">
-                             <i class="icon-chevron-sign-down"></i> #{root}
-                           </a>
+                           <i class="icon-chevron-sign-down"></i> #{root}
                          </h4>
-                       </div>
+                       </a>
                      </div>
                      """
           $group = $ """
@@ -254,6 +255,7 @@ class Plugin
 
     # Create iframe
     @$el = $ '<iframe>'
+    @$el.attr 'id', 'editor-iframe'
     @$el.one 'load', @connect
     @navigate @uri
 
@@ -274,17 +276,6 @@ class Plugin
     @$doc.on 'node:render', Events.handler
     @$doc.on 'node:resize', Events.handler
     @$doc.on 'page:node:fetch', (event, uri, callback) => callback data: @node.data, content: @node.getContent()
-
-    @render()
-
-  render: ->
-    # Resize and show frame
-    @resize @$doc.find('#form').outerHeight yes
-    @$el
-
-  resize: (height) ->
-    console.log 'Plugin.resize()'
-    @$el.animate {height: "#{height}px"}, 400
 
   close: ->
     @node.deselect()

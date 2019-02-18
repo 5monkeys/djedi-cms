@@ -12,8 +12,8 @@
                 console.log('TextEditor.initialize()');
                 var editor = this;
                 editor.$textarea = $('textarea');
-                editor.$textarea.on('keyup', function () {
-                    console.log('TextEditor:keyup');
+                editor.$textarea.on('input', function () {
+                    console.log('TextEditor:input');
                     editor.triggerRender(editor.$textarea.val());
                     editor.$textarea.change()
                 });

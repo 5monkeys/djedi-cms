@@ -75,6 +75,6 @@ urlpatterns = [
 
 * [React][]: [djedi-react](djedi-react#djedi-react)
 
-[docs]: http://5monkeys.github.io/djedi-cms/
+[docs]: https://djedi-cms.org/
 [content-io]: https://github.com/5monkeys/content-io/
 [react]: https://reactjs.org/

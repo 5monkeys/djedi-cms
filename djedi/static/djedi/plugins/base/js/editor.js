@@ -345,7 +345,9 @@
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           part = _ref[_i];
-          _results.push(part[0].toUpperCase() + part.slice(1));
+          if (part !== '') {
+            _results.push((part.slice(0, 1).toUpperCase() + part.slice(1)).replace(/[_-]/g, ' '));
+          }
         }
         return _results;
       })();

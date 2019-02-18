@@ -202,7 +202,7 @@ class PrivateRestTest(ClientTest):
             'height': '64'
         })})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(smart_unicode(response.content), u'<img height="64" src="/foo/bar.png" width="64" />')
+        self.assertEqual(smart_unicode(response.content), u'<img alt="" height="64" src="/foo/bar.png" width="64" />')
 
     def test_editor(self):
         response = self.get('cms.editor', 'sv-se@page/title.foo')

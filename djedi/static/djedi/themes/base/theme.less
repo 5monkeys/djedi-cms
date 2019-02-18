@@ -74,6 +74,7 @@ body {
     }
 
     .embed-shadow {
+      pointer-events: none;
       width: 10px;
       height: 100%;
       position: absolute;
@@ -97,6 +98,8 @@ iframe {
 }
 
 #search-panel {
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
 
   .search-bar {
     padding: 20px;
@@ -294,6 +297,11 @@ body {
 }
 
 .panel-heading {
+  display: block;
+
+  &:hover, &:focus {
+    text-decoration: none;
+  }
 
   &:hover {
     background-color: darken(@panel-default-heading-bg, 2%);
@@ -301,20 +309,10 @@ body {
 
   .panel-title {
     font-size: 1.1em;
-
-    a {
-      display: block;
-
-      &:hover {
-        text-decoration: none;
-      }
-    }
   }
 }
 
 .panel-collapse {
-  max-height: 170px;
-  overflow-y: scroll;
   margin-bottom: 0;
 
   &::-webkit-scrollbar {
@@ -337,8 +335,14 @@ body {
 // Editor
 // --------------------------------------------------
 
+#editor-iframe {
+  height: 395px;
+  max-height: calc(100vh - 70px);
+}
+
 #editor {
   height: 360px;
+  max-height: calc(100vh - 35px);
   padding: 20px 20px 54px 20px;
 
   textarea {

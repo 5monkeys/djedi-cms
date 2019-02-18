@@ -49,7 +49,13 @@ example:
 clean:
 	rm -rf .tox/ dist/ *.egg *.egg-info .coverage* .eggs
 
-.PHONY: compile
-compile: # compile .coffee to .js
-	docker-compose run --rm node coffee -c .
-# Note: CoffeeScript files are watched and automatically compiled in docker.
+# docker-compose run --rm --entrypoint=make coffee coffee
+.PHONY: coffee
+coffee:
+	coffee --compile $(ARGS) djedi
+
+# docker-compose run --rm --entrypoint=make less less
+.PHONY: less
+less:
+	cd djedi/static/djedi/themes/darth && lessc --verbose theme.less theme.css
+	cd djedi/static/djedi/themes/luke && lessc --verbose theme.less theme.css

@@ -215,7 +215,9 @@
               _results1 = [];
               for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
                 part = _ref[_j];
-                _results1.push(part[0].toUpperCase() + part.slice(1));
+                if (part !== '') {
+                  _results1.push((part.slice(0, 1).toUpperCase() + part.slice(1)).replace(/[_-]/g, ' '));
+                }
               }
               return _results1;
             })();
@@ -226,7 +228,7 @@
             }
             root = parts[0];
             if (!groups[root]) {
-              $panel = $("<div class=\"panel panel-default\">\n  <div class=\"panel-heading\">\n    <h4 class=\"panel-title\">\n      <a class=\"accordion-toggle collapsed\" data-toggle=\"collapse\" data-parent=\"#search-result\" href=\"#node-group-" + (root.toLowerCase()) + "\">\n        <i class=\"icon-chevron-sign-down\"></i> " + root + "\n      </a>\n    </h4>\n  </div>\n</div>");
+              $panel = $("<div class=\"panel panel-default\">\n  <a class=\"panel-heading accordion-toggle collapsed\" data-toggle=\"collapse\" data-parent=\"#search-result\" href=\"#node-group-" + (root.toLowerCase()) + "\">\n    <h4 class=\"panel-title\">\n      <i class=\"icon-chevron-sign-down\"></i> " + root + "\n    </h4>\n  </a>\n</div>");
               $group = $("<ul id=\"node-group-" + (root.toLowerCase()) + "\" class=\"panel-collapse collapse list-unstyled\">");
               groups[root] = $group;
               $panel.append($group);
@@ -340,6 +342,7 @@
       this.connect = __bind(this.connect, this);
       this.uri = this.node.uri.valueOf();
       this.$el = $('<iframe>');
+      this.$el.attr('id', 'editor-iframe');
       this.$el.one('load', this.connect);
       this.navigate(this.uri);
     }
@@ -358,7 +361,7 @@
       this.$doc = this.window.$(this.window.document);
       this.$doc.on('node:render', Events.handler);
       this.$doc.on('node:resize', Events.handler);
-      this.$doc.on('page:node:fetch', (function(_this) {
+      return this.$doc.on('page:node:fetch', (function(_this) {
         return function(event, uri, callback) {
           return callback({
             data: _this.node.data,
@@ -366,19 +369,6 @@
           });
         };
       })(this));
-      return this.render();
-    };
-
-    Plugin.prototype.render = function() {
-      this.resize(this.$doc.find('#form').outerHeight(true));
-      return this.$el;
-    };
-
-    Plugin.prototype.resize = function(height) {
-      console.log('Plugin.resize()');
-      return this.$el.animate({
-        height: "" + height + "px"
-      }, 400);
     };
 
     Plugin.prototype.close = function() {

@@ -7,7 +7,8 @@
 <body>
 <h1>{% node 'page/title.txt' default='Djedi' %}</h1>
 
-{% blocknode 'page/body.md' %}
+{# Intentionally odd slashes, underscores and dashes for testing purposes. #}
+{% blocknode 'page//body/into_text-test/.md' %}
     ## I'm a djedi apprentice
     This is fun!
 {% endblocknode %}

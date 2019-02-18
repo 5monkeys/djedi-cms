@@ -112,6 +112,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
+MEDIA_ROOT = '/media/'
+
 # CORS
 # https://github.com/OttoYiu/django-cors-headers
 
@@ -122,6 +124,9 @@ CORS_ORIGIN_WHITELIST = (
 CORS_ALLOW_CREDENTIALS = True
 
 # Djedi
-# http://djedi-cms.org/settings.html
+# https://djedi-cms.org/settings.html
 
 DJEDI_XSS_DOMAIN = 'localhost'
+
+# env DJEDI_THEME=luke docker-compose up -d django
+DJEDI_THEME = os.environ.get('DJEDI_THEME') or None

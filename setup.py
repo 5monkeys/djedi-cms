@@ -32,7 +32,7 @@ setup(
         '    :target: https://travis-ci.org/5monkeys/djedi-cms\n'
         '.. image:: https://coveralls.io/repos/5monkeys/djedi-cms/badge.svg?branch=master\n'
         '    :target: https://coveralls.io/r/5monkeys/djedi-cms?branch=master\n\n'
-        '.. _documentation: http://djedi-cms.org/\n'
+        '.. _documentation: https://djedi-cms.org/\n'
         '.. _source: https://github.com/5monkeys/djedi-cms\n\n'
     ),
     author='Jonas Lundberg',

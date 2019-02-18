@@ -10,6 +10,9 @@ services:
       - "8000:8000"
     volumes:
       - .:/djedi-cms
+      - media-files:/media
+    environment:
+      - DJEDI_THEME=${DJEDI_THEME:-}
 
   node:
     build: ./djedi-react
@@ -23,10 +26,29 @@ services:
       - DJEDI_REACT_DIR=${DJEDI_REACT_DIR:-}
       - SERVER_BASE_URL=http://django:8000/djedi/api
 
-  # Piggy-backing on djedi-react’s image and node_modules to watch CoffeeScript files.
+  # Piggy-backing on djedi-react’s image and node_modules to watch CoffeeScript
+  # and Less files.
   coffee:
     build: ./djedi-react
-    command: ["coffee", "-cw", "."]
+    command: ["make", "coffee", "ARGS=--watch"]
     volumes:
       - .:/code
       - /code/node_modules
+  less:
+    build: ./djedi-react
+    command:
+      [
+        "onchange",
+        "--initial",
+        "djedi/static/djedi/themes/**/*.less",
+        "--",
+        "make",
+        "less",
+        "--silent",
+      ]
+    volumes:
+      - .:/code
+      - /code/node_modules
+
+volumes:
+  media-files:

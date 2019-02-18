@@ -6,13 +6,18 @@
 
 {% block plugin_script %}
     <script>
+        var RENDER_TIMEOUT = 400; // ms
+
         new window.Editor({
             uri: '{{ uri }}',
             initialize: function () {
                 editor = this
+
+                editor.renderTimeoutId = undefined;
+
                 editor.$textarea = $('textarea');
 
-                editor.$textarea.keydown(function(e) {
+                editor.$textarea.on('keydown', function(e) {
                     if(e.keyCode === 9) { // tab was pressed
                         // ### Get caret position/selection
                         var start = this.selectionStart;
@@ -35,12 +40,22 @@
 
                 editor.$textarea.on('input', function () {
                     editor.setState('dirty');
+                    if (editor.renderTimeoutId != null) {
+                      clearTimeout(editor.renderTimeoutId);
+                    }
+                    editor.renderTimeoutId = setTimeout(function() {
+                      editor.renderTimeoutId = undefined;
+                      editor.onFormChange();
+                    }, RENDER_TIMEOUT);
                 });
             },
             render: function (node) {
-                this.$textarea.val(node.data);
+                editor.$textarea.val(node.data);
             },
             onFormChange: function() {
+                if (editor.renderTimeoutId == null) {
+                  clearTimeout(editor.renderTimeoutId);
+                }
                 editor.renderContent(editor.$textarea.val(), true);
             }
         });

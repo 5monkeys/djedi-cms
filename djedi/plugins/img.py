@@ -117,7 +117,12 @@ class ImagePluginBase(BasePlugin):
 
     def render(self, data):
         attrs = {
-            'src': 'http://placekitten.com/160/90',
+            # Use a data URI so that the image works without hassle even if the
+            # Djedi backend and frontend run on different domains. The base64
+            # part was made by running:
+            # $ svgo djedi/static/djedi/placeholder.svg -o - | openssl base64 | tr -d '\n'
+            # 'src': '/static/djedi/placeholder.svg',
+            'src': 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTYwIDkwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIG9wYWNpdHk9Ii4yNSIgZmlsbD0iIzIwYjJhYSIgZD0iTTAgMGgxNjB2OTBIMHoiLz48L3N2Zz4K',  # noqa: E501
             'width': 160,
             'height': 90
         }
@@ -125,13 +130,12 @@ class ImagePluginBase(BasePlugin):
             url = data.get('url')
             width = data.get('width') or 0
             height = data.get('height') or 0
-            alt = data.get('alt')
+            alt = data.get('alt') or ''
             tag_id = data.get('id')
             tag_class = data.get('class')
             if url:
                 attrs['src'] = url
-            if alt:
-                attrs['alt'] = alt
+            attrs['alt'] = alt
             if width and height:
                 attrs['width'] = width
                 attrs['height'] = height
