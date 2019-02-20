@@ -1,6 +1,15 @@
 delay = (ms, func) ->
   setTimeout func, ms
 
+# We have a button that can lock the aspect ratio of both the crop tool, and the
+# width/height fields (changing the width automatically updates the height, and
+# vice versa). That’s cool, but it’s not clear if its useful to the user. I
+# think that 99% of the time you want to crop into a new aspect ratio, but when
+# resizing you always want keep the aspect ratio. By setting this variable to
+# `false`, the aspect ratio button is hidden and the described behavior is
+# enabled.
+ENABLE_ASPECT_RATIO_BUTTON = no
+
 
 ################################################[  CROP  ]##############################################################
 class CropTool
@@ -88,6 +97,16 @@ class CropTool
     # Disallow upscaling the image. The user might of course type in crazy sizes.
     width = Math.min @crop.width, @previewSize.width
     height = Math.min @crop.height, @previewSize.height
+
+    # Keep the aspect ratio of the crop area.
+    unless ENABLE_ASPECT_RATIO_BUTTON
+      ratio = @getCropAspectRatio()
+      height2 = width / ratio
+      width2 = height * ratio
+      if height2 <= height
+        height = height2
+      else
+        width = width2
 
     @canvas.width = width unless @canvas.width == width
     @canvas.height = height unless @canvas.height == height
@@ -318,6 +337,13 @@ class window.ImageEditor extends window.Editor
     @ratioButton.on 'click', @toggleAspectRatio
     @ratioButton.tooltip()
 
+    unless ENABLE_ASPECT_RATIO_BUTTON
+      # Turn the button into a spacer between the width and height fields.
+      @ratioButton.css
+        visibility: 'hidden'
+        padding: 0
+        width: 10
+
   render: (node) ->
     console.log 'ImageEditor.render()', {@firstRender, node}
     super node
@@ -393,7 +419,7 @@ class window.ImageEditor extends window.Editor
     return unless @crop
     [w, h] = @dimensions()
 
-    if keepRatio
+    if keepRatio or not ENABLE_ASPECT_RATIO_BUTTON
       ratio = @crop.getCropAspectRatio()
 
       if keepWidth
