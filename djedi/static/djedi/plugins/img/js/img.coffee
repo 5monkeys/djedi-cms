@@ -60,6 +60,10 @@ class CropTool
     @redrawing = false
     @queuedRedraw = false
 
+    # Select the entire image by default. This makes it more obvious that we
+    # have a crop tool.
+    @api.setSelect [0, 0, @bounds...]
+
   destroy: ->
     @api.ui.holder.hide()
     @api.destroy()

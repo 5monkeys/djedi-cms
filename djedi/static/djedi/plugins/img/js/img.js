@@ -2,6 +2,7 @@
 (function() {
   var CropTool, Dropzone, ENABLE_ASPECT_RATIO_BUTTON, delay,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -56,7 +57,8 @@
       }
       this.ctx = this.canvas.getContext('2d');
       this.redrawing = false;
-      return this.queuedRedraw = false;
+      this.queuedRedraw = false;
+      return this.api.setSelect([0, 0].concat(__slice.call(this.bounds)));
     };
 
     CropTool.prototype.destroy = function() {
