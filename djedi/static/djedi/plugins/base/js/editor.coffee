@@ -99,7 +99,7 @@ class ProgressBar
 class window.Editor
 
   constructor: (@config) ->
-#    console.log 'Editor.constructor', @
+    console.log 'Editor.constructor', @
 
     # cms.coffee waits for the 'load' event of the editor iframe (in which this
     # file runs). Then, cms.coffee has access to the jQuery of the editor iframe
@@ -118,7 +118,7 @@ class window.Editor
       $(window).one 'load', => setTimeout (=> @initialize @config), 0
 
   initialize: (config) ->
-#    console.log 'Editor.initialize'
+    console.log 'Editor.initialize'
     @api = new Client window.DJEDI_ENDPOINT
     @$doc = $ document
 
@@ -184,13 +184,15 @@ class window.Editor
 
     # Notify embedder that plugin is loaded
     if initial
-#      @delay 100, => @trigger 'plugin:loaded', node.uri.valueOf()
       @trigger 'plugin:loaded', node.uri.valueOf()
 
     @render node
-#    @trigger 'node:render', node.uri.valueOf(), node.content or ''
-    @delay 0, => @trigger 'node:render', node.uri.valueOf(), node.content or ''
-    console.log 'content', node.content or ''
+
+    # Re-render node content for drafts only.
+    unless node.meta.is_published
+      @delay 0, => @trigger 'node:render', node.uri.valueOf(), node.content or ''
+
+    console.log 'Editor.onLoad() full node', node
 
   onFormChange: (event) =>
     console.log 'Editor.onFormChange()'
@@ -328,7 +330,6 @@ class window.Editor
   render: (node) ->
     console.log 'Editor.render()'
     @callback 'render', node
-#    $('#editor').fadeIn 150
 
   loadRevision: (event) =>
     console.log 'Editor.loadRevision()'

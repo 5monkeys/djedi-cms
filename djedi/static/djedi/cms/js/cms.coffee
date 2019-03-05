@@ -51,6 +51,11 @@ class Node
       @$outline.on 'click', @select
       $('body', container).append @render()
 
+    # Whenever an image loads inside a node, re-render its outline. The 'load'
+    # event doesn't bubble. jQuery does not support listening in the capture
+    # phase, so use vanilla `addEventListener`.
+    @$el[0].addEventListener 'load', @render, true if @$el.length > 0
+
   id: ->
     @uri.namespace + '@' + @uri.path
 
@@ -63,7 +68,7 @@ class Node
       @$el.html content
       @render()
 
-  render: ->
+  render: =>
     return unless @preview
     console.log 'Node.render'
 

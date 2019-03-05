@@ -20,7 +20,7 @@
     <body class="editor">
         {% block form %}
         <form id="form" role="form" enctype="multipart/form-data" method="post" action="{% url 'admin:djedi:cms.editor' uri|urlencode:''|urlencode:'' %}">
-            <header class="navbar-fixed-top">
+            <header>
                 <nav role="header" class="navbar navbar-default node-title">
                     <div class="plugin"></div>
                     <div class="flag"></div>
@@ -38,7 +38,7 @@
             <section id="tabs">{% block tabs %}{% endblock tabs %}</section>
             <section id="editor">{% block editor %}{% endblock editor %}</section>
             <footer>
-                <nav class="navbar navbar-default navbar-fixed-bottom">
+                <nav class="navbar navbar-default">
                     <i id="spinner" class="icon-spinner icon-spin icon-2x pull-left"></i>
                     <div class="pull-right navbar-right btn-group">
                         <button type="button" id="button-discard" class="btn btn-default navbar-btn" disabled="disabled"><i class="icon-remove"></i> Discard</button>

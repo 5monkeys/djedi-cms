@@ -1,5 +1,19 @@
-body {
-    /*background-color: #333;*/
+.tab-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+}
+
+.tab-pane {
+    position: relative;
+    height: 100%;
+}
+
+#editor {
+  max-height: calc(100vh - 102px);
 }
 
 #image {
@@ -8,68 +22,91 @@ body {
 
 #dropzone {
     position: absolute;
-    top: 68px;
+    z-index: 3;
+    top: 0;
     left: 0;
-    width: 100%;
-}
-
-#dropzone section {
-    /*width: 100%;*/
-    margin: 20px;
-    min-height: 290px;
+    right: 0;
+    height: 236px;
     text-align: center;
     border: 3px dashed rgba(0, 0, 0, 0.5);
-    line-height: 270px;
+    line-height: 236px;
     padding: 0;
+    transition: background-color 0.1s ease-in;
+    cursor: pointer;
 }
 
-#dropzone section.drag {
-    -webkit-transition: background-color 0.1s ease-in;
-       -moz-transition: background-color 0.1s ease-in;
-        -ms-transition: background-color 0.1s ease-in;
-         -o-transition: background-color 0.1s ease-in;
-            transition: background-color 0.1s ease-in;
+#dropzone > span {
+    /* So 'dragenter' and 'dragexit' events aren't triggered inside the dropzone. */
+    pointer-events: none;
+}
+
+#dropzone.drag {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
-#dropzone section.drag-over {
-    -webkit-transition: background-color 0.1s ease-in;
-       -moz-transition: background-color 0.1s ease-in;
-        -ms-transition: background-color 0.1s ease-in;
-         -o-transition: background-color 0.1s ease-in;
-            transition: background-color 0.1s ease-in;
+#dropzone.drag-over {
     background-color: rgba(0, 58, 75, 0.5);
 }
 
-#dropzone section.error {
+#dropzone.error {
     background-color: rgba(75, 0, 39, 0.5);
 }
 
-#dropzone section.drag .drop,
-#dropzone section.drag .uploading,
-#dropzone section.drag-over .drag,
-#dropzone section.drag-over .uploading,
-#dropzone section.drop .drag,
-#dropzone section.drop .drop {
-    display: none;
-}
-
-#dropzone section.drag-over .drop,
-#dropzone section.drop .uploading {
-    display: inline;
+/* Hide the crop "marching ants" box when showing the dropzone on top. */
+#dropzone[data-shown] + #preview .jcrop-holder > * {
+    opacity: 0;
 }
 
 #preview {
+    position: relative;
+    z-index: 1;
     width: 100%;
-    /*min-height: 200px;*/
-    margin-bottom: 20px;
-}
-
-#preview img {
 }
 
 #preview img.original {
     max-width: 100%;
-    max-height: 290px;
-    /*height: 200px;*/
+    max-height: 236px;
+}
+
+#preview .jcrop-holder {
+    height: auto !important;
+}
+
+#resize {
+    position: absolute;
+    z-index: 2;
+    left: -5px;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px;
+    padding-bottom: 0;
+}
+
+/* When the window isn’t very tall and the resize controls are on top of the image. */
+#resize::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background-color: inherit;
+}
+
+#resize input {
+    display: inline;
+    width: 95px;
+    min-width: 0;
+}
+
+/* Hide width/height fields when there's no image (just the placeholder image). */
+#preview:empty + #resize {
+    display: none;
+}
+
+#ar-lock + .tooltip {
+    white-space: nowrap;
 }

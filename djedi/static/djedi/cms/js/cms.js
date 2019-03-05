@@ -60,6 +60,7 @@
 
     function Node(uri, data, container) {
       this.select = __bind(this.select, this);
+      this.render = __bind(this.render, this);
       this.uri = uri.to_uri();
       this.data = data;
       this.$el = $("span[data-i18n='" + (this.id()) + "']", container);
@@ -68,6 +69,9 @@
         this.$outline = $('<div class="djedi-node-outline">');
         this.$outline.on('click', this.select);
         $('body', container).append(this.render());
+      }
+      if (this.$el.length > 0) {
+        this.$el[0].addEventListener('load', this.render, true);
       }
     }
 
