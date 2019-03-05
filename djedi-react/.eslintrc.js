@@ -2,7 +2,14 @@ const baseRules = require("eslint-config-lydell");
 
 module.exports = {
   root: true,
-  plugins: ["import", "react", "prettier", "simple-import-sort", "jest"],
+  plugins: [
+    "import",
+    "react",
+    "react-hooks",
+    "prettier",
+    "simple-import-sort",
+    "jest",
+  ],
   parser: "babel-eslint",
   env: { es6: true },
   globals: {
