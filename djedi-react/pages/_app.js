@@ -35,30 +35,26 @@ djedi.options.fetch = unfetch;
 // Inject the admin sidebar, if the user has permission.
 djedi.injectAdmin();
 
-// This is 99% the standard Next.js boilerplate for _app.js.
 export default class MyApp extends App {
   static async getInitialProps({ Component, ctx, ctx: { query } }) {
-    let pageProps = {};
-
     // This demo uses a query parameter for the language to keep the demo small.
     // Ugly, but it works.
     const language = {}.hasOwnProperty.call(LANGUAGES, query.language)
       ? query.language
       : DEFAULT_LANGUAGE;
 
-    if (Component.getInitialProps) {
+    // Load page data and Djedi nodes in parallel.
+    const [pageProps] = await Promise.all([
       // Pass the language to the child `getInitialProps`, in case it needs to
       // call `djedi.prefetch`.
-      pageProps = await Component.getInitialProps({ ...ctx, language });
-    }
-
-    // Prefetch on all pages. If the page itself has already prefetched (like
-    // index.js does) this is basically a no-op. If a page absolutely must not
-    // make network requests, set `.skipDjediPrefetch = true` on it.
-    if (!Component.skipDjediPrefetch) {
-      // Make sure to pass the language.
-      await djedi.prefetch({ language });
-    }
+      Component.getInitialProps
+        ? Component.getInitialProps({ ...ctx, language })
+        : {},
+      // Prefetch on all pages. If the page takes care of prefetching itself (like
+      // index.js does), the page should set `.skipDjediPrefetch = true` on
+      // itself to avoid double network requests.
+      Component.skipDjediPrefetch ? undefined : djedi.prefetch({ language }),
+    ]);
 
     // Track which nodes are actually rendered.
     const nodes = djedi.track();

@@ -12,6 +12,8 @@ export default class Home extends React.Component {
     storeSlug: PropTypes.string.isRequired,
   };
 
+  static skipDjediPrefetch = true;
+
   static async getInitialProps({ language }) {
     // Imagine this coming from the URL or something.
     const storeSlug = "andys-tools";
