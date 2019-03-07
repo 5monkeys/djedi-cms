@@ -1,6 +1,6 @@
 import simplejson as json
 import six
-from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
@@ -26,7 +26,11 @@ class EmbedApi(View):
         if has_permission(request):
             return render_embed(request=request)
         else:
-            raise PermissionDenied
+            # We used to `raise PermissionDenied` here (which might seem more
+            # appropriate), but that has the annoying side effect of being
+            # logged as an error in the browser dev tools, making people think
+            # something is wrong.
+            return HttpResponse(status=204)
 
 
 class NodesApi(APIView):
