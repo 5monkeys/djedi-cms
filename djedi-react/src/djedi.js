@@ -257,6 +257,12 @@ export class Djedi {
     const url = `${this.options.baseUrl}/embed/`;
 
     return this._fetch(url, { credentials: "include" }).then(response => {
+      // If the user is not logged in as an admin, the API responds with 204 No
+      // Content. Also handle 403 Forbidden for backwards compatibility.
+      if (response.status === 204 || response.status === 403) {
+        return false;
+      }
+
       if (response.status >= 200 && response.status < 400) {
         return response.text().then(html => {
           // Browsers don’t allow <script> tags inserted as part of an HTML
@@ -276,9 +282,7 @@ export class Djedi {
           return true;
         });
       }
-      if (response.status === 403) {
-        return false;
-      }
+
       return Promise.reject(createStatusCodeError(response));
     });
   }

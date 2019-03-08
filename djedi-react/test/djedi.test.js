@@ -539,6 +539,16 @@ describe("injectAdmin", () => {
   });
 
   test("handles not having permission", async () => {
+    fetch("", { status: 204, stringify: false });
+    document.body.innerHTML = "<p>Some content</p>";
+    const inserted = await djedi.injectAdmin();
+    expect(inserted).toBe(false);
+    expect(document.body.innerHTML).toMatchInlineSnapshot(
+      `"<p>Some content</p>"`
+    );
+  });
+
+  test("handles not having permission – backwards compatibility", async () => {
     fetch("<h1>403 Forbidden</h1>", { status: 403, stringify: false });
     document.body.innerHTML = "<p>Some content</p>";
     const inserted = await djedi.injectAdmin();

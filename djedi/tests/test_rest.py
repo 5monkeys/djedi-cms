@@ -293,7 +293,7 @@ class PublicRestTest(ClientTest):
 
         self.client.logout()
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 204)
 
     def test_nodes(self):
         with self.assertCache(sets=1):
