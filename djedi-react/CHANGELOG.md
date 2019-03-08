@@ -1,3 +1,13 @@
+### Version 5.3.0 (2019-03-08)
+
+- Added: `djedi.injectAdmin` now supports the 204 response code that Djedi 1.3.0
+  uses when the user is not a logged in as a Djedi user. The old 403 status code
+  is also supported for backwards compatibility. The new 204 status code avoids
+  the annoying/confusing red errors in the browser console of a “failed”
+  request. (Older versions of djedi-react won’t crash if you try to use them
+  with Djedi 1.3.0. An unnecessary `MutationObserver` will be installed for all
+  visitors, but it shouldn’t matter much.)
+
 ### Version 5.2.0 (2019-01-29)
 
 - Improved: The admin sidebar is now updated as nodes come and go on the page in
