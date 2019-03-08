@@ -44,7 +44,7 @@
     "@babel/preset-env": "7.3.4",
     "@babel/preset-react": "7.0.0",
     "babel-eslint": "10.0.1",
-    "babel-jest": "24.1.0",
+    "babel-jest": "24.3.1",
     "coffeescript": "1.8.0",
     "djedi-react": "./stub",
     "doctoc": "1.4.0",
@@ -54,16 +54,16 @@
     "eslint-plugin-jest": "22.3.0",
     "eslint-plugin-prettier": "3.0.1",
     "eslint-plugin-react": "7.12.4",
-    "eslint-plugin-react-hooks": "1.4.0",
+    "eslint-plugin-react-hooks": "1.5.0",
     "eslint-plugin-simple-import-sort": "3.0.0",
     "isomorphic-unfetch": "3.0.0",
-    "jest": "24.1.0",
+    "jest": "24.3.1",
     "less": "3.9.0",
     "next": "8.0.3",
     "onchange": "5.2.0",
     "prettier": "1.16.4",
-    "react": "16.8.3",
-    "react-dom": "16.8.3",
-    "react-test-renderer": "16.8.3"
+    "react": "16.8.4",
+    "react-dom": "16.8.4",
+    "react-test-renderer": "16.8.4"
   }
 }
