@@ -91,8 +91,17 @@ class CropTool
 
     @redrawing = true
 
+    # The `window` of the actual page. The sidebar itself is an iframe, and the
+    # image editor is a nested iframe. The preview `<img>` element must be
+    # constructed from the window it is going to be inserted into, and the `URL`
+    # object from the same window must be used to construct its `src`, otherwise
+    # browsers will complain about not being able to load a "local resource" if
+    # the actual page and the sidebar have different origins (domains).
+    # Cross-frame security stuff.
+    win = window.parent.parent
+
     hasPreview = @preview?
-    @preview = $ '<img>' unless hasPreview
+    @preview = $ new win.Image unless hasPreview
 
     # For images with transparent background it is important to clear the canvas
     # between renders.
@@ -136,11 +145,11 @@ class CropTool
       width, height
 
     @canvas.toBlob (blob) =>
-      url = URL.createObjectURL blob
+      url = win.URL.createObjectURL blob
       img.src = url
       img.onload = =>
         img.onload = undefined
-        URL.revokeObjectURL url
+        win.URL.revokeObjectURL url
         queued = @queuedRedraw
         @redrawing = false
         @queuedRedraw = false

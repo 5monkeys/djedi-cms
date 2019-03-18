@@ -112,6 +112,13 @@ export default class Home extends React.Component {
             </p>
           );
         })()}
+
+        <style jsx global>{`
+          img {
+            max-width: 600px;
+            height: auto;
+          }
+        `}</style>
       </div>
     );
   }

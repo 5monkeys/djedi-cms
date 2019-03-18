@@ -95,15 +95,16 @@
     };
 
     CropTool.prototype.redraw = function() {
-      var hasPreview, height, height2, img, ratio, width, width2;
+      var hasPreview, height, height2, img, ratio, width, width2, win;
       if (this.redrawing) {
         this.queuedRedraw = true;
         return;
       }
       this.redrawing = true;
+      win = window.parent.parent;
       hasPreview = this.preview != null;
       if (!hasPreview) {
-        this.preview = $('<img>');
+        this.preview = $(new win.Image);
       }
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       width = Math.min(this.crop.width, this.previewSize.width);
@@ -138,12 +139,12 @@
       return this.canvas.toBlob((function(_this) {
         return function(blob) {
           var url;
-          url = URL.createObjectURL(blob);
+          url = win.URL.createObjectURL(blob);
           img.src = url;
           return img.onload = function() {
             var queued;
             img.onload = void 0;
-            URL.revokeObjectURL(url);
+            win.URL.revokeObjectURL(url);
             queued = _this.queuedRedraw;
             _this.redrawing = false;
             _this.queuedRedraw = false;
