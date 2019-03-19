@@ -8,12 +8,13 @@ class Response {
     this.status = status;
     this.statusText = "<mock.statusText>";
     this._body = body;
+    this._contentType = contentType;
 
     this.headers = {
       get: name => {
         switch (name.toLowerCase()) {
           case "content-type":
-            return contentType;
+            return this._contentType;
           default:
             return undefined;
         }
@@ -22,19 +23,19 @@ class Response {
   }
 
   async json() {
-    return this._consumeBody(JSON.parse(this._body));
+    return JSON.parse(this._consumeBody());
   }
 
   async text() {
-    return this._consumeBody(String(this._body));
+    return String(this._consumeBody());
   }
 
-  async _consumeBody(body) {
+  _consumeBody() {
     if (this.bodyUsed) {
       throw new TypeError("Body has already been consumed.");
     }
     this.bodyUsed = true;
-    return body;
+    return this._body;
   }
 }
 
@@ -69,6 +70,7 @@ fetch.reset = () => {
       new Response({
         status: 200,
         body: JSON.stringify({}),
+        contentType: "application/json",
       })
     )
   );

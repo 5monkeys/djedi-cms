@@ -40,10 +40,29 @@ Non-success status code: 500",
 }
 `;
 
+exports[`get it handles getting a null response 1`] = `
+Object {
+  "message": "djedi-react: Expected the API to return an object of nodes, but got: null",
+}
+`;
+
+exports[`get it handles getting a string as response 1`] = `
+Object {
+  "message": "djedi-react: Expected the API to return an object of nodes, but got: \\"{\\\\\\"i18n://en-us@test.txt\\\\\\":\\\\\\"test\\\\\\"}\\"",
+}
+`;
+
 exports[`get it handles invalid JSON 1`] = `
 Object {
   "message": "djedi-react: (no response) POST /djedi/nodes/:
 Unexpected end of JSON input",
+}
+`;
+
+exports[`get it handles multiple Content-Type headers, possibly with charset 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt",
+  "value": "test",
 }
 `;
 
@@ -194,10 +213,29 @@ Non-success status code: 500",
 }
 `;
 
+exports[`getBatched it handles getting a null response 1`] = `
+Object {
+  "message": "djedi-react: Expected the API to return an object of nodes, but got: null",
+}
+`;
+
+exports[`getBatched it handles getting a string as response 1`] = `
+Object {
+  "message": "djedi-react: Expected the API to return an object of nodes, but got: \\"{\\\\\\"i18n://en-us@test.txt\\\\\\":\\\\\\"test\\\\\\"}\\"",
+}
+`;
+
 exports[`getBatched it handles invalid JSON 1`] = `
 Object {
   "message": "djedi-react: (no response) POST /djedi/nodes/:
 Unexpected end of JSON input",
+}
+`;
+
+exports[`getBatched it handles multiple Content-Type headers, possibly with charset 1`] = `
+Object {
+  "uri": "i18n://en-us@test.txt",
+  "value": "test",
 }
 `;
 
@@ -320,12 +358,26 @@ Non-success status code: 500",
 }
 `;
 
+exports[`prefetch it handles getting a null response 1`] = `
+Object {
+  "message": "djedi-react: Expected the API to return an object of nodes, but got: null",
+}
+`;
+
+exports[`prefetch it handles getting a string as response 1`] = `
+Object {
+  "message": "djedi-react: Expected the API to return an object of nodes, but got: \\"{\\\\\\"i18n://en-us@test.txt\\\\\\":\\\\\\"test\\\\\\"}\\"",
+}
+`;
+
 exports[`prefetch it handles invalid JSON 1`] = `
 Object {
   "message": "djedi-react: (no response) POST /djedi/nodes/:
 Unexpected end of JSON input",
 }
 `;
+
+exports[`prefetch it handles multiple Content-Type headers, possibly with charset 1`] = `undefined`;
 
 exports[`prefetch it handles rejected requests 1`] = `
 Object {

@@ -1171,6 +1171,37 @@ function networkTests(fn) {
     await wait();
   });
 
+  test("it handles multiple Content-Type headers, possibly with charset", async done => {
+    fetch(simpleNodeResponse("test", "test"), {
+      contentType: "text/json, application/json; charset=utf-8",
+    });
+    fn(result => {
+      expect(result).toMatchSnapshot();
+      done();
+    });
+    await wait();
+  });
+
+  test("it handles getting a string as response", async done => {
+    fetch(simpleNodeResponse("test", "test"), {
+      contentType: "application/json5",
+    });
+    fn(result => {
+      expect(errorDetails(result)).toMatchSnapshot();
+      done();
+    });
+    await wait();
+  });
+
+  test("it handles getting a null response", async done => {
+    fetch(null);
+    fn(result => {
+      expect(errorDetails(result)).toMatchSnapshot();
+      done();
+    });
+    await wait();
+  });
+
   test("it respects options.baseUrl", async () => {
     djedi.options.baseUrl = "https://example.com/cms";
     const callback = jest.fn();

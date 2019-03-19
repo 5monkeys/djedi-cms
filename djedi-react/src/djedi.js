@@ -6,6 +6,7 @@ import Cache from "./Cache";
 import { applyUriDefaults, parseUri, stringifyUri } from "./uri";
 
 const DEFAULT_CACHE_TTL = typeof window === "undefined" ? 20e3 : Infinity; // ms
+const JSON_REGEX = /\bapplication\/json\b/;
 const DOCUMENT_DOMAIN_REGEX = /\bdocument\.domain\s*=\s*(["'])([^'"\s]+)\1/;
 const UPDATE_ADMIN_SIDEBAR_TIMEOUT = 100; // ms
 
@@ -442,8 +443,17 @@ export class Djedi {
       return result;
     }, {});
     return this._post("/nodes/", nodesWithNull).then(results => {
-      this.addNodes(results);
-      return results;
+      if (typeof results === "object" && results != null) {
+        this.addNodes(results);
+        return results;
+      }
+      return Promise.reject(
+        new TypeError(
+          `djedi-react: Expected the API to return an object of nodes, but got: ${JSON.stringify(
+            results
+          )}`
+        )
+      );
     });
   }
 
@@ -475,8 +485,7 @@ export class Djedi {
       .then(
         response => {
           response.__input = data;
-          const isJSON =
-            response.headers.get("Content-Type") === "application/json";
+          const isJSON = JSON_REGEX.test(response.headers.get("Content-Type"));
           return (isJSON ? response.json() : response.text()).then(body => {
             response.__output = body;
             return response.status >= 200 && response.status < 400
