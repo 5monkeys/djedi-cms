@@ -1,3 +1,11 @@
+### Version 5.3.1 (2019-03-19)
+
+- Fixed: `Content-Type: application/json; charset=utf-8` is now accepted for the
+  nodes API response, not just `Content-Type: application/json`.
+- Improved: Light validation for the node API response, rather than crashing or
+  silently doing the wrong thing. Previously a returned string would be treated
+  as `string.length` nodes.
+
 ### Version 5.3.0 (2019-03-08)
 
 - Added: `djedi.injectAdmin` now supports the 204 response code that Djedi 1.3.0
