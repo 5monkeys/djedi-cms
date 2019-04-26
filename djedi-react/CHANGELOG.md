@@ -30,7 +30,7 @@
 
 - Changed: djedi-react no longer depends on
   [isomorphic-unfetch](https://github.com/developit/unfetch/tree/master/packages/isomorphic-unfetch).
-  Instead, you must set `djedi.options.set` to a `fetch`-like function. For
+  Instead, you must set `djedi.options.fetch` to a `fetch`-like function. For
   example, you could still use isomorphic-unfetch:
   `djedi.options.fetch = unfetch`. This lets you use the same `fetch` as the
   rest of your app, and customize requests (such as adding headers). (Breaking
