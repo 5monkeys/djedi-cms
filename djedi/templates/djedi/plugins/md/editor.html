@@ -56,7 +56,11 @@
                 if (editor.renderTimeoutId == null) {
                   clearTimeout(editor.renderTimeoutId);
                 }
-                editor.renderContent(editor.$textarea.val(), true);
+                // The empty callback is needed to make the render request
+                // async. Otherwise a sync XHR is used, which locks the entire
+                // UI, making it impossible to type while the request is in
+                // flight, which is very annoying.
+                editor.renderContent(editor.$textarea.val(), true, function() {});
             }
         });
     </script>
