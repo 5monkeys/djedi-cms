@@ -28,6 +28,11 @@ class Admin(ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    # Hide Djedi in the admin, since that view is not finished yet.
+    # This only works in Django 1.8+, but shouldn’t break older versions.
+    def has_module_permission(self, request):
+        return False
+
 
 class DjediCMS(DjediContextMixin, View):
 
