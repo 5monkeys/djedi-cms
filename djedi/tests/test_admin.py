@@ -1,3 +1,4 @@
+from unittest import skip
 import cio.conf
 from djedi.utils.encoding import smart_unicode
 from djedi.tests.base import ClientTest
@@ -36,6 +37,7 @@ class PanelTest(ClientTest):
             response = self.client.get(url)
             self.assertIn(b'document.domain = "foobar.se"', response.content)
 
+    @skip('Unfinished admin view is hidden')
     def test_django_admin(self):
         # Patch django admin index
         from django.contrib.admin.templatetags.log import AdminLogNode
