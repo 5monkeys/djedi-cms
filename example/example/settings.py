@@ -112,7 +112,14 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
+STATIC_ROOT = '/static/'
 MEDIA_ROOT = '/media/'
+
+# To test if collectstatic with ManifestStaticFilesStorage works, set `DEBUG =
+# False` and run:
+# docker-compose exec django python manage.py collectstatic --no-input
+# DEBUG = False
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 # CORS
 # https://github.com/OttoYiu/django-cors-headers
