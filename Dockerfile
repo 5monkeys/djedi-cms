@@ -1,4 +1,4 @@
-FROM python:3.6.3
+FROM python:3.6
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y gettext && \
