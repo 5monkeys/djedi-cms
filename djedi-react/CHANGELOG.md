@@ -1,3 +1,7 @@
+### Version 5.4.0 (2019-06-12)
+
+- Added: `djedi.removeAdmin`.
+
 ### Version 5.3.1 (2019-03-19)
 
 - Fixed: `Content-Type: application/json; charset=utf-8` is now accepted for the
