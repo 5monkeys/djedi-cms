@@ -83,6 +83,11 @@ test("djedi.injectAdmin does not do anything", async () => {
   expect(typeof document).toBe("undefined");
 });
 
+test("djedi.removeAdmin does not do anything", async () => {
+  djedi.removeAdmin();
+  expect(typeof document).toBe("undefined");
+});
+
 test("when rendering the same view twice, djedi.track results in the same nodes", async () => {
   fetch({
     ...simpleNodeResponse("1", "1"),

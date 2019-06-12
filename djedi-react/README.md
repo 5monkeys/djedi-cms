@@ -765,7 +765,24 @@ permission.
 The returned `Promise` resolves to a boolean indicating whether any HTML was
 inserted, or rejects with an error if the request fails.
 
+It’s common to call this method when your application starts up. If your site
+has a login/logout feature, you might want to call the method again after login,
+in case the user is an admin.
+
 On the server, this method no-ops and always returns `Promise<false>`.
+
+##### `djedi.removeAdmin(): void`
+
+Removes the admin sidebar inserted by [djedi.injectAdmin].
+
+This is useful if you have a login/logout feature on your site, and some users
+are admins. When logging out an admin, you probably want to remove the admin
+sidebar as well. If you don’t, djedi-react will likely reload the sidebar after
+the logout because of DOM/node changes. That will cause the sidebar iframe to
+fail to load because you’re not logged in anymore, but the now defunct iframe
+will still stick around.
+
+On the server, this method no-ops.
 
 ##### `djedi.prefetch({ filter?: Uri => boolean, extra?: Array<Node>, language?: string } = {}): Promise<void>`
 

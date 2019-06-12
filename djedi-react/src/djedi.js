@@ -288,6 +288,23 @@ export class Djedi {
     });
   }
 
+  removeAdmin() {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    // istanbul ignore next
+    if (this._updateAdminSidebarTimeoutId != null) {
+      clearTimeout(this._updateAdminSidebarTimeoutId);
+    }
+    // istanbul ignore next
+    if (this._mutationObserver != null) {
+      this._mutationObserver.disconnect();
+    }
+
+    updateAdminSidebar({ remove: true });
+  }
+
   reportRenderedNode(passedNode, { language = undefined } = {}) {
     const node = this._normalizeNode(passedNode, { language });
     const previous = this._renderedNodes.get(node.uri);

@@ -591,6 +591,30 @@ Array [
   });
 });
 
+describe("removeAdmin", () => {
+  test("it removes the iframe and outlines", () => {
+    document.body.innerHTML = `
+<p>Some content</p>
+<iframe id="djedi-cms"></iframe>
+<span class="djedi-node-outline"></span>
+<span class="djedi-node-outline"></span>
+<span class="djedi-node-outline"></span>
+    `.trim();
+    expect(document.querySelectorAll("iframe")).toHaveLength(1);
+    djedi.removeAdmin();
+    expect(document.body.innerHTML).toMatchInlineSnapshot(`
+"<p>Some content</p>
+
+
+
+"
+`);
+    // Can be run again without trouble.
+    djedi.removeAdmin();
+    expect(document.querySelectorAll("iframe")).toHaveLength(0);
+  });
+});
+
 describe("reportRenderedNode and reportRemovedNode", () => {
   test("they work", () => {
     djedi.options.languages = {
