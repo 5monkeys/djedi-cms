@@ -1,6 +1,7 @@
 import django
 
 from functools import partial
+from sys import version_info
 
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -80,6 +81,23 @@ else:
     def get_cache(name):
         return caches[name]
 
+
+if version_info < (3,):
+    from inspect import getargspec
+else:
+    from collections import namedtuple
+    from inspect import getfullargspec
+
+    ArgSpec = namedtuple('ArgSpec', ['args', 'varargs', 'keywords', 'defaults'])
+
+    def getargspec(func):
+        spec = getfullargspec(func)
+        return ArgSpec(
+            args=spec.args,
+            varargs=spec.varargs,
+            keywords=spec.varkw,
+            defaults=spec.defaults,
+        )
 
 __all__ = ['render_to_string',
            'render',
