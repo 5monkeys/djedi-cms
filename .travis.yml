@@ -3,6 +3,10 @@ sudo: false
 
 python: 3.5
 
+addons:
+  apt_packages:
+    - sqlite3
+
 env:
   # NOTE: On Travis web page define private STASH_URL, STASH_TOKEN, STASH_SECRET.
   global:
@@ -29,21 +33,33 @@ env:
     - TOXENV=py35-django111
     - TOXENV=py35-django20
     - TOXENV=py35-django21
-    - TOXENV=py35-django22
 
     - TOXENV=lint
     - TOXENV=coverage
 
 matrix:
   include:
+    - env: TOXENV=py35-django22
+      python: 3.5
+      sudo: true
+      dist: xenial
+
     - env: TOXENV=py36-django111
-      python: 3.6
+      python: 3.5
+      sudo: true
+      dist: xenial
     - env: TOXENV=py36-django20
       python: 3.6
+      sudo: true
+      dist: xenial
     - env: TOXENV=py36-django21
       python: 3.6
+      sudo: true
+      dist: xenial
     - env: TOXENV=py36-django22
       python: 3.6
+      sudo: true
+      dist: xenial
 
     - env: TOXENV=py37-django111
       python: 3.7
@@ -61,7 +77,6 @@ matrix:
       python: 3.7
       sudo: true
       dist: xenial
-
 
 install:
   - pip install --upgrade pip
