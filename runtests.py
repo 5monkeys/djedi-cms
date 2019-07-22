@@ -19,6 +19,7 @@ DEFAULT_SETTINGS = dict(
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'djedi.middleware.translation.DjediTranslationMiddleware',
     ),
@@ -28,6 +29,7 @@ DEFAULT_SETTINGS = dict(
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
+        'django.contrib.messages',
         'django.contrib.admin',
         'djedi',
     ],
@@ -54,6 +56,7 @@ DEFAULT_SETTINGS = dict(
                 'debug': True,
                 'context_processors': [
                     'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
                 ]
             }
         }
