@@ -3,7 +3,7 @@ FROM python:3.6
 # Install system dependencies
 RUN apt-get update && apt-get install -y gettext && \
     pip install \
-        'Django>=2.0,<2.1' \
+        'Django>=2.2,<2.3' \
         'django-cors-headers<=2.3.0'
 
 # Install Djedi-CMS
