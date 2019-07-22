@@ -45,15 +45,19 @@ matrix:
     - env: TOXENV=py36-django22
       python: 3.6
 
-    - env: ENV=py37-django20
+    - env: TOXENV=py37-django111
       python: 3.7
       sudo: true
       dist: xenial
-    - env: ENV=py37-django21
+    - env: TOXENV=py37-django20
       python: 3.7
       sudo: true
       dist: xenial
-    - env: ENV=py37-django22
+    - env: TOXENV=py37-django21
+      python: 3.7
+      sudo: true
+      dist: xenial
+    - env: TOXENV=py37-django22
       python: 3.7
       sudo: true
       dist: xenial
