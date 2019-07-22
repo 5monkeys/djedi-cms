@@ -45,7 +45,7 @@ matrix:
       dist: xenial
 
     - env: TOXENV=py36-django111
-      python: 3.5
+      python: 3.6
       sudo: true
       dist: xenial
     - env: TOXENV=py36-django20
