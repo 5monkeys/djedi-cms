@@ -40,6 +40,21 @@ class NodesApi(APIView):
     """
     @never_cache
     def post(self, request):
+        try:
+            json_body = json.loads(request.body)
+        except json.errors.JSONDecodeError:
+            return self.render_to_json(
+                {'error': 'Not a valid JSON body.'},
+                status=400,
+            )
+        if (
+            not all(isinstance(k, six.string_types) for k in json_body.keys())
+            or not all(isinstance(v, six.string_types) for v in json_body.values())
+        ):
+            return self.render_to_json(
+                {'error': 'Invalid request body structure.'},
+                status=400,
+            )
         # Disable caching gets in CachePipe, defaults through this api is not trusted
         cio.conf.settings.configure(
             local=True,
@@ -51,7 +66,7 @@ class NodesApi(APIView):
         )
 
         nodes = []
-        for uri, default in six.iteritems(json.loads(request.body)):
+        for uri, default in six.iteritems(json_body):
             node = cio.get(uri, default=default)
             nodes.append(node)
 
