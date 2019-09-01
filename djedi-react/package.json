@@ -43,6 +43,7 @@
     "@babel/plugin-syntax-jsx": "7.2.0",
     "@babel/preset-env": "7.4.5",
     "@babel/preset-react": "7.0.0",
+    "babel-check-duplicated-nodes": "^1.0.0",
     "babel-eslint": "10.0.1",
     "babel-jest": "24.8.0",
     "coffeescript": "1.8.0",
