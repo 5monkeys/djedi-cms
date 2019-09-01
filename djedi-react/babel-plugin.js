@@ -65,8 +65,10 @@ module.exports = function djediBabelPlugin({ types: t }) {
 
         // Move the uri into a variable.
         const uriId = path.scope.generateUidIdentifier(URI_VAR_NAME);
-        program.push({ id: uriId, init: t.stringLiteral(uri) });
-        uriAttr.get("value").replaceWith(t.jSXExpressionContainer(uriId));
+        program.push({ id: t.cloneNode(uriId), init: t.stringLiteral(uri) });
+        uriAttr
+          .get("value")
+          .replaceWith(t.jSXExpressionContainer(t.cloneNode(uriId)));
 
         let defaultId = undefined;
 
@@ -74,10 +76,10 @@ module.exports = function djediBabelPlugin({ types: t }) {
         if (defaultValue != null) {
           defaultId = path.scope.generateUidIdentifier(DEFAULT_VAR_NAME);
           program.push({
-            id: defaultId,
+            id: t.cloneNode(defaultId),
             init: t.stringLiteral(dedent(defaultValue)),
           });
-          child.replaceWith(t.jSXExpressionContainer(defaultId));
+          child.replaceWith(t.jSXExpressionContainer(t.cloneNode(defaultId)));
           for (const otherChild of path.get("children")) {
             if (otherChild !== child) {
               otherChild.remove();
@@ -217,7 +219,7 @@ function getDefaultValue(valuePath, t) {
 
 function makeClientImport(clientId, t) {
   return t.importDeclaration(
-    [t.importSpecifier(clientId, t.identifier(CLIENT_NAME))],
+    [t.importSpecifier(t.cloneNode(clientId), t.identifier(CLIENT_NAME))],
     t.stringLiteral(MODULE_NAME)
   );
 }
@@ -225,13 +227,18 @@ function makeClientImport(clientId, t) {
 function makeReportCall(clientId, uriId, defaultId, t) {
   return t.expressionStatement(
     t.callExpression(
-      t.memberExpression(clientId, t.identifier(CLIENT_METHOD_NAME)),
+      t.memberExpression(
+        t.cloneNode(clientId),
+        t.identifier(CLIENT_METHOD_NAME)
+      ),
       [
         t.objectExpression([
-          t.objectProperty(t.identifier(NODE_URI_KEY), uriId),
+          t.objectProperty(t.identifier(NODE_URI_KEY), t.cloneNode(uriId)),
           t.objectProperty(
             t.identifier(NODE_VALUE_KEY),
-            defaultId == null ? t.identifier("undefined") : defaultId
+            defaultId == null
+              ? t.identifier("undefined")
+              : t.cloneNode(defaultId)
           ),
         ]),
       ]

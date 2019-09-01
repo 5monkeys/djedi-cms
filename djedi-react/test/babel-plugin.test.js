@@ -1,5 +1,6 @@
 import * as babel from "@babel/core";
 import jsx from "@babel/plugin-syntax-jsx";
+import checkDuplicatedNodes from "babel-check-duplicated-nodes";
 import dedent from "dedent-js";
 import fs from "fs";
 
@@ -22,6 +23,14 @@ function transform(code) {
     plugins: [jsx, babelPlugin],
     highlightCode: false,
   }).code;
+}
+
+function transformToAST(code) {
+  return babel.transform(code, {
+    plugins: [jsx, babelPlugin],
+    ast: true,
+    code: false,
+  }).ast;
 }
 
 test("it works", () => {
@@ -64,6 +73,18 @@ _djedi.reportPrefetchableNode({
 
 <Node uri={_djedi_uri}>{_djedi_default}</Node>;
 `);
+});
+
+test("ensure no duplicated AST nodes are found", () => {
+  const code = dedent`
+    <>
+      <Node uri="uri1">value1</Node>
+      <Node uri="uri2">value2</Node>
+    </>
+  `;
+  expect(() => checkDuplicatedNodes(babel, transformToAST(code))).not.toThrow(
+    Error
+  );
 });
 
 describe("it throws helpful errors", () => {
