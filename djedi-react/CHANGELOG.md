@@ -1,4 +1,4 @@
-### Version 5.4.1 (2019-09-03)
+### Version 5.4.1 (2019-10-09)
 
 - Fixed: The babel plugin generated incorrect AST because of some AST nodes
   being duplicated. Fixed by cloning the nodes instead of reusing them.
