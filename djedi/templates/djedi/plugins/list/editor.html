@@ -1,0 +1,17 @@
+{% extends 'djedi/plugins/base/editor.html' %}
+
+{% block editor %}
+  <button id="node-add" class="form-control btn btn-secondary">add</button>
+  <br>
+  <div id="node-list">
+  </div>
+  <textarea name="data" class="form-control"></textarea>
+{% endblock editor %}
+
+{% block plugin_script %}
+  <script>
+    new window.ListEditor({
+      uri: '{{ uri }}'
+    });
+  </script>
+{% endblock plugin_script %}
