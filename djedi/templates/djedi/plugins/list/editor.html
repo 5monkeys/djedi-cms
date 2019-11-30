@@ -1,0 +1,39 @@
+{% extends 'djedi/plugins/base/editor.html' %}
+{% load static staticfiles %}
+{% block editor %}
+  <div class="helpers">
+    <div id="direction-options">
+      <label class="direction-title">Direction: </label>
+      <div class="radio"><label><input type="radio" name="direction" value="col" checked>Vertical</label></div>
+      <div class="radio"><label><input type="radio" name="direction" value="row">Horizontal</label></div>
+    </div>
+    <textarea rows="10" style="width: 100%" name="data" id="subnode-data"></textarea>
+    <div class="dropdown">
+      <a href="#" id="node-add-list" data-toggle="dropdown" class="dropdown-toggle label label-default"><var>Add <i class="icon-plus"></i></var></a>
+      <ul id="plugin-list" class="dropdown-menu" role="menu" aria-labelledby="node-add"></ul>
+    </div>
+  </div>
+  <div id="node-list" class="subnodes">
+  </div>
+{% endblock editor %}
+
+{% block plugin_style %}
+  <link href="{% static 'djedi/plugins/list/css/list.css' %}?v={{ VERSION }}" rel="stylesheet" media="screen">
+{% endblock %}
+
+{% block plugin_script %}
+  <script src="{% static 'djedi/cms/js/cms.js' %}?v={{ VERSION }}"></script>
+  <script src="{% static 'djedi/plugins/list/js/list.js' %}?v={{ VERSION }}"></script>
+  <script>
+    console.log(window);
+    new window.ListEditor({
+      uri: '{{ uri }}',
+      plugins: {{ PLUGINS }},
+      render: function (node) {
+        $('#subnode-data').val(node.data)
+        console.log("list render")
+      },
+      field: "#subnode-data"
+    });
+  </script>
+{% endblock plugin_script %}

@@ -319,6 +319,8 @@ class window.ImageEditor extends window.Editor
     @field = $ config.field
     @preview = $ config.preview
 
+    @enable_crop_preview = config.enable_crop_preview
+
     @dropzone = new Dropzone
       field: @field
       el: config.dropzone
@@ -413,7 +415,9 @@ class window.ImageEditor extends window.Editor
         $image.on 'crop:preview', (event, html) =>
           @crop?.setPreviewAttributes @getHtmlFields()
           # This replaces the image on the page with the preview image.
-          @triggerRender html
+
+          if @enable_crop_preview
+            @triggerRender html
         $image.on 'crop:attributes', =>
           @updateImageAttributes()
           if @crop
