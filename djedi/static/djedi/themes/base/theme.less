@@ -68,7 +68,26 @@ body {
   .antialiased();
 
   &.embedded {
+    display: block; //fallback
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
+
+    & .tab-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .tab-pane {
+        flex: 1;
+        height: auto;
+        max-height: none;
+
+        #editor-iframe {
+          height: 100%;
+        }
+      }
+    }
 
     &.closed {
     }

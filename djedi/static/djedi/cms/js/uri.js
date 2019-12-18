@@ -28,6 +28,9 @@
       if (this.ext) {
         s += '.' + this.ext;
       }
+      if (this.query) {
+        s += '?' + $.param(this.query);
+      }
       if (this.version) {
         s += '#' + this.version;
       }
@@ -42,33 +45,54 @@
       this.path = obj.path;
       this.ext = obj.ext;
       this.version = obj.version;
+      this.query = obj.query;
       return this.parts = {
         scheme: this.scheme,
         namespace: this.namespace,
         path: this.path,
         ext: this.ext,
-        version: this.version
+        version: this.version,
+        query: this.query
       };
     };
     this.parse = function(uri_str) {
-      var base, ext, namespace, path, scheme, version, _, _ref, _ref1, _ref2, _ref3;
+      var base, ext, key, namespace, pair, param_pairs, path, query, querystring, scheme, val, version, _, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
       _ref = partition(uri_str, '#'), base = _ref[0], _ = _ref[1], version = _ref[2];
-      _ref1 = rpartition(base, '://'), scheme = _ref1[0], _ = _ref1[1], path = _ref1[2];
-      _ref2 = rpartition(path, '@'), namespace = _ref2[0], _ = _ref2[1], path = _ref2[2];
-      _ref3 = partition(path, '.'), path = _ref3[0], _ = _ref3[1], ext = _ref3[2];
+      if (base.indexOf('?') !== -1) {
+        _ref1 = rpartition(base, '?'), base = _ref1[0], _ = _ref1[1], querystring = _ref1[2];
+        param_pairs = querystring.split('&');
+        query = {};
+        for (_i = 0, _len = param_pairs.length; _i < _len; _i++) {
+          pair = param_pairs[_i];
+          _ref2 = partition(pair, '='), key = _ref2[0], _ = _ref2[1], val = _ref2[2];
+          query[key] = decodeURIComponent(val);
+        }
+      }
+      _ref3 = rpartition(base, '://'), scheme = _ref3[0], _ = _ref3[1], path = _ref3[2];
+      _ref4 = rpartition(path, '@'), namespace = _ref4[0], _ = _ref4[1], path = _ref4[2];
+      _ref5 = partition(path, '.'), path = _ref5[0], _ = _ref5[1], ext = _ref5[2];
       return {
         scheme: scheme || null,
         namespace: namespace || null,
         path: path,
         ext: ext || null,
-        version: version || null
+        version: version || null,
+        query: query || null
       };
     };
     this.from_str = function(uri_str) {
       return this.from_parts(this.parse(uri_str));
     };
     this.clone = function(obj) {
-      return this.from_parts(_.extend(obj, this.parts));
+      var key, parts, val, _uri;
+      parts = Object.assign({}, this.parts);
+      _uri = ((' ' + this.valueOf()).slice(1)).to_uri();
+      for (key in obj) {
+        val = obj[key];
+        parts[key] = val;
+      }
+      _uri.from_parts(parts);
+      return _uri;
     };
     this.from_parts(this.parse(this));
     return this;

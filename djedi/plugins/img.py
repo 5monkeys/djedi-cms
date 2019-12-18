@@ -39,13 +39,13 @@ class ImagePluginBase(FormsBasePlugin):
     def forms(self):
         return {'HTML': DataForm}
 
-    def _open(self, filename):
+    def _open_file(self, filename):
         raise NotImplementedError
 
-    def _save(self, filename, bytes):
+    def _save_file(self, filename, bytes):
         raise NotImplementedError
 
-    def _url(self, filename):
+    def _file_url(self, filename):
         raise NotImplementedError
 
     def _create_filename(self, filename, **kwargs):
@@ -67,7 +67,7 @@ class ImagePluginBase(FormsBasePlugin):
             # Add image url to loaded data
             filename = data.get('filename', None)
             if filename:
-                data['url'] = self._url(filename)
+                data['url'] = self._file_url(filename)
 
             return data
         else:
@@ -87,7 +87,7 @@ class ImagePluginBase(FormsBasePlugin):
             filename = path.sep.join(('djedi', 'img', upload.name))
             filename = self._create_filename(filename, w=width, h=height)
         elif filename:
-            file = self._open(filename)
+            file = self._open_file(filename)
             image = Image.open(file)
         else:
             image = None
@@ -124,7 +124,7 @@ class ImagePluginBase(FormsBasePlugin):
             if filename != data.get('filename'):
                 new_file = six.BytesIO()
                 image.save(new_file, format)
-                filename = self._save(filename, new_file)
+                filename = self._save_file(filename, new_file)
 
         if file:
             file.close()
@@ -193,12 +193,12 @@ class ImagePlugin(ImagePluginBase):
 
         return file_storage
 
-    def _open(self, filename):
+    def _open_file(self, filename):
         return self._file_storage.open(filename)
 
-    def _save(self, filename, bytes):
+    def _save_file(self, filename, bytes):
         content = InMemoryUploadedFile(bytes, None, filename, None, None, None)
         return self._file_storage.save(filename, content)
 
-    def _url(self, filename):
+    def _file_url(self, filename):
         return self._file_storage.url(filename)

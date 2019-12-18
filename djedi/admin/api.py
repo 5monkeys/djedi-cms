@@ -4,6 +4,7 @@ from djedi.plugins.base import DjediPlugin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.utils.http import urlunquote
+from django.utils.safestring import mark_safe
 from django.views.decorators.cache import never_cache
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -12,13 +13,13 @@ from django.views.generic import View
 import cio
 from cio.plugins import plugins
 from cio.plugins.exceptions import UnknownPlugin
+from cio.node import Node
 from cio.utils.uri import URI
 
 from .exceptions import InvalidNodeData
 from .mixins import JSONResponseMixin, DjediContextMixin
 from ..compat import TemplateResponse
 from .. import auth
-
 
 class APIView(View):
 
@@ -183,7 +184,8 @@ class RenderApi(APIView):
         except UnknownPlugin:
             raise Http404
         else:
-            content = plugin.render(data)
+            node = Node(URI(ext=ext), content=data)
+            content = plugin._render(data, node)
             return self.render_to_response(content)
 
 
@@ -222,7 +224,9 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
             return self.render_plugin(request, context)
 
     def render_plugin(self, request, context):
+        ext = context['uri'].query['plugin'] if context['uri'].query and 'plugin' in context['uri'].query else context['uri'].ext
+        context['uri'] = mark_safe(context['uri'])
         return TemplateResponse(request, [
-            'djedi/plugins/%s/editor.html' % context['uri'].ext,
+            'djedi/plugins/%s/editor.html' % ext,
             'djedi/plugins/base/editor.html'
         ], self.get_context_data(**context))

@@ -1,4 +1,4 @@
-console.log = () ->
+#console.log = () ->
 
 $.fn.enable = -> @removeAttr 'disabled'
 $.fn.disable = -> @attr 'disabled', 'disabled'
@@ -134,8 +134,12 @@ class window.Editor
     @$version = $ 'header .version'
     @$flag = $ 'header .flag'
 
-    $('#button-publish').on 'click', @publish
-    $('#button-discard').on 'click', @discard
+    @$doc.on 'editor:save', () => @$form.submit()
+    @$doc.on 'editor:publish', () => @onPublish()
+
+    @actions.publish.on 'click', @publish
+    @actions.discard.on 'click', @discard
+    @actions.save.on 'click', @save
 
     # Use ajaxForm from downloads
     @$form.ajaxForm
@@ -149,10 +153,12 @@ class window.Editor
 
     @$doc.ajaxStart -> $('#spinner').toggleClass('icon-spin').show()
     @$doc.ajaxStop -> $('#spinner').toggleClass('icon-spin').hide()
-
+    console.log(config)
     @api.load config.uri, @onLoad
     @callback 'initialize', config
     @initialized = yes
+    window.editor = @
+    @trigger 'editor:initialized', @, config
 
   callback: (name, args...) ->
     callback = @config[name]
@@ -171,7 +177,7 @@ class window.Editor
   prepareForm: ->
 
   onLoad: (node) =>
-    console.log 'Editor.onLoad()', node.uri
+    console.log 'Editor.onLoad()'
     initial = @node == undefined
 
     # Fetch default node data from embedder
@@ -196,6 +202,7 @@ class window.Editor
 
   onFormChange: (event) =>
     console.log 'Editor.onFormChange()'
+    @trigger 'editor:dirty'
     @setState 'dirty'
     @callback 'onFormChange', event
 
@@ -203,7 +210,13 @@ class window.Editor
     console.log 'Editor.onSave()'
     node = @setNode node
     @render node
+    @trigger 'node:update', node.uri.valueOf(), node
     @trigger 'node:render', node.uri.valueOf(), node.content
+
+  onPublish: () =>
+    node = @api.publish @node.uri.valueOf()
+    @setNode node
+    @setState 'published'
 
   setNode: (node) ->
     console.log 'Editor.setNode()'
@@ -372,9 +385,8 @@ class window.Editor
     content
 
   publish: =>
-    node = @api.publish @node.uri.valueOf()
-    @setNode node
-    @setState 'published'
+    if @state == "draft"
+      @trigger "editor:publish", @node.uri
 
   discard: =>
     if @node.uri.version == 'draft'
@@ -385,3 +397,8 @@ class window.Editor
     @node = null
 
     @api.load uri.valueOf(), @onLoad
+    @trigger "editor:discard", @node.uri
+
+  save: =>
+    if @state == "dirty"
+      @trigger 'editor:save', @node.uri

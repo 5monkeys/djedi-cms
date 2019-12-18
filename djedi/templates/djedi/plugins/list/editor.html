@@ -1,17 +1,33 @@
 {% extends 'djedi/plugins/base/editor.html' %}
-
+{% load static staticfiles %}
 {% block editor %}
-  <button id="node-add" class="form-control btn btn-secondary">add</button>
-  <br>
-  <div id="node-list">
+  <div class="helpers">
+    <select id="node-add-list">
+      <option>Add node</option>
+    </select>
+    <textarea rows="10" style="width: 100%" name="data" id="subnode-data"></textarea>
   </div>
-  <textarea name="data" class="form-control"></textarea>
+  <div id="node-list" class="subnodes">
+  </div>
 {% endblock editor %}
 
+{% block plugin_style %}
+  <link href="{% static 'djedi/plugins/list/css/list.css' %}?v={{ VERSION }}" rel="stylesheet" media="screen">
+{% endblock %}
+
 {% block plugin_script %}
+  <script src="{% static 'djedi/cms/js/cms.js' %}?v={{ VERSION }}"></script>
+  <script src="{% static 'djedi/plugins/list/js/list.js' %}?v={{ VERSION }}"></script>
   <script>
+    console.log(window);
     new window.ListEditor({
-      uri: '{{ uri }}'
+      uri: '{{ uri }}',
+      plugins: {{ PLUGINS }},
+      render: function (node) {
+        $('#subnode-data').val(node.data)
+        console.log("list render")
+      },
+      field: "#subnode-data"
     });
   </script>
 {% endblock plugin_script %}

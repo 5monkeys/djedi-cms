@@ -4,8 +4,6 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
-  console.log = function() {};
-
   $.fn.enable = function() {
     return this.removeAttr('disabled');
   };
@@ -156,9 +154,11 @@
   window.Editor = (function() {
     function Editor(config) {
       this.config = config;
+      this.save = __bind(this.save, this);
       this.discard = __bind(this.discard, this);
       this.publish = __bind(this.publish, this);
       this.loadRevision = __bind(this.loadRevision, this);
+      this.onPublish = __bind(this.onPublish, this);
       this.onSave = __bind(this.onSave, this);
       this.onFormChange = __bind(this.onFormChange, this);
       this.onLoad = __bind(this.onLoad, this);
@@ -191,8 +191,19 @@
       this.$path = $('header .uri');
       this.$version = $('header .version');
       this.$flag = $('header .flag');
-      $('#button-publish').on('click', this.publish);
-      $('#button-discard').on('click', this.discard);
+      this.$doc.on('editor:save', (function(_this) {
+        return function() {
+          return _this.$form.submit();
+        };
+      })(this));
+      this.$doc.on('editor:publish', (function(_this) {
+        return function() {
+          return _this.onPublish();
+        };
+      })(this));
+      this.actions.publish.on('click', this.publish);
+      this.actions.discard.on('click', this.discard);
+      this.actions.save.on('click', this.save);
       this.$form.ajaxForm({
         beforeSubmit: this.prepareForm,
         success: this.onSave
@@ -207,9 +218,12 @@
       this.$doc.ajaxStop(function() {
         return $('#spinner').toggleClass('icon-spin').hide();
       });
+      console.log(config);
       this.api.load(config.uri, this.onLoad);
       this.callback('initialize', config);
-      return this.initialized = true;
+      this.initialized = true;
+      window.editor = this;
+      return this.trigger('editor:initialized', this, config);
     };
 
     Editor.prototype.callback = function() {
@@ -240,7 +254,7 @@
 
     Editor.prototype.onLoad = function(node) {
       var initial;
-      console.log('Editor.onLoad()', node.uri);
+      console.log('Editor.onLoad()');
       initial = this.node === void 0;
       if (initial) {
         this.trigger('page:node:fetch', node.uri.valueOf(), (function(_this) {
@@ -267,6 +281,7 @@
 
     Editor.prototype.onFormChange = function(event) {
       console.log('Editor.onFormChange()');
+      this.trigger('editor:dirty');
       this.setState('dirty');
       return this.callback('onFormChange', event);
     };
@@ -275,7 +290,15 @@
       console.log('Editor.onSave()');
       node = this.setNode(node);
       this.render(node);
+      this.trigger('node:update', node.uri.valueOf(), node);
       return this.trigger('node:render', node.uri.valueOf(), node.content);
+    };
+
+    Editor.prototype.onPublish = function() {
+      var node;
+      node = this.api.publish(this.node.uri.valueOf());
+      this.setNode(node);
+      return this.setState('published');
     };
 
     Editor.prototype.setNode = function(node) {
@@ -476,10 +499,9 @@
     };
 
     Editor.prototype.publish = function() {
-      var node;
-      node = this.api.publish(this.node.uri.valueOf());
-      this.setNode(node);
-      return this.setState('published');
+      if (this.state === "draft") {
+        return this.trigger("editor:publish", this.node.uri);
+      }
     };
 
     Editor.prototype.discard = function() {
@@ -490,7 +512,14 @@
       uri = this.node.uri;
       uri.version = null;
       this.node = null;
-      return this.api.load(uri.valueOf(), this.onLoad);
+      this.api.load(uri.valueOf(), this.onLoad);
+      return this.trigger("editor:discard", this.node.uri);
+    };
+
+    Editor.prototype.save = function() {
+      if (this.state === "dirty") {
+        return this.trigger('editor:save', this.node.uri);
+      }
     };
 
     return Editor;

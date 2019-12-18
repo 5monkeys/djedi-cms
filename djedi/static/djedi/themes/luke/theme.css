@@ -5345,7 +5345,23 @@ body {
   font-smoothing: antialiased;
 }
 body.embedded {
+  display: block;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+}
+body.embedded .tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+body.embedded .tab-content .tab-pane {
+  flex: 1;
+  height: auto;
+  max-height: none;
+}
+body.embedded .tab-content .tab-pane #editor-iframe {
+  height: 100%;
 }
 body.embedded .embed-shadow {
   pointer-events: none;

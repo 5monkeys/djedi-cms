@@ -227,7 +227,7 @@ class PrivateRestTest(ClientTest):
                 )
 
             else:
-                assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
+                assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri', 'PLUGINS',))
 
             self.assertNotIn(b'document.domain', response.content)
 
@@ -293,6 +293,143 @@ class PrivateRestTest(ClientTest):
 
             response = self.post('api', 'i18n://sv-se@header/logo.img', form)
             self.assertEqual(response.status_code, 200)
+
+    def test_save_nested_content(self):
+        data = {
+            'direction': 'column',
+            'children': [
+                {
+                    'key': 'abc123',
+                    'plugin': 'md',
+                    'data': '# One banana',
+                },
+                {
+                    'key': '321cba',
+                    'plugin': 'txt',
+                    'data': 'Bananas',
+                },
+            ]
+        }
+        serialized_data = json.dumps(data)
+        listnode = cio.set('sv-se@page/apa.list', serialized_data)
+        text_node_uri = listnode.uri.clone(query={
+            'key': '321cba'
+        })
+        text_node = cio.load(text_node_uri)
+        self.assertEqual(text_node['data'], "Bananas")
+        self.assertEqual(text_node['content'], "Bananas")
+
+        md_node = cio.load(listnode.uri.clone(query={
+            'key': 'abc123'
+        }))
+        self.assertEqual(md_node['content'], '<h1>One banana</h1>')
+        self.assertEqual(md_node['data'], '# One banana')
+
+        # Test setting new subnode data
+        cio.set('sv-se@page/apa.list?key=newkey&plugin=md', '# Banan')
+        node_data = cio.load('sv-se@page/apa.list?key=newkey&plugin=md')
+        self.assertEqual(node_data['content'], '<h1>Banan</h1>')
+        self.assertEqual(node_data['data'], '# Banan')
+
+        # Test setting existing subnode data
+        cio.set('sv-se@page/apa.list?key=abc123&plugin=md', '# Two Bananas')
+        node_data = cio.load('sv-se@page/apa.list?key=abc123&plugin=md')
+
+        self.assertEqual(node_data['content'], '<h1>Two Bananas</h1>')
+        self.assertEqual(node_data['data'], '# Two Bananas')
+
+        # Test setting it multiple times
+        cio.set('sv-se@page/apa.list#draft', json.dumps({
+            'direction': 'column',
+            'children': [
+                {
+                    'key': 'abc123',
+                    'plugin': 'md',
+                    'data': '# One banana',
+                }
+            ]
+        }))
+        cio.set('sv-se@page/apa.list?key=abc123&plugin=md', '# No bananas')
+        cio.set('sv-se@page/apa.list?key=abc123&plugin=md', '# Many bananas')
+        cio.set('sv-se@page/apa.list?key=abc123&plugin=md', '# Many bananas')
+        node_data = cio.load('sv-se@page/apa.list?key=abc123&plugin=md')
+        parent_node = cio.load('sv-se@page/apa.list')
+        self.assertEqual(node_data['content'], '<h1>Many bananas</h1>')
+        self.assertEqual(node_data['data'], '# Many bananas')
+        self.assertEqual(parent_node['data'], json.dumps({
+            'direction': 'column',
+            'children': [
+                {
+                    'key': 'abc123',
+                    'plugin': 'md',
+                    'data': '# Many bananas',
+                }
+            ]
+        }))
+
+        # Test nested list
+        cio.set('sv-se@page/apa.list', json.dumps({
+            'direction': 'column',
+            'children': [
+                {
+                    'key': 'abc123',
+                    'plugin': 'md',
+                    'data': '# One banana',
+                }
+            ]
+        }))
+        cio.set('sv-se@page/apa.list?key=321cba&plugin=list', json.dumps({
+            'direction': 'column',
+            'children': [
+                {
+                    'key': 'betterkey',
+                    'plugin': 'md',
+                    'data': '# My banana',
+                }
+            ]
+        }))
+        node_data = cio.load('sv-se@page/apa.list?key=abc123&plugin=md')
+        list_node = cio.load('sv-se@page/apa.list?key=321cba&plugin=list')
+        parent_node = cio.load('sv-se@page/apa.list')
+        child_node = cio.load('sv-se@page/apa.list?key=321cba,betterkey&plugin=md')
+        self.assertEqual(node_data['content'], '<h1>One banana</h1>')
+        self.assertEqual(node_data['data'], '# One banana')
+        self.assertEqual(parent_node['data'], json.dumps({
+            'direction': 'column',
+            'children': [
+                {
+                    'key': 'abc123',
+                    'plugin': 'md',
+                    'data': '# One banana',
+                },
+                {
+                    'key': '321cba',
+                    'plugin': 'list',
+                    'data': json.dumps({
+                        'direction': 'column',
+                        'children': [
+                            {
+                                'key': 'betterkey',
+                                'plugin': 'md',
+                                'data': '# My banana',
+                            }
+                        ]
+                    })
+                }
+            ]
+        }))
+        self.assertEqual(list_node['data'], json.dumps({
+            'direction': 'column',
+            'children': [
+                {
+                    'key': 'betterkey',
+                    'plugin': 'md',
+                    'data': '# My banana',
+                }
+            ]
+        }))
+        self.assertEqual(child_node['data'], '# My banana')
+        self.assertEqual(child_node['content'], '<h1>My banana</h1> ')
 
 
 class PublicRestTest(ClientTest):
