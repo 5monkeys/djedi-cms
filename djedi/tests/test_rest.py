@@ -429,7 +429,7 @@ class PrivateRestTest(ClientTest):
             ]
         }))
         self.assertEqual(child_node['data'], '# My banana')
-        self.assertEqual(child_node['content'], '<h1>My banana</h1> ')
+        self.assertEqual(child_node['content'], '<h1>My banana</h1>')
 
 
 class PublicRestTest(ClientTest):
