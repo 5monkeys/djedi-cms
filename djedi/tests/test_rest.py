@@ -391,7 +391,7 @@ class PrivateRestTest(ClientTest):
         node_data = cio.load('sv-se@page/apa.list?key=abc123&plugin=md')
         list_node = cio.load('sv-se@page/apa.list?key=321cba&plugin=list')
         parent_node = cio.load('sv-se@page/apa.list')
-        child_node = cio.load('sv-se@page/apa.list?key=321cba,betterkey&plugin=md')
+        child_node = cio.load('sv-se@page/apa.list?key=321cba_betterkey&plugin=md')
         self.assertEqual(node_data['content'], '<h1>One banana</h1>')
         self.assertEqual(node_data['data'], '# One banana')
         self.assertEqual(parent_node['data'], json.dumps({
@@ -430,6 +430,23 @@ class PrivateRestTest(ClientTest):
         }))
         self.assertEqual(child_node['data'], '# My banana')
         self.assertEqual(child_node['content'], '<h1>My banana</h1>')
+
+        cio.set('sv-se@page/apa.list?key=321cba_betterkey&plugin=md', "# Not yours")
+        deep_node = cio.load('sv-se@page/apa.list?key=321cba_betterkey&plugin=md')
+        list_node = cio.load('sv-se@page/apa.list?key=321cba&plugin=list')
+        self.assertEqual(deep_node['data'], '# Not yours')
+        self.assertEqual(deep_node['content'], '<h1>Not yours</h1>')
+        self.assertEqual(list_node['data'], json.dumps({
+            'direction': 'column',
+            'children': [
+                {
+                    'key': 'betterkey',
+                    'plugin': 'md',
+                    'data': '# Not yours',
+                }
+            ]
+        }))
+
 
 
 class PublicRestTest(ClientTest):

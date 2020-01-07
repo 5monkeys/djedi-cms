@@ -19,6 +19,7 @@ class window.ListEditor extends window.Editor
     @data = @initDataStructure()
     @saveQueue = []
     @loading = false
+    @preventParentReload = false
 
     @container = $('#node-list')
     @dataHolder = $('#subnode-data')
@@ -34,7 +35,7 @@ class window.ListEditor extends window.Editor
     @editor.$add_list.on 'change', (evt) =>
       @spawnSubnode @node.uri.clone({
         query: {
-          key: @getSubnodeKey(),
+          key: @getSubnodeUriKey(),
           plugin: $(evt.target).val()
         }
       }).valueOf(), true
@@ -50,7 +51,7 @@ class window.ListEditor extends window.Editor
       for entry in codedData.children
         @spawnSubnode @node.uri.clone({
           query: {
-            key: entry.key,
+            key: @getSubnodeUriKey(entry.key),
             plugin: entry.plugin,
           }
         }).valueOf(), false, entry.data
@@ -66,7 +67,7 @@ class window.ListEditor extends window.Editor
     super node
 
   setState: (state) =>
-    if state == 'dirty' && @loading
+    if state == 'draft' && @preventParentReload || state == 'dirty' && @loading
       return
     super state
 
@@ -101,7 +102,7 @@ class window.ListEditor extends window.Editor
 
     @subPlugins.push plug
     @data.children.push {
-      key: node.uri.query.key,
+      key: @getSubnodeKey(node.uri.query['key']),
       plugin: node.uri.query.plugin,
       data: data,
     }
@@ -109,14 +110,19 @@ class window.ListEditor extends window.Editor
 
     windowRef = plug.$el[0].contentWindow
     $(plug.$el).on 'load', () =>
-      windowRef.$(windowRef.document).on 'editor:initialized', (event, edt, cfg) =>
-        edt.$form.ajaxForm({
-            success: (data) =>
-              console.log "subnode save successful", data
-              @workSaveQueue()
-              edt.onSave(data)
-            beforeSubmit: edt.prepareForm
-        });
+#      windowRef.$(windowRef.document).on 'editor:initialized', (event, edt, cfg) =>
+#        edt.$form.ajaxForm({
+#            success: (data) =>
+#              console.log "subnode save successful", data
+#              @workSaveQueue()
+#              edt.onSave(data)
+#            beforeSubmit: edt.prepareForm
+#        });
+      windowRef.$(windowRef.document).on 'editor:state-changed', (event, oldState, newState, node) =>
+        console.log(oldState, newState)
+        if oldState == 'dirty' && newState == 'draft'
+          @workSaveQueue()
+          @updateSubnode(node.uri.to_uri().query.key, node)
 
       windowRef.$(windowRef.document).on 'editor:dirty', () =>
         @editor.setState('dirty')
@@ -137,6 +143,7 @@ class window.ListEditor extends window.Editor
       @editor.setState('dirty')
 
   save: () ->
+    @preventParentReload = true
     for plug in @subPlugins
       @saveQueue.push(plug)
     super
@@ -146,9 +153,11 @@ class window.ListEditor extends window.Editor
     @workSaveQueue()
 
   workSaveQueue: () =>
+    console.log "ListEditor.workSaveQueue()", @saveQueue.length
     if @saveQueue.length > 0
       @saveSubnode(@saveQueue.pop())
     else
+      @preventParentReload = false
       event = {
         type:'click',
         target: $('#revisions').find('.draft').find('a').get()[0],
@@ -160,7 +169,10 @@ class window.ListEditor extends window.Editor
 
   saveSubnode: (plugin) =>
     windowRef = plugin.$el[0].contentWindow
-    windowRef.editor.$form.submit()
+    if windowRef.editor.state != 'dirty'
+      @workSaveQueue()
+    else
+      windowRef.editor.save()
 
 
   popSubnode: (uri) =>
@@ -201,7 +213,9 @@ class window.ListEditor extends window.Editor
 
   renderSubnode: (uri, content) =>
     console.log("ListEditor.renderSubnode()")
-    newContent = $(@node.content).find('#'+uri.to_uri().query['key']).html(content).end()[0];
+    key = @getSubnodeKey(decodeURIComponent(uri.to_uri().query['key']))
+    console.log(key)
+    newContent = $(@node.content).find('#'+key).html(content).end()[0];
     @updateData(false)
     @node.content = newContent
     @editor.triggerRender newContent
@@ -209,17 +223,24 @@ class window.ListEditor extends window.Editor
   updateSubnode: (uuid, node, norender = false) =>
     console.log("ListEditor.updateSubnode()", uuid)
     if node.data
+      console.log(node)
       for child in @data.children
         if child.key == node.uri.query.key
+          console.log("updating node data")
           child.data = node.data
     @renderSubnode(node.uri, node.content)
 
-  getSubnodeKey: (key = undefined) =>
+  getSubnodeUriKey: (key = undefined) =>
     keys = ""
     uri = @node.uri.to_uri()
     if uri.query && uri.query['key']
-      keys += @node.uri.to_uri().query['key'] + ","
+      keys += @node.uri.to_uri().query['key'] + "_"
     return keys + (key or @generateGuid())
+
+  getSubnodeKey: (composite_key) =>
+    keys = composite_key.split('_')
+    return keys[keys.length - 1]
+
   generateGuid: () ->
     result = ''
     for j in [0...32]

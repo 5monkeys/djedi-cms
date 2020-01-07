@@ -9,6 +9,7 @@
 
     function ListEditor() {
       this.getSubnodeKey = __bind(this.getSubnodeKey, this);
+      this.getSubnodeUriKey = __bind(this.getSubnodeUriKey, this);
       this.updateSubnode = __bind(this.updateSubnode, this);
       this.renderSubnode = __bind(this.renderSubnode, this);
       this.updateData = __bind(this.updateData, this);
@@ -39,6 +40,7 @@
       this.data = this.initDataStructure();
       this.saveQueue = [];
       this.loading = false;
+      this.preventParentReload = false;
       this.container = $('#node-list');
       this.dataHolder = $('#subnode-data');
       this.editor.$add_list = $('#node-add-list');
@@ -55,7 +57,7 @@
         return function(evt) {
           _this.spawnSubnode(_this.node.uri.clone({
             query: {
-              key: _this.getSubnodeKey(),
+              key: _this.getSubnodeUriKey(),
               plugin: $(evt.target).val()
             }
           }).valueOf(), true);
@@ -77,7 +79,7 @@
           entry = _ref[_i];
           this.spawnSubnode(this.node.uri.clone({
             query: {
-              key: entry.key,
+              key: this.getSubnodeUriKey(entry.key),
               plugin: entry.plugin
             }
           }).valueOf(), false, entry.data);
@@ -98,7 +100,7 @@
     };
 
     ListEditor.prototype.setState = function(state) {
-      if (state === 'dirty' && this.loading) {
+      if (state === 'draft' && this.preventParentReload || state === 'dirty' && this.loading) {
         return;
       }
       return ListEditor.__super__.setState.call(this, state);
@@ -143,7 +145,7 @@
       plug.$el.attr('src', path + ("node/" + (encodeURIComponent(encodeURIComponent(uri))) + "/editor"));
       this.subPlugins.push(plug);
       this.data.children.push({
-        key: node.uri.query.key,
+        key: this.getSubnodeKey(node.uri.query['key']),
         plugin: node.uri.query.plugin,
         data: data
       });
@@ -151,15 +153,12 @@
       windowRef = plug.$el[0].contentWindow;
       $(plug.$el).on('load', (function(_this) {
         return function() {
-          windowRef.$(windowRef.document).on('editor:initialized', function(event, edt, cfg) {
-            return edt.$form.ajaxForm({
-              success: function(data) {
-                console.log("subnode save successful", data);
-                _this.workSaveQueue();
-                return edt.onSave(data);
-              },
-              beforeSubmit: edt.prepareForm
-            });
+          windowRef.$(windowRef.document).on('editor:state-changed', function(event, oldState, newState, node) {
+            console.log(oldState, newState);
+            if (oldState === 'dirty' && newState === 'draft') {
+              _this.workSaveQueue();
+              return _this.updateSubnode(node.uri.to_uri().query.key, node);
+            }
           });
           windowRef.$(windowRef.document).on('editor:dirty', function() {
             _this.editor.setState('dirty');
@@ -184,6 +183,7 @@
 
     ListEditor.prototype.save = function() {
       var plug, _i, _len, _ref;
+      this.preventParentReload = true;
       _ref = this.subPlugins;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         plug = _ref[_i];
@@ -199,9 +199,11 @@
 
     ListEditor.prototype.workSaveQueue = function() {
       var event;
+      console.log("ListEditor.workSaveQueue()", this.saveQueue.length);
       if (this.saveQueue.length > 0) {
         return this.saveSubnode(this.saveQueue.pop());
       } else {
+        this.preventParentReload = false;
         event = {
           type: 'click',
           target: $('#revisions').find('.draft').find('a').get()[0],
@@ -217,7 +219,11 @@
     ListEditor.prototype.saveSubnode = function(plugin) {
       var windowRef;
       windowRef = plugin.$el[0].contentWindow;
-      return windowRef.editor.$form.submit();
+      if (windowRef.editor.state !== 'dirty') {
+        return this.workSaveQueue();
+      } else {
+        return windowRef.editor.save();
+      }
     };
 
     ListEditor.prototype.popSubnode = function(uri) {
@@ -273,9 +279,11 @@
     };
 
     ListEditor.prototype.renderSubnode = function(uri, content) {
-      var newContent;
+      var key, newContent;
       console.log("ListEditor.renderSubnode()");
-      newContent = $(this.node.content).find('#' + uri.to_uri().query['key']).html(content).end()[0];
+      key = this.getSubnodeKey(decodeURIComponent(uri.to_uri().query['key']));
+      console.log(key);
+      newContent = $(this.node.content).find('#' + key).html(content).end()[0];
       this.updateData(false);
       this.node.content = newContent;
       return this.editor.triggerRender(newContent);
@@ -288,10 +296,12 @@
       }
       console.log("ListEditor.updateSubnode()", uuid);
       if (node.data) {
+        console.log(node);
         _ref = this.data.children;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
           if (child.key === node.uri.query.key) {
+            console.log("updating node data");
             child.data = node.data;
           }
         }
@@ -299,7 +309,7 @@
       return this.renderSubnode(node.uri, node.content);
     };
 
-    ListEditor.prototype.getSubnodeKey = function(key) {
+    ListEditor.prototype.getSubnodeUriKey = function(key) {
       var keys, uri;
       if (key == null) {
         key = void 0;
@@ -307,9 +317,15 @@
       keys = "";
       uri = this.node.uri.to_uri();
       if (uri.query && uri.query['key']) {
-        keys += this.node.uri.to_uri().query['key'] + ",";
+        keys += this.node.uri.to_uri().query['key'] + "_";
       }
       return keys + (key || this.generateGuid());
+    };
+
+    ListEditor.prototype.getSubnodeKey = function(composite_key) {
+      var keys;
+      keys = composite_key.split('_');
+      return keys[keys.length - 1];
     };
 
     ListEditor.prototype.generateGuid = function() {

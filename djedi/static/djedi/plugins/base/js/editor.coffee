@@ -245,6 +245,7 @@ class window.Editor
   setState: (state) ->
     console.log 'Editor.setState()', state
     if state != @state
+      oldState = @state
       @state = state
       @$version.removeClass 'label-default label-warning label-danger label-info label-success'
       switch state
@@ -273,6 +274,8 @@ class window.Editor
           @actions.discard.disable()
           @actions.save.disable()
           @actions.publish.enable()
+      @trigger 'editor:state-changed', oldState, state, @node
+
 
   renderHeader: (node) ->
     uri = node.uri

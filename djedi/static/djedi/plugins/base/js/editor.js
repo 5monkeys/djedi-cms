@@ -328,8 +328,10 @@
     };
 
     Editor.prototype.setState = function(state) {
+      var oldState;
       console.log('Editor.setState()', state);
       if (state !== this.state) {
+        oldState = this.state;
         this.state = state;
         this.$version.removeClass('label-default label-warning label-danger label-info label-success');
         switch (state) {
@@ -337,28 +339,33 @@
             this.$version.addClass('label-default');
             this.actions.discard.disable();
             this.actions.save.enable();
-            return this.actions.publish.disable();
+            this.actions.publish.disable();
+            break;
           case 'dirty':
             this.$version.addClass('label-danger');
             this.actions.discard.enable();
             this.actions.save.enable();
-            return this.actions.publish.disable();
+            this.actions.publish.disable();
+            break;
           case 'draft':
             this.$version.addClass('label-primary');
             this.actions.discard.enable();
             this.actions.save.disable();
-            return this.actions.publish.enable();
+            this.actions.publish.enable();
+            break;
           case 'published':
             this.$version.addClass('label-success');
             this.actions.discard.disable();
             this.actions.save.disable();
-            return this.actions.publish.disable();
+            this.actions.publish.disable();
+            break;
           case 'revert':
             this.$version.addClass('label-warning');
             this.actions.discard.disable();
             this.actions.save.disable();
-            return this.actions.publish.enable();
+            this.actions.publish.enable();
         }
+        return this.trigger('editor:state-changed', oldState, state, this.node);
       }
     };
 
