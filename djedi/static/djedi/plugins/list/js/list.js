@@ -36,6 +36,7 @@
       var plg, _i, _len, _ref;
       console.log('ListEditor.initialize', this);
       ListEditor.__super__.initialize.call(this, config);
+      this.subnodeCss = '<style> .node-title, footer { display: none; } </style>';
       this.editor = this;
       this.subPlugins = [];
       this.data = this.initDataStructure();
@@ -44,25 +45,24 @@
       this.preventParentReload = false;
       this.container = $('#node-list');
       this.dataHolder = $('#subnode-data');
-      this.editor.$add_list = $('#node-add-list');
+      this.editor.$add_list = $('#plugin-list');
       $('#form input').unbind();
       $('#form textarea').unbind();
       $('#form select').unbind();
       _ref = config.plugins;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         plg = _ref[_i];
-        $('<option val="' + plg + '" id="node-add">' + plg + '</option>').appendTo(this.editor.$add_list);
+        $('<li class="node-add"><a href="#">' + plg + '</a></li>').appendTo(this.editor.$add_list);
       }
-      this.editor.$add = $('#node-add');
-      this.editor.$add_list.on('change', (function(_this) {
+      this.editor.$add = $('.node-add');
+      this.editor.$add.on('click', (function(_this) {
         return function(evt) {
-          _this.spawnSubnode(_this.node.uri.clone({
+          return _this.spawnSubnode(_this.node.uri.clone({
             query: {
               key: _this.getSubnodeUriKey(),
-              plugin: $(evt.target).val()
+              plugin: $(evt.target).text()
             }
           }).valueOf(), true);
-          return $(evt.target).val('');
         };
       })(this));
       return $(window).on('editor:state-changed', (function(_this) {
@@ -156,6 +156,10 @@
       windowRef = plug.$el[0].contentWindow;
       $(plug.$el).on('load', (function(_this) {
         return function() {
+          var head;
+          head = windowRef.$(plug.$el[0]).contents().find("head");
+          console.log(head);
+          windowRef.$(head).append(_this.subnodeCss);
           windowRef.$(windowRef.document).on('editor:state-changed', function(event, oldState, newState, node) {
             console.log(oldState, newState);
             if (oldState === 'dirty' && newState === 'draft') {

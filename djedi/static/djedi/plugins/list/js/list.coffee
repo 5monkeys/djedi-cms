@@ -14,6 +14,13 @@ class window.ListEditor extends window.Editor
     console.log 'ListEditor.initialize', @
 
     super config
+    @subnodeCss = '
+      <style>
+        .node-title, footer {
+          display: none;
+        }
+      </style>
+    ';
     @editor = this;
     @subPlugins = []
     @data = @initDataStructure()
@@ -23,23 +30,22 @@ class window.ListEditor extends window.Editor
 
     @container = $('#node-list')
     @dataHolder = $('#subnode-data')
-    @editor.$add_list = $('#node-add-list')
+    @editor.$add_list = $('#plugin-list')
 
     $('#form input').unbind()
     $('#form textarea').unbind()
     $('#form select').unbind()
     for plg in config.plugins
-      $('<option val="'+plg+'" id="node-add">'+plg+'</option>').appendTo @editor.$add_list
+      $('<li class="node-add"><a href="#">'+plg+'</a></li>').appendTo @editor.$add_list
 
-    @editor.$add = $('#node-add')
-    @editor.$add_list.on 'change', (evt) =>
+    @editor.$add = $('.node-add')
+    @editor.$add.on 'click', (evt) =>
       @spawnSubnode @node.uri.clone({
         query: {
           key: @getSubnodeUriKey(),
-          plugin: $(evt.target).val()
+          plugin: $(evt.target).text()
         }
       }).valueOf(), true
-      $(evt.target).val('')
 
     $(window).on 'editor:state-changed', (event, oldState, newState) =>
       console.log("ListEditor.stateChanged()")
@@ -78,7 +84,6 @@ class window.ListEditor extends window.Editor
   spawnSubnode: (uri, refreshValue = true, data = "") =>
     console.log("ListEditor.spawnSubNode()")
     classes = 'subnodes__item'
-    #classes += ' subnodes__item--closed' if @subPlugins.length > 0
 
     cont = $("<div class='"+classes+"'></div>").appendTo @container
     title = $("<div class='subnodes__item-title'></div>").appendTo cont
@@ -92,7 +97,6 @@ class window.ListEditor extends window.Editor
 
 
     node = new window.Node uri, data, holder
-    #separatedUri = node.uri.path.split('/')
 
     title.append node.uri.query['plugin'] or 'unknown'
     cont.attr 'uri-ref', node.uri.valueOf()
@@ -113,7 +117,11 @@ class window.ListEditor extends window.Editor
     holder.append plug.$el
 
     windowRef = plug.$el[0].contentWindow
+
     $(plug.$el).on 'load', () =>
+      head = windowRef.$(plug.$el[0]).contents().find("head");
+      console.log(head);
+      windowRef.$(head).append(@subnodeCss)
       windowRef.$(windowRef.document).on 'editor:state-changed', (event, oldState, newState, node) =>
         console.log(oldState, newState)
         if oldState == 'dirty' && newState == 'draft'

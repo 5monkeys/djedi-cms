@@ -2,9 +2,13 @@
 {% load static staticfiles %}
 {% block editor %}
   <div class="helpers">
-    <select id="node-add-list">
-      <option>Add node</option>
-    </select>
+    <div class="dropdown">
+      <a href="#" id="node-add-list" data-toggle="dropdown" class="dropdown-toggle label label-default"><var>Add node</var> <i class="icon-caret-down"></i></a>
+      <ul id="plugin-list" class="dropdown-menu" role="menu" aria-labelledby="node-add"></ul>
+    </div>
+    <!--<a id="node-add-list">
+      <option value="">Add node</option>
+    </a>-->
     <textarea rows="10" style="width: 100%" name="data" id="subnode-data"></textarea>
   </div>
   <div id="node-list" class="subnodes">
