@@ -92,9 +92,9 @@ class window.ListEditor extends window.Editor
 
 
     node = new window.Node uri, data, holder
-    separatedUri = node.uri.path.split('/')
+    #separatedUri = node.uri.path.split('/')
 
-    title.append separatedUri[separatedUri.length - 1]
+    title.append node.uri.query['plugin'] or 'unknown'
     cont.attr 'uri-ref', node.uri.valueOf()
     plug = new window.Plugin node
     ref_uri = @node.uri.clone({

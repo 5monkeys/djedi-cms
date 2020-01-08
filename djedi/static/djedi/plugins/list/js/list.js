@@ -114,7 +114,7 @@
     };
 
     ListEditor.prototype.spawnSubnode = function(uri, refreshValue, data) {
-      var classes, cont, holder, node, path, plug, ref_uri, separatedUri, title, windowRef;
+      var classes, cont, holder, node, path, plug, ref_uri, title, windowRef;
       if (refreshValue == null) {
         refreshValue = true;
       }
@@ -137,8 +137,7 @@
         };
       })(this));
       node = new window.Node(uri, data, holder);
-      separatedUri = node.uri.path.split('/');
-      title.append(separatedUri[separatedUri.length - 1]);
+      title.append(node.uri.query['plugin'] || 'unknown');
       cont.attr('uri-ref', node.uri.valueOf());
       plug = new window.Plugin(node);
       ref_uri = this.node.uri.clone({
