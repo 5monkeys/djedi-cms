@@ -54,7 +54,7 @@
         $('<option val="' + plg + '" id="node-add">' + plg + '</option>').appendTo(this.editor.$add_list);
       }
       this.editor.$add = $('#node-add');
-      return this.editor.$add_list.on('change', (function(_this) {
+      this.editor.$add_list.on('change', (function(_this) {
         return function(evt) {
           _this.spawnSubnode(_this.node.uri.clone({
             query: {
@@ -63,6 +63,12 @@
             }
           }).valueOf(), true);
           return $(evt.target).val('');
+        };
+      })(this));
+      return $(window).on('editor:state-changed', (function(_this) {
+        return function(event, oldState, newState) {
+          console.log("ListEditor.stateChanged()");
+          return console.log(oldState, newState);
         };
       })(this));
     };
@@ -174,9 +180,7 @@
         };
       })(this));
       this.updateData(refreshValue);
-      if (!refreshValue) {
-        return this.editor.setState('draft');
-      } else {
+      if (refreshValue) {
         this.trigger('editor:dirty');
         return this.editor.setState('dirty');
       }

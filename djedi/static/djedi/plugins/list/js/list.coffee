@@ -41,6 +41,10 @@ class window.ListEditor extends window.Editor
       }).valueOf(), true
       $(evt.target).val('')
 
+    $(window).on 'editor:state-changed', (event, oldState, newState) =>
+      console.log("ListEditor.stateChanged()")
+      console.log(oldState, newState);
+
   onLoad: (node) =>
     @loading = true
     @clearList()
@@ -128,9 +132,7 @@ class window.ListEditor extends window.Editor
 
 
     @updateData(refreshValue)
-    if (!refreshValue)
-      @editor.setState('draft')
-    else
+    if refreshValue
       @trigger 'editor:dirty'
       @editor.setState('dirty')
 

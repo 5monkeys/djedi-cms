@@ -1,10 +1,8 @@
 from cio.plugins.base import BasePlugin
 from cio.plugins import plugins
-from cio.utils.uri import URI
 from cio.node import Node
 import cio
 import json
-import logging
 
 class ListPlugin(BasePlugin):
     ext = 'list'
@@ -85,34 +83,6 @@ class ListPlugin(BasePlugin):
                     for child in parent_layer['children']:
                         if child['key'] == key:
                             child['data'] = json.dumps(nd)
-        # child_key, child_uri = self._get_child_uri(uri)
-        # if child_key:
-        #     child_tree = uri.query['key'].split('_')
-        #     parent_uri = uri.clone(query=None)
-        #     parent = cio.load(parent_uri)
-        #     try:
-        #         parent_data = json.loads(parent['data'])
-        #     except:
-        #         return ""
-        #     for no, key in enumerate(child_tree):
-        #         for idx, child in enumerate(parent_data['children']):
-        #             if child['key'] == key:
-        #                 if no == len(child_tree) - 1:
-        #                     parent_data = json.dumps(child['data'])
-        #                 else:
-        #                     parent_data['children'][idx] = target_child
-        #                 break
-        #         else:
-        #             parent_data['children'].append(target_child)
-        #
-        #         plugin = plugins.resolve(uri.clone(ext=uri.query['plugin'], version=None, query=None))
-        #         child_node = Node(child_uri.clone(), node.content, **node.meta)
-        #         target_child = {
-        #             'key': child_key,
-        #             'plugin': uri.query['plugin'],
-        #             'data': plugin._save(child_node).content
-        #         }
-        #         node.content = self.save(json.dumps(parent_data))
         return super(ListPlugin, self)._save(node)
 
     def _render(self, data, node):
@@ -172,35 +142,5 @@ class ListPlugin(BasePlugin):
             return key, cloned_uri
         else:
             return None, cloned_uri
-
-    # def publish(self, node):
-    #     try:
-    #         node_uris = json.loads(node.content)
-    #     except:
-    #         node_uris = []
-    #     nodes_versions = [
-    #         cio.publish(URI(uri)).uri for uri in node_uris
-    #     ]
-    #     logging.log(logging.CRITICAL, str(node_uris))
-    #     logging.log(logging.CRITICAL, str(node.content))
-    #     logging.log(logging.CRITICAL, str(nodes_versions))
-    #     node.content = json.dumps(nodes_versions)
-    #     return node
-    #
-    # def render(self, data):
-    #     try:
-    #         node_uris = json.loads(data)
-    #     except:
-    #         node_uris = []
-    #     html = '<ul class="djedi-list">'
-    #     nodes = [
-    #         cio.get(URI(uri)) for uri in node_uris
-    #     ]
-    #     for node in nodes:
-    #         content = node.content
-    #         _, uuid = node.uri.path.rsplit('/', 1)
-    #         html += '<li id="'+uuid+'">' + (content or '') + '</li>'
-    #     html += '</ul>'
-    #     return html
 
 
