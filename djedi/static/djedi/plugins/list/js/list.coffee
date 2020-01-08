@@ -78,7 +78,7 @@ class window.ListEditor extends window.Editor
   spawnSubnode: (uri, refreshValue = true, data = "") =>
     console.log("ListEditor.spawnSubNode()")
     classes = 'subnodes__item'
-    classes += ' subnodes__item--closed' if @subPlugins.length > 0
+    #classes += ' subnodes__item--closed' if @subPlugins.length > 0
 
     cont = $("<div class='"+classes+"'></div>").appendTo @container
     title = $("<div class='subnodes__item-title'></div>").appendTo cont

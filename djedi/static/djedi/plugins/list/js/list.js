@@ -123,9 +123,6 @@
       }
       console.log("ListEditor.spawnSubNode()");
       classes = 'subnodes__item';
-      if (this.subPlugins.length > 0) {
-        classes += ' subnodes__item--closed';
-      }
       cont = $("<div class='" + classes + "'></div>").appendTo(this.container);
       title = $("<div class='subnodes__item-title'></div>").appendTo(cont);
       holder = $("<div class='subnodes__item-content'></div>").appendTo(cont);
