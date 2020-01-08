@@ -110,14 +110,6 @@ class window.ListEditor extends window.Editor
 
     windowRef = plug.$el[0].contentWindow
     $(plug.$el).on 'load', () =>
-#      windowRef.$(windowRef.document).on 'editor:initialized', (event, edt, cfg) =>
-#        edt.$form.ajaxForm({
-#            success: (data) =>
-#              console.log "subnode save successful", data
-#              @workSaveQueue()
-#              edt.onSave(data)
-#            beforeSubmit: edt.prepareForm
-#        });
       windowRef.$(windowRef.document).on 'editor:state-changed', (event, oldState, newState, node) =>
         console.log(oldState, newState)
         if oldState == 'dirty' && newState == 'draft'
@@ -152,6 +144,16 @@ class window.ListEditor extends window.Editor
     super node
     @workSaveQueue()
 
+  onPublish: () =>
+    super
+    event = {
+      type:'click',
+      target: $('#revisions').find('.published').find('a').get()[0],
+      preventDefault: () -> {},
+    }
+    @loadRevision(event)
+    @setState 'published'
+
   workSaveQueue: () =>
     console.log "ListEditor.workSaveQueue()", @saveQueue.length
     if @saveQueue.length > 0
@@ -178,6 +180,7 @@ class window.ListEditor extends window.Editor
   popSubnode: (uri) =>
     console.log("ListEditor.popSubnode()")
     targetUri = uri
+    targetKey = @getSubnodeKey(targetUri.to_uri().query.key)
     nodeList = @container
     @subPlugins = @subPlugins.filter (value) ->
       if value.uri.valueOf() != targetUri
@@ -186,10 +189,11 @@ class window.ListEditor extends window.Editor
       nodeList.find('[uri-ref="'+targetUri+'"]').remove()
       return false
     @data.children = @data.children.filter (value) ->
-      if value.key != targetUri.to_uri().query.key
+      if value.key != targetKey
         return true
       return false
     @setState "dirty"
+    @trigger 'editor:dirty'
     @updateData(true)
 
   clearList: () =>
@@ -214,7 +218,6 @@ class window.ListEditor extends window.Editor
   renderSubnode: (uri, content) =>
     console.log("ListEditor.renderSubnode()")
     key = @getSubnodeKey(decodeURIComponent(uri.to_uri().query['key']))
-    console.log(key)
     newContent = $(@node.content).find('#'+key).html(content).end()[0];
     @updateData(false)
     @node.content = newContent

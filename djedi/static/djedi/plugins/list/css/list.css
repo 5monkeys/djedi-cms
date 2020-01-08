@@ -13,7 +13,7 @@
 }
 
 .subnodes {
-
+    margin-left: 5px;
 }
 
 .subnodes__item {
@@ -72,5 +72,9 @@
 }
 
 .subnodes__item--closed .subnodes__item-content {
+    display: none;
+}
+
+#subnode-data {
     display: none;
 }

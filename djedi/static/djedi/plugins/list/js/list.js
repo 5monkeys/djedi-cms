@@ -17,6 +17,7 @@
       this.popSubnode = __bind(this.popSubnode, this);
       this.saveSubnode = __bind(this.saveSubnode, this);
       this.workSaveQueue = __bind(this.workSaveQueue, this);
+      this.onPublish = __bind(this.onPublish, this);
       this.spawnSubnode = __bind(this.spawnSubnode, this);
       this.setState = __bind(this.setState, this);
       this.render = __bind(this.render, this);
@@ -197,6 +198,20 @@
       return this.workSaveQueue();
     };
 
+    ListEditor.prototype.onPublish = function() {
+      var event;
+      ListEditor.__super__.onPublish.apply(this, arguments);
+      event = {
+        type: 'click',
+        target: $('#revisions').find('.published').find('a').get()[0],
+        preventDefault: function() {
+          return {};
+        }
+      };
+      this.loadRevision(event);
+      return this.setState('published');
+    };
+
     ListEditor.prototype.workSaveQueue = function() {
       var event;
       console.log("ListEditor.workSaveQueue()", this.saveQueue.length);
@@ -227,9 +242,10 @@
     };
 
     ListEditor.prototype.popSubnode = function(uri) {
-      var nodeList, targetUri;
+      var nodeList, targetKey, targetUri;
       console.log("ListEditor.popSubnode()");
       targetUri = uri;
+      targetKey = this.getSubnodeKey(targetUri.to_uri().query.key);
       nodeList = this.container;
       this.subPlugins = this.subPlugins.filter(function(value) {
         if (value.uri.valueOf() !== targetUri) {
@@ -240,12 +256,13 @@
         return false;
       });
       this.data.children = this.data.children.filter(function(value) {
-        if (value.key !== targetUri.to_uri().query.key) {
+        if (value.key !== targetKey) {
           return true;
         }
         return false;
       });
       this.setState("dirty");
+      this.trigger('editor:dirty');
       return this.updateData(true);
     };
 
@@ -282,7 +299,6 @@
       var key, newContent;
       console.log("ListEditor.renderSubnode()");
       key = this.getSubnodeKey(decodeURIComponent(uri.to_uri().query['key']));
-      console.log(key);
       newContent = $(this.node.content).find('#' + key).html(content).end()[0];
       this.updateData(false);
       this.node.content = newContent;

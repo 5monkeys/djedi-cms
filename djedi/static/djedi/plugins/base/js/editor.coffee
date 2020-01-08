@@ -372,6 +372,7 @@ class window.Editor
     console.log 'Editor.renderContent()'
     plugin = @node.uri.ext
     data = {data: data} if typeof(data) == 'string'
+    data['uri'] = @node.uri
     content = ''
 
     if callback
@@ -388,7 +389,7 @@ class window.Editor
     content
 
   publish: =>
-    if @state == "draft"
+    if @state == "draft" || @state == "revert"
       @trigger "editor:publish", @node.uri
 
   discard: =>

@@ -484,6 +484,7 @@
           data: data
         };
       }
+      data['uri'] = this.node.uri;
       content = '';
       if (callback) {
         this.api.render(plugin, data, (function(_this) {
@@ -506,7 +507,7 @@
     };
 
     Editor.prototype.publish = function() {
-      if (this.state === "draft") {
+      if (this.state === "draft" || this.state === "revert") {
         return this.trigger("editor:publish", this.node.uri);
       }
     };

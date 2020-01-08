@@ -17,7 +17,12 @@ class ListPlugin(BasePlugin):
             try:
                 data = json.loads(content)
             except:
-                return ""
+                if uri.query['plugin']:
+                    plugin = plugins.resolve(uri.clone(ext=uri.query['plugin'], version=None, query=None))
+                    data = plugin._load(node)
+                    return data
+                else:
+                    return ""
 
             for child in data['children']:
                 if child['key'] == child_key:
@@ -27,7 +32,6 @@ class ListPlugin(BasePlugin):
                     data = plugin._load(child_node)
                     return data
             else:
-                # raise Exception("Child node not found {}".format(child_key))
                 return ""
         return super(ListPlugin, self).load(node.content)
 
@@ -115,7 +119,14 @@ class ListPlugin(BasePlugin):
         uri = node.uri.clone()
         child_key, child_uri = self._get_child_uri(uri)
         if child_key:
-            decoded_data = json.loads(node.content)
+            try:
+                decoded_data = json.loads(node.content)
+            except:
+                if uri.query['plugin']:
+                    plugin = plugins.resolve(uri.clone(ext=uri.query['plugin'], version=None, query=None))
+                    return plugin._render(data, node)
+                else:
+                    return ""
             for child in decoded_data['children']:
                 if child['key'] == child_key:
                     return self._render_child(child, child_uri)

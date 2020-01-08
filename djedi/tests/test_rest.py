@@ -447,6 +447,13 @@ class PrivateRestTest(ClientTest):
             ]
         }))
 
+        cio.set('sv-se@page/render.list', json.dumps({
+            'direction': 'column',
+            'children': []
+        }))
+        response = self.post('api.render', 'list', {'data': u'# Djedi', 'uri': 'i18n://sv-se@page/render.list?key=abc123&plugin=md'})
+        assert response.status_code == 200
+        self.assertRenderedMarkdown(smart_unicode(response.content), u'# Djedi')
 
 
 class PublicRestTest(ClientTest):
