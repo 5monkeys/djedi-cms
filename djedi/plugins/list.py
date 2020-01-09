@@ -109,8 +109,8 @@ class ListPlugin(BasePlugin):
                 return ""
             render_data = ""
             for child in decoded_data['children']:
-                render_data += '<li id={}>{}</li>'.format(child['key'], self._render_child(child, uri))
-            return self.render(render_data)
+                render_data += '<li class=djedi-plugin--{} id={}>{}</li>'.format(child['plugin'], child['key'], self._render_child(child, uri))
+            return self.render({'direction': decoded_data['direction'], 'children': render_data})
 
     def _render_child(self, child_data, uri):
         child_meta = child_data
@@ -121,7 +121,7 @@ class ListPlugin(BasePlugin):
         return content
 
     def render(self, data):
-        return '<ul class="djedi-list">{}</ul>'.format(data)
+        return '<ul class="djedi-list djedi-list--{}">{}</ul>'.format(data['direction'], data['children'])
 
     def _check_child_integrity(self, child):
         return 'key' in child and 'data' in child and 'plugin' in child

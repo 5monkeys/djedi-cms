@@ -6,9 +6,12 @@
       <a href="#" id="node-add-list" data-toggle="dropdown" class="dropdown-toggle label label-default"><var>Add node</var> <i class="icon-caret-down"></i></a>
       <ul id="plugin-list" class="dropdown-menu" role="menu" aria-labelledby="node-add"></ul>
     </div>
-    <!--<a id="node-add-list">
-      <option value="">Add node</option>
-    </a>-->
+    <div id="direction-options">
+      <div class="radio"><label><input type="radio" name="direction" value="col">Column</label></div>
+      <div class="radio"><label><input type="radio" name="direction" value="row">Row</label></div>
+      <div class="radio"><label><input type="radio" name="direction" value="ucol">Column reverse</label></div>
+      <div class="radio"><label><input type="radio" name="direction" value="urow">Row reverse</label></div>
+    </div>
     <textarea rows="10" style="width: 100%" name="data" id="subnode-data"></textarea>
   </div>
   <div id="node-list" class="subnodes">

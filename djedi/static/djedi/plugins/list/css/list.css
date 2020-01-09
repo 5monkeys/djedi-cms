@@ -16,6 +16,10 @@
     margin-left: 5px;
 }
 
+.subnodes #editor-iframe {
+    height: 355px;
+}
+
 .subnodes__item {
     display: block;
     margin-bottom: 15px;
@@ -77,4 +81,30 @@
 
 #subnode-data {
     display: none;
+}
+
+.djedi-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.djedi-list li {
+}
+
+.djedi-list--col {
+    flex-direction: column;
+}
+
+.djedi-list--ucol {
+    flex-direction: column-reverse;
+}
+
+.djedi-list--row {
+    flex-direction: row;
+}
+
+.djedi-list--urow {
+    flex-direction: row-reverse;
 }

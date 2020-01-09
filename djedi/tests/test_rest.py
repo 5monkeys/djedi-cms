@@ -296,7 +296,7 @@ class PrivateRestTest(ClientTest):
 
     def test_save_nested_content(self):
         data = {
-            'direction': 'column',
+            'direction': 'col',
             'children': [
                 {
                     'key': 'abc123',
@@ -340,7 +340,7 @@ class PrivateRestTest(ClientTest):
 
         # Test setting it multiple times
         cio.set('sv-se@page/apa.list#draft', json.dumps({
-            'direction': 'column',
+            'direction': 'col',
             'children': [
                 {
                     'key': 'abc123',
@@ -357,7 +357,7 @@ class PrivateRestTest(ClientTest):
         self.assertEqual(node_data['content'], '<h1>Many bananas</h1>')
         self.assertEqual(node_data['data'], '# Many bananas')
         self.assertEqual(parent_node['data'], json.dumps({
-            'direction': 'column',
+            'direction': 'col',
             'children': [
                 {
                     'key': 'abc123',
@@ -369,7 +369,7 @@ class PrivateRestTest(ClientTest):
 
         # Test nested list
         cio.set('sv-se@page/apa.list', json.dumps({
-            'direction': 'column',
+            'direction': 'col',
             'children': [
                 {
                     'key': 'abc123',
@@ -379,7 +379,7 @@ class PrivateRestTest(ClientTest):
             ]
         }))
         cio.set('sv-se@page/apa.list?key=321cba&plugin=list', json.dumps({
-            'direction': 'column',
+            'direction': 'col',
             'children': [
                 {
                     'key': 'betterkey',
@@ -395,7 +395,7 @@ class PrivateRestTest(ClientTest):
         self.assertEqual(node_data['content'], '<h1>One banana</h1>')
         self.assertEqual(node_data['data'], '# One banana')
         self.assertEqual(parent_node['data'], json.dumps({
-            'direction': 'column',
+            'direction': 'col',
             'children': [
                 {
                     'key': 'abc123',
@@ -406,7 +406,7 @@ class PrivateRestTest(ClientTest):
                     'key': '321cba',
                     'plugin': 'list',
                     'data': json.dumps({
-                        'direction': 'column',
+                        'direction': 'col',
                         'children': [
                             {
                                 'key': 'betterkey',
@@ -419,7 +419,7 @@ class PrivateRestTest(ClientTest):
             ]
         }))
         self.assertEqual(list_node['data'], json.dumps({
-            'direction': 'column',
+            'direction': 'col',
             'children': [
                 {
                     'key': 'betterkey',
@@ -437,7 +437,7 @@ class PrivateRestTest(ClientTest):
         self.assertEqual(deep_node['data'], '# Not yours')
         self.assertEqual(deep_node['content'], '<h1>Not yours</h1>')
         self.assertEqual(list_node['data'], json.dumps({
-            'direction': 'column',
+            'direction': 'col',
             'children': [
                 {
                     'key': 'betterkey',
@@ -448,12 +448,27 @@ class PrivateRestTest(ClientTest):
         }))
 
         cio.set('sv-se@page/render.list', json.dumps({
-            'direction': 'column',
+            'direction': 'col',
             'children': []
         }))
         response = self.post('api.render', 'list', {'data': u'# Djedi', 'uri': 'i18n://sv-se@page/render.list?key=abc123&plugin=md'})
         assert response.status_code == 200
         self.assertRenderedMarkdown(smart_unicode(response.content), u'# Djedi')
+
+        data = json.dumps({
+            'direction': 'col',
+            'children': [
+                {
+                    'key': 'betterkey',
+                    'plugin': 'md',
+                    'data': '# Not yours',
+                }
+            ]
+        })
+
+        response = self.post('api.render', 'list', {'data': data, 'uri': 'i18n://sv-se@page/render_new.list'})
+        assert response.status_code == 200
+        self.assertEqual(response.content, b'<ul class="djedi-list djedi-list--col"><li class=djedi-plugin--md id=betterkey><h1>Not yours</h1></li></ul>')
 
 
 class PublicRestTest(ClientTest):

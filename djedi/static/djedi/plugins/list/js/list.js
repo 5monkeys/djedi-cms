@@ -22,12 +22,13 @@
       this.setState = __bind(this.setState, this);
       this.render = __bind(this.render, this);
       this.onLoad = __bind(this.onLoad, this);
+      this.setDirection = __bind(this.setDirection, this);
       return ListEditor.__super__.constructor.apply(this, arguments);
     }
 
     ListEditor.prototype.initDataStructure = function() {
       return {
-        direction: '',
+        direction: 'col',
         children: []
       };
     };
@@ -36,7 +37,7 @@
       var plg, _i, _len, _ref;
       console.log('ListEditor.initialize', this);
       ListEditor.__super__.initialize.call(this, config);
-      this.subnodeCss = '<style> .node-title, footer { display: none; } </style>';
+      this.subnodeCss = '<style> .node-title, footer { display: none; } #editor { height: auto; max-height: none; } </style>';
       this.editor = this;
       this.subPlugins = [];
       this.data = this.initDataStructure();
@@ -45,14 +46,22 @@
       this.preventParentReload = false;
       this.container = $('#node-list');
       this.dataHolder = $('#subnode-data');
+      this.directions = $('#direction-options');
       this.editor.$add_list = $('#plugin-list');
       $('#form input').unbind();
       $('#form textarea').unbind();
       $('#form select').unbind();
+      this.directions.find('input').on('change', (function(_this) {
+        return function(e) {
+          return _this.setDirection(e.target.value);
+        };
+      })(this));
       _ref = config.plugins;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         plg = _ref[_i];
-        $('<li class="node-add"><a href="#">' + plg + '</a></li>').appendTo(this.editor.$add_list);
+        if (plg !== 'list') {
+          $('<li class="node-add"><a href="#">' + plg + '</a></li>').appendTo(this.editor.$add_list);
+        }
       }
       this.editor.$add = $('.node-add');
       this.editor.$add.on('click', (function(_this) {
@@ -73,6 +82,23 @@
       })(this));
     };
 
+    ListEditor.prototype.setDirection = function(dir, refreshData) {
+      var target;
+      if (refreshData == null) {
+        refreshData = true;
+      }
+      this.directions.find('[name="direction"]').prop('checked', false);
+      target = this.directions.find('[value="' + dir + '"]');
+      if (target.length === 1) {
+        target.prop('checked', true);
+        this.data.direction = dir;
+        this.updateData(refreshData);
+        return this.setState('dirty');
+      } else {
+        return this.setDirection("col", refreshData);
+      }
+    };
+
     ListEditor.prototype.onLoad = function(node) {
       var codedData, entry, exception, _i, _len, _ref;
       this.loading = true;
@@ -91,6 +117,7 @@
             }
           }).valueOf(), false, entry.data);
         }
+        this.setDirection(codedData.direction, false);
       } catch (_error) {
         exception = _error;
         this.clearList();
@@ -162,7 +189,7 @@
           windowRef.$(head).append(_this.subnodeCss);
           windowRef.$(windowRef.document).on('editor:state-changed', function(event, oldState, newState, node) {
             console.log(oldState, newState);
-            if (oldState === 'dirty' && newState === 'draft') {
+            if (oldState === 'dirty' && (newState === 'draft' || newState === 'published')) {
               _this.workSaveQueue();
               return _this.updateSubnode(node.uri.to_uri().query.key, node);
             }

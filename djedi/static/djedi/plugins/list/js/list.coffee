@@ -5,7 +5,7 @@ class window.ListEditor extends window.Editor
 
   initDataStructure: () ->
     return {
-      direction: '',
+      direction: 'col',
       children: []
     }
 
@@ -19,6 +19,10 @@ class window.ListEditor extends window.Editor
         .node-title, footer {
           display: none;
         }
+        #editor {
+          height: auto;
+          max-height: none;
+        }
       </style>
     ';
     @editor = this;
@@ -30,13 +34,17 @@ class window.ListEditor extends window.Editor
 
     @container = $('#node-list')
     @dataHolder = $('#subnode-data')
+    @directions = $('#direction-options')
     @editor.$add_list = $('#plugin-list')
 
     $('#form input').unbind()
     $('#form textarea').unbind()
     $('#form select').unbind()
+    @directions.find('input').on 'change', (e) =>
+      @setDirection e.target.value
     for plg in config.plugins
-      $('<li class="node-add"><a href="#">'+plg+'</a></li>').appendTo @editor.$add_list
+      if plg != 'list'
+        $('<li class="node-add"><a href="#">'+plg+'</a></li>').appendTo @editor.$add_list
 
     @editor.$add = $('.node-add')
     @editor.$add.on 'click', (evt) =>
@@ -50,6 +58,17 @@ class window.ListEditor extends window.Editor
     $(window).on 'editor:state-changed', (event, oldState, newState) =>
       console.log("ListEditor.stateChanged()")
       console.log(oldState, newState);
+
+  setDirection: (dir, refreshData = true) =>
+    @directions.find('[name="direction"]').prop('checked', false);
+    target = @directions.find('[value="'+dir+'"]');
+    if target.length == 1
+      target.prop('checked', true);
+      @data.direction = dir
+      @updateData(refreshData)
+      @setState('dirty')
+    else
+      @setDirection "col", refreshData;
 
   onLoad: (node) =>
     @loading = true
@@ -65,6 +84,7 @@ class window.ListEditor extends window.Editor
             plugin: entry.plugin,
           }
         }).valueOf(), false, entry.data
+      @setDirection codedData.direction, false
     catch exception
       @clearList()
       @updateData(true)
@@ -124,7 +144,7 @@ class window.ListEditor extends window.Editor
       windowRef.$(head).append(@subnodeCss)
       windowRef.$(windowRef.document).on 'editor:state-changed', (event, oldState, newState, node) =>
         console.log(oldState, newState)
-        if oldState == 'dirty' && newState == 'draft'
+        if oldState == 'dirty' && (newState == 'draft' || newState == 'published')
           @workSaveQueue()
           @updateSubnode(node.uri.to_uri().query.key, node)
 
