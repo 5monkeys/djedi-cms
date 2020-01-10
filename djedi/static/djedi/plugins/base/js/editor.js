@@ -4,6 +4,8 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __slice = [].slice;
 
+  console.log = function() {};
+
   $.fn.enable = function() {
     return this.removeAttr('disabled');
   };
