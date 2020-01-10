@@ -31,6 +31,8 @@ class window.ListEditor extends window.Editor
     @saveQueue = []
     @loading = false
     @preventParentReload = false
+    @subnodeDirty = false;
+    @doShallowSave = false;
 
     @container = $('#node-list')
     @dataHolder = $('#subnode-data')
@@ -44,7 +46,7 @@ class window.ListEditor extends window.Editor
       @setDirection e.target.value
     for plg in config.plugins
       if plg != 'list'
-        $('<li class="node-add"><a href="#">'+plg+'</a></li>').appendTo @editor.$add_list
+        $('<li class="node-add"><a href="#"><span class="'+@getPluginColor(plg)+'">'+plg+'</span></a></li>').appendTo @editor.$add_list
 
     @editor.$add = $('.node-add')
     @editor.$add.on 'click', (evt) =>
@@ -52,7 +54,8 @@ class window.ListEditor extends window.Editor
         query: {
           key: @getSubnodeUriKey(),
           plugin: $(evt.target).text()
-        }
+        },
+        version: "",
       }).valueOf(), true
 
     $(window).on 'editor:state-changed', (event, oldState, newState) =>
@@ -82,7 +85,8 @@ class window.ListEditor extends window.Editor
           query: {
             key: @getSubnodeUriKey(entry.key),
             plugin: entry.plugin,
-          }
+          },
+          version: "",
         }).valueOf(), false, entry.data
       @setDirection codedData.direction, false
     catch exception
@@ -99,6 +103,9 @@ class window.ListEditor extends window.Editor
   setState: (state) =>
     if state == 'draft' && @preventParentReload || state == 'dirty' && @loading
       return
+    if state == "dirty" && @subnodeDirty
+      #Disable subnode re-ordering buttons
+      @container.find('.subnodes__item-shift').addClass('subnodes__item-shift--disabled')
     super state
 
   spawnSubnode: (uri, refreshValue = true, data = "") =>
@@ -115,11 +122,30 @@ class window.ListEditor extends window.Editor
     $("<div class='subnodes__item-remove'><i class='icon-remove'></i></div>").appendTo(title).on 'click', (e) =>
       @popSubnode($(e.target).parents('.subnodes__item').attr "uri-ref")
 
+    handle = $("<div class='subnodes__item-shift'>
+                  <a class='subnodes__item-shift--up'><i class='icon-chevron-up'></i></a>
+                  <a class='subnodes__item-shift--down'><i class='icon-chevron-down'></i></a>
+                </div>").prependTo title
+    handle.find('a').on 'click', (event) =>
+      if @subnodeDirty
+        return false
+      newOrder = false
+      if ($(event.target).hasClass('subnodes__item-shift--up') || $(event.target).hasClass('icon-chevron-up'))
+        newOrder = @moveChild(uri, -1)
+      else
+        newOrder = @moveChild(uri, 1)
+      if newOrder != false
+        @resortNodes()
+        @updateData true
+        @setState('dirty')
+        @shallowSave()
 
     node = new window.Node uri, data, holder
 
-    title.append node.uri.query['plugin'] or 'unknown'
+    title.append ("<span class='subnodes__item-title__text'>"+(node.uri.query['plugin'] or 'unknown')+"</span>")
+    title.find('.subnodes__item-title__text').addClass(@getPluginColor(node.uri.query['plugin'] or 'plugin-fg-unknown'))
     cont.attr 'uri-ref', node.uri.valueOf()
+    cont.attr 'data-key', node.uri.query['key']
     plug = new window.Plugin node
     ref_uri = @node.uri.clone({
       version: ""
@@ -128,9 +154,10 @@ class window.ListEditor extends window.Editor
     path = path.replace("node/#{encodeURIComponent(encodeURIComponent @node.uri)}/editor", "")
     plug.$el.attr 'src', path + "node/#{encodeURIComponent(encodeURIComponent uri)}/editor"
 
+    cont.css('order', @data.children.length);
     @subPlugins.push plug
     @data.children.push {
-      key: @getSubnodeKey(node.uri.query['key']),
+      key: @getSubnodeKey(node.uri.query.key),
       plugin: node.uri.query.plugin,
       data: data,
     }
@@ -140,15 +167,15 @@ class window.ListEditor extends window.Editor
 
     $(plug.$el).on 'load', () =>
       head = windowRef.$(plug.$el[0]).contents().find("head");
-      console.log(head);
       windowRef.$(head).append(@subnodeCss)
       windowRef.$(windowRef.document).on 'editor:state-changed', (event, oldState, newState, node) =>
         console.log(oldState, newState)
-        if oldState == 'dirty' && (newState == 'draft' || newState == 'published')
+        if oldState == 'dirty' && newState == 'draft'
           @workSaveQueue()
           @updateSubnode(node.uri.to_uri().query.key, node)
 
       windowRef.$(windowRef.document).on 'editor:dirty', () =>
+        @subnodeDirty = true
         @editor.setState('dirty')
         @trigger 'editor:dirty'
 
@@ -158,6 +185,13 @@ class window.ListEditor extends window.Editor
       windowRef.$(windowRef.document).on 'node:render', (event, uri, content) =>
         @renderSubnode(uri, content)
 
+#      windowRef.$(windowRef.document).on 'editor:initialized', () =>
+#        windowRef.$(windowRef.document).unbind 'editor:save'
+#        windowRef.$(windowRef.document).on 'editor:save', () =>
+#          if @saveQueue.length == 0
+#            @save();
+#          else
+#            windowRef.editor.$form.submit();
 
     @updateData(refreshValue)
     if refreshValue
@@ -170,9 +204,17 @@ class window.ListEditor extends window.Editor
       @saveQueue.push(plug)
     super
 
+  shallowSave: () ->
+    @doShallowSave = true
+    if @state == "dirty"
+      @trigger 'editor:save', @node.uri
+
   onSave: (node) ->
     super node
-    @workSaveQueue()
+    if !@doShallowSave
+      @workSaveQueue()
+    else
+      @doShallowSave = false;
 
   onPublish: () =>
     super
@@ -197,6 +239,8 @@ class window.ListEditor extends window.Editor
       }
       @loadRevision(event)
       @setState('draft')
+      @subnodeDirty = false
+      @container.find('.subnodes__item-shift').removeClass('subnodes__item-shift--disabled')
       # Load latest revision
 
   saveSubnode: (plugin) =>
@@ -255,13 +299,39 @@ class window.ListEditor extends window.Editor
 
   updateSubnode: (uuid, node, norender = false) =>
     console.log("ListEditor.updateSubnode()", uuid)
-    if node.data
-      console.log(node)
+    console.log(@data.children)
+    index = 0;
+    if node['data']
       for child in @data.children
-        if child.key == node.uri.query.key
-          console.log("updating node data")
-          child.data = node.data
-    @renderSubnode(node.uri, node.content)
+        if child.key == uuid
+          @data.children[index].data = node['data']
+        index++
+    @renderSubnode(node['uri'], node['content'])
+
+  array_move: (arr, old_index, new_index) ->
+    if new_index >= arr.length
+      k = new_index - arr.length + 1
+      while k--
+        arr.push(undefined)
+    arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+
+  moveChild: (uri, steps) =>
+    _uri = uri.to_uri();
+    step = 0;
+    for child in @data.children
+      if (child.key == _uri.query['key'])
+        if (step+steps >= 0 && step+steps < @data.children.length)
+          @array_move(@data.children, step, step+steps)
+          return step+steps;
+      else
+        step++;
+    return false;
+
+  resortNodes: () =>
+    step  = 0;
+    for child in @data.children
+      $("[data-key="+child.key+"]").css('order', step)
+      step++;
 
   getSubnodeUriKey: (key = undefined) =>
     keys = ""

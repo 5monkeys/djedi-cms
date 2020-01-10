@@ -279,17 +279,17 @@ class window.Editor
 
   renderHeader: (node) ->
     uri = node.uri
-    color = (uri.ext[0].toUpperCase().charCodeAt() - 65) % 5 + 1
+    color = @getPluginColor(uri.ext)
 
     parts = (
       for part in uri.path.split '/' when part != ''
         (part[..0].toUpperCase() + part[1..-1]).replace /[_-]/g, ' '
     )
-    path = parts.join " <span class=\"plugin-fg-#{color}\">/</span> "
+    path = parts.join " <span class=\"#{color}\">/</span> "
 
     lang = uri.namespace.split('-')[0] if uri.scheme == 'i18n'
 
-    @$plugin.html(uri.ext).addClass "plugin-fg-#{color}"
+    @$plugin.html(uri.ext).addClass color
     @$path.html path
     @$flag.addClass "flag-#{lang}"
 
@@ -345,6 +345,7 @@ class window.Editor
 
   render: (node) ->
     console.log 'Editor.render()'
+    @trigger 'editor:render', node
     @callback 'render', node
 
   loadRevision: (event) =>
@@ -406,3 +407,7 @@ class window.Editor
   save: =>
     if @state == "dirty"
       @trigger 'editor:save', @node.uri
+
+  getPluginColor: (ext) =>
+    color = (ext[0].toUpperCase().charCodeAt() - 65) % 5 + 1
+    return "plugin-fg-#{color}"

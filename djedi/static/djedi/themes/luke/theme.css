@@ -5703,6 +5703,24 @@ body.open .navbar-brand > a > i.dc-djedi-icon {
   font-style: normal;
   cursor: pointer;
 }
+body.editor .dropdown-menu {
+  background-color: rgba(0, 0, 0, 0.75);
+  border-color: #666;
+  text-shadow: none;
+  font-size: 9px;
+  min-width: 80px;
+  overflow: auto;
+  max-height: 300px;
+  margin-right: 45px;
+}
+body.editor .dropdown-menu > li > a {
+  font-weight: bold;
+  color: #ffad3c;
+}
+body.editor .dropdown-menu > li > a:hover {
+  color: #fff;
+  background-color: #222;
+}
 body.editor header .navbar {
   background: #fff;
   border-bottom: 1px solid #e1e1e1;

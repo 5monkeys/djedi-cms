@@ -427,7 +427,27 @@ body {
 }
 
 body.editor {
+  .dropdown-menu {
+    background-color: rgba(0, 0, 0, 0.75);
+    border-color: #666;
+    text-shadow: none;
+    font-size: 9px;
+    min-width: 80px;
+    overflow: auto;
+    max-height: 300px;
+    margin-right: 45px;
 
+    > li {
+      > a {
+        font-weight: bold;
+        color: #ffad3c;
+        &:hover {
+          color: #fff;
+          background-color: #222;
+        }
+      }
+    }
+  }
   header {
     .navbar {
       background: @editor-title-bg;

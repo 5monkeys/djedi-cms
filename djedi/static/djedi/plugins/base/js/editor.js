@@ -154,6 +154,7 @@
   window.Editor = (function() {
     function Editor(config) {
       this.config = config;
+      this.getPluginColor = __bind(this.getPluginColor, this);
       this.save = __bind(this.save, this);
       this.discard = __bind(this.discard, this);
       this.publish = __bind(this.publish, this);
@@ -372,7 +373,7 @@
     Editor.prototype.renderHeader = function(node) {
       var color, lang, part, parts, path, uri, v;
       uri = node.uri;
-      color = (uri.ext[0].toUpperCase().charCodeAt() - 65) % 5 + 1;
+      color = this.getPluginColor(uri.ext);
       parts = (function() {
         var _i, _len, _ref, _results;
         _ref = uri.path.split('/');
@@ -385,11 +386,11 @@
         }
         return _results;
       })();
-      path = parts.join(" <span class=\"plugin-fg-" + color + "\">/</span> ");
+      path = parts.join(" <span class=\"" + color + "\">/</span> ");
       if (uri.scheme === 'i18n') {
         lang = uri.namespace.split('-')[0];
       }
-      this.$plugin.html(uri.ext).addClass("plugin-fg-" + color);
+      this.$plugin.html(uri.ext).addClass(color);
       this.$path.html(path);
       this.$flag.addClass("flag-" + lang);
       v = this.$version.find('var');
@@ -443,6 +444,7 @@
 
     Editor.prototype.render = function(node) {
       console.log('Editor.render()');
+      this.trigger('editor:render', node);
       return this.callback('render', node);
     };
 
@@ -528,6 +530,12 @@
       if (this.state === "dirty") {
         return this.trigger('editor:save', this.node.uri);
       }
+    };
+
+    Editor.prototype.getPluginColor = function(ext) {
+      var color;
+      color = (ext[0].toUpperCase().charCodeAt() - 65) % 5 + 1;
+      return "plugin-fg-" + color;
     };
 
     return Editor;

@@ -10,6 +10,8 @@
     function ListEditor() {
       this.getSubnodeKey = __bind(this.getSubnodeKey, this);
       this.getSubnodeUriKey = __bind(this.getSubnodeUriKey, this);
+      this.resortNodes = __bind(this.resortNodes, this);
+      this.moveChild = __bind(this.moveChild, this);
       this.updateSubnode = __bind(this.updateSubnode, this);
       this.renderSubnode = __bind(this.renderSubnode, this);
       this.updateData = __bind(this.updateData, this);
@@ -44,6 +46,8 @@
       this.saveQueue = [];
       this.loading = false;
       this.preventParentReload = false;
+      this.subnodeDirty = false;
+      this.doShallowSave = false;
       this.container = $('#node-list');
       this.dataHolder = $('#subnode-data');
       this.directions = $('#direction-options');
@@ -60,7 +64,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         plg = _ref[_i];
         if (plg !== 'list') {
-          $('<li class="node-add"><a href="#">' + plg + '</a></li>').appendTo(this.editor.$add_list);
+          $('<li class="node-add"><a href="#"><span class="' + this.getPluginColor(plg) + '">' + plg + '</span></a></li>').appendTo(this.editor.$add_list);
         }
       }
       this.editor.$add = $('.node-add');
@@ -70,7 +74,8 @@
             query: {
               key: _this.getSubnodeUriKey(),
               plugin: $(evt.target).text()
-            }
+            },
+            version: ""
           }).valueOf(), true);
         };
       })(this));
@@ -114,7 +119,8 @@
             query: {
               key: this.getSubnodeUriKey(entry.key),
               plugin: entry.plugin
-            }
+            },
+            version: ""
           }).valueOf(), false, entry.data);
         }
         this.setDirection(codedData.direction, false);
@@ -137,11 +143,14 @@
       if (state === 'draft' && this.preventParentReload || state === 'dirty' && this.loading) {
         return;
       }
+      if (state === "dirty" && this.subnodeDirty) {
+        this.container.find('.subnodes__item-shift').addClass('subnodes__item-shift--disabled');
+      }
       return ListEditor.__super__.setState.call(this, state);
     };
 
     ListEditor.prototype.spawnSubnode = function(uri, refreshValue, data) {
-      var classes, cont, holder, node, path, plug, ref_uri, title, windowRef;
+      var classes, cont, handle, holder, node, path, plug, ref_uri, title, windowRef;
       if (refreshValue == null) {
         refreshValue = true;
       }
@@ -163,9 +172,32 @@
           return _this.popSubnode($(e.target).parents('.subnodes__item').attr("uri-ref"));
         };
       })(this));
+      handle = $("<div class='subnodes__item-shift'> <a class='subnodes__item-shift--up'><i class='icon-chevron-up'></i></a> <a class='subnodes__item-shift--down'><i class='icon-chevron-down'></i></a> </div>").prependTo(title);
+      handle.find('a').on('click', (function(_this) {
+        return function(event) {
+          var newOrder;
+          if (_this.subnodeDirty) {
+            return false;
+          }
+          newOrder = false;
+          if ($(event.target).hasClass('subnodes__item-shift--up') || $(event.target).hasClass('icon-chevron-up')) {
+            newOrder = _this.moveChild(uri, -1);
+          } else {
+            newOrder = _this.moveChild(uri, 1);
+          }
+          if (newOrder !== false) {
+            _this.resortNodes();
+            _this.updateData(true);
+            _this.setState('dirty');
+            return _this.shallowSave();
+          }
+        };
+      })(this));
       node = new window.Node(uri, data, holder);
-      title.append(node.uri.query['plugin'] || 'unknown');
+      title.append("<span class='subnodes__item-title__text'>" + (node.uri.query['plugin'] || 'unknown') + "</span>");
+      title.find('.subnodes__item-title__text').addClass(this.getPluginColor(node.uri.query['plugin'] || 'plugin-fg-unknown'));
       cont.attr('uri-ref', node.uri.valueOf());
+      cont.attr('data-key', node.uri.query['key']);
       plug = new window.Plugin(node);
       ref_uri = this.node.uri.clone({
         version: ""
@@ -173,9 +205,10 @@
       path = document.location.pathname.replace("node/" + (encodeURIComponent(encodeURIComponent(ref_uri))) + "/editor", "");
       path = path.replace("node/" + (encodeURIComponent(encodeURIComponent(this.node.uri))) + "/editor", "");
       plug.$el.attr('src', path + ("node/" + (encodeURIComponent(encodeURIComponent(uri))) + "/editor"));
+      cont.css('order', this.data.children.length);
       this.subPlugins.push(plug);
       this.data.children.push({
-        key: this.getSubnodeKey(node.uri.query['key']),
+        key: this.getSubnodeKey(node.uri.query.key),
         plugin: node.uri.query.plugin,
         data: data
       });
@@ -185,16 +218,16 @@
         return function() {
           var head;
           head = windowRef.$(plug.$el[0]).contents().find("head");
-          console.log(head);
           windowRef.$(head).append(_this.subnodeCss);
           windowRef.$(windowRef.document).on('editor:state-changed', function(event, oldState, newState, node) {
             console.log(oldState, newState);
-            if (oldState === 'dirty' && (newState === 'draft' || newState === 'published')) {
+            if (oldState === 'dirty' && newState === 'draft') {
               _this.workSaveQueue();
               return _this.updateSubnode(node.uri.to_uri().query.key, node);
             }
           });
           windowRef.$(windowRef.document).on('editor:dirty', function() {
+            _this.subnodeDirty = true;
             _this.editor.setState('dirty');
             return _this.trigger('editor:dirty');
           });
@@ -224,9 +257,20 @@
       return ListEditor.__super__.save.apply(this, arguments);
     };
 
+    ListEditor.prototype.shallowSave = function() {
+      this.doShallowSave = true;
+      if (this.state === "dirty") {
+        return this.trigger('editor:save', this.node.uri);
+      }
+    };
+
     ListEditor.prototype.onSave = function(node) {
       ListEditor.__super__.onSave.call(this, node);
-      return this.workSaveQueue();
+      if (!this.doShallowSave) {
+        return this.workSaveQueue();
+      } else {
+        return this.doShallowSave = false;
+      }
     };
 
     ListEditor.prototype.onPublish = function() {
@@ -258,7 +302,9 @@
           }
         };
         this.loadRevision(event);
-        return this.setState('draft');
+        this.setState('draft');
+        this.subnodeDirty = false;
+        return this.container.find('.subnodes__item-shift').removeClass('subnodes__item-shift--disabled');
       }
     };
 
@@ -337,23 +383,67 @@
     };
 
     ListEditor.prototype.updateSubnode = function(uuid, node, norender) {
-      var child, _i, _len, _ref;
+      var child, index, _i, _len, _ref;
       if (norender == null) {
         norender = false;
       }
       console.log("ListEditor.updateSubnode()", uuid);
-      if (node.data) {
-        console.log(node);
+      console.log(this.data.children);
+      index = 0;
+      if (node['data']) {
         _ref = this.data.children;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
-          if (child.key === node.uri.query.key) {
-            console.log("updating node data");
-            child.data = node.data;
+          if (child.key === uuid) {
+            this.data.children[index].data = node['data'];
           }
+          index++;
         }
       }
-      return this.renderSubnode(node.uri, node.content);
+      return this.renderSubnode(node['uri'], node['content']);
+    };
+
+    ListEditor.prototype.array_move = function(arr, old_index, new_index) {
+      var k;
+      if (new_index >= arr.length) {
+        k = new_index - arr.length + 1;
+        while (k--) {
+          arr.push(void 0);
+        }
+      }
+      return arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+    };
+
+    ListEditor.prototype.moveChild = function(uri, steps) {
+      var child, step, _i, _len, _ref, _uri;
+      _uri = uri.to_uri();
+      step = 0;
+      _ref = this.data.children;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        child = _ref[_i];
+        if (child.key === _uri.query['key']) {
+          if (step + steps >= 0 && step + steps < this.data.children.length) {
+            this.array_move(this.data.children, step, step + steps);
+            return step + steps;
+          }
+        } else {
+          step++;
+        }
+      }
+      return false;
+    };
+
+    ListEditor.prototype.resortNodes = function() {
+      var child, step, _i, _len, _ref, _results;
+      step = 0;
+      _ref = this.data.children;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        child = _ref[_i];
+        $("[data-key=" + child.key + "]").css('order', step);
+        _results.push(step++);
+      }
+      return _results;
     };
 
     ListEditor.prototype.getSubnodeUriKey = function(key) {

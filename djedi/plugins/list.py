@@ -56,7 +56,9 @@ class ListPlugin(BasePlugin):
                             query = uri.query
                             query.pop('key')
                             child_node = Node(uri.clone(query=query), node.content, **node.meta)
-                            child['data'] = plugin._save(child_node).content
+                            saved_node = plugin._save(child_node)
+                            node.uri = node.uri.clone(version=saved_node.uri.version)
+                            child['data'] = saved_node.content
                             break
                         else:
                             parent_layers.append((key, json.loads(child['data'])))
@@ -67,11 +69,13 @@ class ListPlugin(BasePlugin):
                         query = uri.query
                         query.pop('key')
                         child_node = Node(uri.clone(query=query), node.content, **node.meta)
+                        saved_node = plugin._save(child_node)
                         child = {
                             'key': key,
                             'plugin': uri.query['plugin'],
-                            'data': plugin._save(child_node).content
+                            'data': saved_node.content
                         }
+                        node.uri = node.uri.clone(version=saved_node.uri.version)
                         parent_layer['children'].append(child)
             #Rewrap layers
             parent_layers.reverse()
