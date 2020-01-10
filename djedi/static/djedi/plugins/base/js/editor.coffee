@@ -1,4 +1,4 @@
-#console.log = () ->
+console.log = () ->
 
 $.fn.enable = -> @removeAttr 'disabled'
 $.fn.disable = -> @attr 'disabled', 'disabled'

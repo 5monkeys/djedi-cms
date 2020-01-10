@@ -31,8 +31,8 @@ class window.ListEditor extends window.Editor
     @saveQueue = []
     @loading = false
     @preventParentReload = false
-    @subnodeDirty = false;
-    @doShallowSave = false;
+    @subnodeDirty = false
+    @doShallowSave = false
 
     @container = $('#node-list')
     @dataHolder = $('#subnode-data')
@@ -184,14 +184,6 @@ class window.ListEditor extends window.Editor
 
       windowRef.$(windowRef.document).on 'node:render', (event, uri, content) =>
         @renderSubnode(uri, content)
-
-#      windowRef.$(windowRef.document).on 'editor:initialized', () =>
-#        windowRef.$(windowRef.document).unbind 'editor:save'
-#        windowRef.$(windowRef.document).on 'editor:save', () =>
-#          if @saveQueue.length == 0
-#            @save();
-#          else
-#            windowRef.editor.$form.submit();
 
     @updateData(refreshValue)
     if refreshValue
