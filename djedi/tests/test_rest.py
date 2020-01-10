@@ -451,7 +451,11 @@ class PrivateRestTest(ClientTest):
             'direction': 'col',
             'children': []
         }))
-        response = self.post('api.render', 'list', {'data': u'# Djedi', 'uri': 'i18n://sv-se@page/render.list?key=abc123&plugin=md'})
+        response = self.post(
+            'api.render',
+            'list',
+            {'data': u'# Djedi', 'uri': 'i18n://sv-se@page/render.list?key=abc123&plugin=md'}
+        )
         assert response.status_code == 200
         self.assertRenderedMarkdown(smart_unicode(response.content), u'# Djedi')
 
@@ -468,7 +472,14 @@ class PrivateRestTest(ClientTest):
 
         response = self.post('api.render', 'list', {'data': data, 'uri': 'i18n://sv-se@page/render_new.list'})
         assert response.status_code == 200
-        self.assertEqual(response.content, b'<ul class="djedi-list djedi-list--col"><li class=djedi-plugin--md id=betterkey><h1>Not yours</h1></li></ul>')
+        self.assertEqual(
+            response.content,
+            b'<ul class="djedi-list djedi-list--col">'
+            b'<li class=djedi-plugin--md id=betterkey>'
+            b'<h1>Not yours</h1>'
+            b'</li>'
+            b'</ul>'
+        )
 
 
 class PublicRestTest(ClientTest):

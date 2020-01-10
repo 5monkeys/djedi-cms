@@ -4,6 +4,7 @@ from cio.node import Node
 import cio
 import json
 
+
 class ListPlugin(BasePlugin):
     ext = 'list'
 
@@ -14,7 +15,7 @@ class ListPlugin(BasePlugin):
             content = node.content
             try:
                 data = json.loads(content)
-            except:
+            except ValueError:
                 if uri.query['plugin']:
                     plugin = plugins.resolve(uri.clone(ext=uri.query['plugin'], version=None, query=None))
                     data = plugin._load(node)
@@ -33,60 +34,62 @@ class ListPlugin(BasePlugin):
                 return ""
         return super(ListPlugin, self).load(node.content)
 
+    def _handle_child_save(self, uri, node):
+        key_tree = uri.query['key'].split('_')
+        parent_layers = list()
+        parent = cio.load(uri.clone(query=None))
+        try:
+            parent_data = json.loads(parent['data'])
+        except ValueError:
+            return ""
+        parent_layers.append((None, parent_data))
+        for no, key in enumerate(key_tree):
+            last = no == len(key_tree) - 1
+            # Unwrap layers
+            (_, parent_layer) = parent_layers[len(parent_layers)-1]
+            for child in parent_layer['children']:
+                if child['key'] == key and last:
+                    plugin = plugins.resolve(uri.clone(ext=child['plugin']))
+                    query = uri.query
+                    query.pop('key')
+                    child_node = Node(uri.clone(query=query), node.content, **node.meta)
+                    saved_node = plugin._save(child_node)
+                    node.uri = node.uri.clone(version=saved_node.uri.version)
+                    child['data'] = saved_node.content
+                    break
+                elif child['key'] == key:
+                    parent_layers.append((key, json.loads(child['data'])))
+                    break
+            else:
+                if last:
+                    plugin = plugins.resolve(uri.clone(ext=uri.query['plugin']))
+                    query = uri.query
+                    query.pop('key')
+                    child_node = Node(uri.clone(query=query), node.content, **node.meta)
+                    saved_node = plugin._save(child_node)
+                    child = {
+                        'key': key,
+                        'plugin': uri.query['plugin'],
+                        'data': saved_node.content
+                    }
+                    node.uri = node.uri.clone(version=saved_node.uri.version)
+                    parent_layer['children'].append(child)
+        # Rewrap layers
+        parent_layers.reverse()
+        for count, (key, nd) in enumerate(parent_layers):
+            if key is None:
+                node.content = self.save(json.dumps(nd))
+            else:
+                (_, parent_layer) = parent_layers[count+1]
+                for child in parent_layer['children']:
+                    if child['key'] == key:
+                        child['data'] = json.dumps(nd)
+
     def _save(self, node):
         uri = node.uri.clone()
         child_key, child_uri = self._get_child_uri(uri)
         if child_key:
-            key_tree = uri.query['key'].split('_')
-            parent_layers = list()
-            parent = cio.load(uri.clone(query=None))
-            try:
-                 parent_data = json.loads(parent['data'])
-            except:
-                return ""
-            parent_layers.append((None, parent_data))
-            for no, key in enumerate(key_tree):
-                last = no == len(key_tree) - 1
-                #Unwrap layers
-                (_, parent_layer) = parent_layers[len(parent_layers)-1]
-                for child in parent_layer['children']:
-                    if child['key'] == key:
-                        if last:
-                            plugin = plugins.resolve(uri.clone(ext=child['plugin']))
-                            query = uri.query
-                            query.pop('key')
-                            child_node = Node(uri.clone(query=query), node.content, **node.meta)
-                            saved_node = plugin._save(child_node)
-                            node.uri = node.uri.clone(version=saved_node.uri.version)
-                            child['data'] = saved_node.content
-                            break
-                        else:
-                            parent_layers.append((key, json.loads(child['data'])))
-                            break
-                else:
-                    if last:
-                        plugin = plugins.resolve(uri.clone(ext=uri.query['plugin']))
-                        query = uri.query
-                        query.pop('key')
-                        child_node = Node(uri.clone(query=query), node.content, **node.meta)
-                        saved_node = plugin._save(child_node)
-                        child = {
-                            'key': key,
-                            'plugin': uri.query['plugin'],
-                            'data': saved_node.content
-                        }
-                        node.uri = node.uri.clone(version=saved_node.uri.version)
-                        parent_layer['children'].append(child)
-            #Rewrap layers
-            parent_layers.reverse()
-            for count, (key, nd) in enumerate(parent_layers):
-                if key is None:
-                    node.content = self.save(json.dumps(nd))
-                else:
-                    (_, parent_layer) = parent_layers[count+1]
-                    for child in parent_layer['children']:
-                        if child['key'] == key:
-                            child['data'] = json.dumps(nd)
+            self._handle_child_save(uri, node)
         return super(ListPlugin, self)._save(node)
 
     def _render(self, data, node):
@@ -95,7 +98,7 @@ class ListPlugin(BasePlugin):
         if child_key:
             try:
                 decoded_data = json.loads(node.content)
-            except:
+            except ValueError:
                 if uri.query['plugin']:
                     plugin = plugins.resolve(uri.clone(ext=uri.query['plugin'], version=None, query=None))
                     return plugin._render(data, node)
@@ -109,11 +112,15 @@ class ListPlugin(BasePlugin):
         else:
             try:
                 decoded_data = json.loads(data)
-            except:
+            except ValueError:
                 return ""
             render_data = ""
             for child in decoded_data['children']:
-                render_data += '<li class=djedi-plugin--{} id={}>{}</li>'.format(child['plugin'], child['key'], self._render_child(child, uri))
+                render_data += '<li class=djedi-plugin--{} id={}>{}</li>'.format(
+                    child['plugin'],
+                    child['key'],
+                    self._render_child(child, uri)
+                )
             return self.render({'direction': decoded_data['direction'], 'children': render_data})
 
     def _render_child(self, child_data, uri):
@@ -125,7 +132,10 @@ class ListPlugin(BasePlugin):
         return content
 
     def render(self, data):
-        return '<ul class="djedi-list djedi-list--{}">{}</ul>'.format(data['direction'], data['children'])
+        return '<ul class="djedi-list djedi-list--{}">{}</ul>'.format(
+            data['direction'],
+            data['children']
+        )
 
     def _check_child_integrity(self, child):
         return 'key' in child and 'data' in child and 'plugin' in child
@@ -138,7 +148,7 @@ class ListPlugin(BasePlugin):
         if cloned_uri.query and 'key' in cloned_uri.query:
             key, _, rest = cloned_uri.query['key'].partition('_')
             query = cloned_uri.query
-            if rest is '' or None:
+            if rest == '' or None:
                 query.pop('key')
             else:
                 query['key'] = rest
@@ -146,5 +156,3 @@ class ListPlugin(BasePlugin):
             return key, cloned_uri
         else:
             return None, cloned_uri
-
-

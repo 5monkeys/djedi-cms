@@ -21,6 +21,7 @@ from .mixins import JSONResponseMixin, DjediContextMixin
 from ..compat import TemplateResponse
 from .. import auth
 
+
 class APIView(View):
 
     @csrf_exempt
@@ -227,7 +228,9 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
             return self.render_plugin(request, context)
 
     def render_plugin(self, request, context):
-        ext = context['uri'].query['plugin'] if context['uri'].query and 'plugin' in context['uri'].query else context['uri'].ext
+        ext = context['uri'].query['plugin'] \
+            if context['uri'].query and 'plugin' in context['uri'].query \
+            else context['uri'].ext
         context['uri'] = mark_safe(context['uri'])
         return TemplateResponse(request, [
             'djedi/plugins/%s/editor.html' % ext,
