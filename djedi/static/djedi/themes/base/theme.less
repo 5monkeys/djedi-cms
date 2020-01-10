@@ -66,28 +66,28 @@ body {
   background-color: @body-bg;
   color: @text-color;
   .antialiased();
-
-  &.embedded {
-    display: block; //fallback
+  display: block; //fallback
+  display: flex;
+  flex-direction: column;
+  & .tab-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
 
-    & .tab-content {
+    .tab-pane {
       flex: 1;
-      display: flex;
-      flex-direction: column;
+      height: auto;
+      max-height: none;
 
-      .tab-pane {
-        flex: 1;
-        height: auto;
-        max-height: none;
-
-        #editor-iframe {
-          height: 100%;
-        }
+      #editor-iframe {
+        height: 100%;
       }
     }
+  }
+
+  &.embedded {
+
+    overflow: hidden;
 
     &.closed {
     }
