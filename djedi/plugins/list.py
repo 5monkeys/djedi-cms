@@ -36,7 +36,6 @@ class ListPlugin(BasePlugin):
 
     def _handle_child_save(self, uri, node):
         key_tree = uri.query['key'][0].split('_')
-        parent_layers = list()
         parent = cio.load(uri.clone(query=None))
         try:
             parent_data = json.loads(parent['data'])

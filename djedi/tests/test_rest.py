@@ -453,8 +453,8 @@ class PrivateRestTest(ClientTest):
         }))
         response = self.post(
             'api.render',
-            'list',
-            {'data': u'# Djedi', 'uri': 'i18n://sv-se@page/render.list?key=abc123&plugin=md'}
+            'md',
+            {'data': u'# Djedi'}
         )
         assert response.status_code == 200
         self.assertRenderedMarkdown(smart_unicode(response.content), u'# Djedi')
@@ -470,7 +470,7 @@ class PrivateRestTest(ClientTest):
             ]
         })
 
-        response = self.post('api.render', 'list', {'data': data, 'uri': 'i18n://sv-se@page/render_new.list'})
+        response = self.post('api.render', 'list', {'data': data})
         assert response.status_code == 200
         self.assertEqual(
             response.content,

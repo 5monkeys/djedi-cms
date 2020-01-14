@@ -482,13 +482,16 @@
     Editor.prototype.renderContent = function(data, doTrigger, callback) {
       var content, plugin;
       console.log('Editor.renderContent()');
-      plugin = this.node.uri.ext;
+      if (this.node.uri.query && this.node.uri.query['plugin']) {
+        plugin = this.node.uri.query['plugin'];
+      } else {
+        plugin = this.node.uri.ext;
+      }
       if (typeof data === 'string') {
         data = {
           data: data
         };
       }
-      data['uri'] = this.node.uri;
       content = '';
       if (callback) {
         this.api.render(plugin, data, (function(_this) {

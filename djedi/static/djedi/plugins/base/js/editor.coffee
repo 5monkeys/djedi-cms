@@ -371,9 +371,13 @@ class window.Editor
 
   renderContent: (data, doTrigger, callback) ->
     console.log 'Editor.renderContent()'
-    plugin = @node.uri.ext
+
+    if @node.uri.query and @node.uri.query['plugin']
+      plugin = @node.uri.query['plugin']
+    else
+      plugin = @node.uri.ext
+
     data = {data: data} if typeof(data) == 'string'
-    data['uri'] = @node.uri
     content = ''
 
     if callback
