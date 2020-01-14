@@ -184,12 +184,12 @@ class RenderApi(APIView):
             if uri == {}:
                 uri = URI(ext=ext)
             node = Node(uri=uri, content=data)
-            data = plugin._load(node)
+            data = plugin.load_node(node)
             node.content = data
         except UnknownPlugin:
             raise Http404
         else:
-            content = plugin._render(data, node)
+            content = plugin.render_node(node, data)
             return self.render_to_response(content)
 
 
@@ -228,8 +228,9 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
             return self.render_plugin(request, context)
 
     def render_plugin(self, request, context):
-        ext = context['uri'].query['plugin'] \
+        ext = context['uri'].query['plugin'][0] \
             if context['uri'].query and 'plugin' in context['uri'].query \
+            and context['uri'].query['plugin'] \
             else context['uri'].ext
         context['uri'] = mark_safe(context['uri'])
         return TemplateResponse(request, [

@@ -402,7 +402,7 @@ class window.Editor
     @node = null
 
     @api.load uri.valueOf(), @onLoad
-    @trigger "editor:discard", @node.uri
+    @trigger "editor:discard", uri
 
   save: =>
     if @state == "dirty"

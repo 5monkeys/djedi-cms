@@ -525,7 +525,7 @@
       uri.version = null;
       this.node = null;
       this.api.load(uri.valueOf(), this.onLoad);
-      return this.trigger("editor:discard", this.node.uri);
+      return this.trigger("editor:discard", uri);
     };
 
     Editor.prototype.save = function() {

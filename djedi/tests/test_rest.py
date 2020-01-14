@@ -313,14 +313,14 @@ class PrivateRestTest(ClientTest):
         serialized_data = json.dumps(data)
         listnode = cio.set('sv-se@page/apa.list', serialized_data)
         text_node_uri = listnode.uri.clone(query={
-            'key': '321cba'
+            'key': ['321cba']
         })
         text_node = cio.load(text_node_uri)
         self.assertEqual(text_node['data'], "Bananas")
         self.assertEqual(text_node['content'], "Bananas")
 
         md_node = cio.load(listnode.uri.clone(query={
-            'key': 'abc123'
+            'key': ['abc123']
         }))
         self.assertEqual(md_node['content'], '<h1>One banana</h1>')
         self.assertEqual(md_node['data'], '# One banana')
