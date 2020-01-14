@@ -42,13 +42,26 @@ class ListPlugin(BasePlugin):
             parent_data = json.loads(parent['data'])
         except ValueError:
             return ""
-        parent_layers.append((None, parent_data))
+        parent_layers = self._unwrap_layers(key_tree, uri, node, parent_data)
+        # Rewrap layers
+        parent_layers.reverse()
+        for count, (key, nd) in enumerate(parent_layers):
+            if key is None:
+                node.content = self.save(json.dumps(nd))
+            else:
+                (_, parent_layer) = parent_layers[count+1]
+                for child in parent_layer['children']:
+                    if child['key'] == key:
+                        child['data'] = json.dumps(nd)
+
+    def _unwrap_layers(self, key_tree, uri, node, parent_data):
+        parent_layers = [(None, parent_data)]
+        if uri.query['plugin']:
+            requested_plugin = uri.query['plugin'][0]
+        else:
+            requested_plugin = uri.ext
         for no, key in enumerate(key_tree):
             last = no == len(key_tree) - 1
-            if uri.query['plugin']:
-                requested_plugin = uri.query['plugin'][0]
-            else:
-                requested_plugin = uri.ext
             # Unwrap layers
             (_, parent_layer) = parent_layers[len(parent_layers)-1]
             for child in parent_layer['children']:
@@ -78,20 +91,10 @@ class ListPlugin(BasePlugin):
                     }
                     node.uri = node.uri.clone(version=saved_node.uri.version)
                     parent_layer['children'].append(child)
-        # Rewrap layers
-        parent_layers.reverse()
-        for count, (key, nd) in enumerate(parent_layers):
-            if key is None:
-                node.content = self.save(json.dumps(nd))
-            else:
-                (_, parent_layer) = parent_layers[count+1]
-                for child in parent_layer['children']:
-                    if child['key'] == key:
-                        child['data'] = json.dumps(nd)
+        return parent_layers
 
     def save_node(self, node):
         uri = node.uri.clone()
-        #import pdb; pdb.set_trace()
         child_key, child_uri = self._get_child_uri(uri)
         if child_key:
             self._handle_child_save(uri, node)
