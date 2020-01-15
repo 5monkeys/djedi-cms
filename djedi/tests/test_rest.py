@@ -11,6 +11,7 @@ from cio.backends import storage
 from cio.backends.exceptions import NodeDoesNotExist, PersistenceError
 from cio.plugins import plugins
 from cio.utils.uri import URI
+from djedi.plugins.form import BaseEditorForm
 from djedi.tests.base import ClientTest, DjediTest, UserMixin
 from djedi.utils.encoding import smart_unicode
 
@@ -201,6 +202,7 @@ class PrivateRestTest(ClientTest):
             'width': '64',
             'height': '64'
         })})
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(smart_unicode(response.content), u'<img alt="" height="64" src="/foo/bar.png" width="64" />')
 
@@ -214,7 +216,13 @@ class PrivateRestTest(ClientTest):
         for ext in plugins:
             response = self.get('cms.editor', 'sv-se@page/title.' + ext)
             self.assertEqual(response.status_code, 200)
-            assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
+            if ext == 'img':
+                assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri', 'forms'))
+                assert 'HTML' in response.context_data['forms']
+                assert isinstance(response.context_data['forms']['HTML'], BaseEditorForm)
+            else:
+                assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
+
             self.assertNotIn(b'document.domain', response.content)
 
         with cio.conf.settings(XSS_DOMAIN='foobar.se'):
@@ -230,12 +238,14 @@ class PrivateRestTest(ClientTest):
             'data[width]': u'64',
             'data[height]': u'64',
             'data[crop]': u'64,64,128,128',
-            'data[id]': u'vw',
-            'data[class]': u'year-53',
-            'data[alt]': u'Zwitter',
+            'data[attr_id]': u'vw',
+            'data[attr_class]': u'year-53',
+            'data[attr_alt]': u'Zwitter',
             'meta[comment]': u'VW'
         }
+
         response = self.post('api', 'i18n://sv-se@header/logo.img', form)
+
         self.assertEqual(response.status_code, 200)
 
         with open(image_path, "rb") as image:
