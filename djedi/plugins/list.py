@@ -118,20 +118,20 @@ class ListPlugin(BasePlugin):
         root_node = cio.load(node.uri.clone(query=None))
         root_data = root_node['data']
 
-        child_node, key = self.get_child_node(node.uri, root_data, default=node.content)
-        node.content = self.save_child(node.content, child_node, key, parent_data=root_data)  # TODO: deep clone data?
+        node.content = self.save_child(node.content, parent_node=node, parent_data=root_data)  # TODO: deep clone data?
 
         return node
 
-    def save_child(self, leaf_data, child_node, key, parent_data):
+    def save_child(self, leaf_data, parent_node, parent_data):
+        child_node, key = self.get_child_node(parent_node.uri, parent_data, default=parent_node.content)
+
         plugin = self.resolve_child_plugin(child_node.uri)
         if plugin.ext == self.ext:
             if not self.is_nested(child_node.uri):
                 child_content = self.save(leaf_data)
             else:
                 child_data = self.load(child_node.content)
-                sub_node, sub_key = self.get_child_node(child_node.uri, parent_data=child_data, default=child_data)
-                child_content = self.save_child(leaf_data, sub_node, key=sub_key, parent_data=child_data)
+                child_content = self.save_child(leaf_data, parent_node=child_node, parent_data=child_data)
         else:
             child_node.content = leaf_data
             child_node = plugin.save_node(child_node)
