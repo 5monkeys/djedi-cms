@@ -310,17 +310,18 @@ class PrivateRestTest(ClientTest):
                 },
             ]
         }
-        serialized_data = json.dumps(data)
-        listnode = cio.set('sv-se@page/apa.list', serialized_data)
+        listnode = cio.set('sv-se@page/apa.list', data)
         text_node_uri = listnode.uri.clone(query={
-            'key': ['321cba']
+            'key': ['321cba'],
+            'plugin': ['txt']
         })
         text_node = cio.load(text_node_uri)
         self.assertEqual(text_node['data'], "Bananas")
         self.assertEqual(text_node['content'], "Bananas")
 
         md_node = cio.load(listnode.uri.clone(query={
-            'key': ['abc123']
+            'key': ['abc123'],
+            'plugin': ['md']
         }))
         self.assertEqual(md_node['content'], '<h1>One banana</h1>')
         self.assertEqual(md_node['data'], '# One banana')
@@ -339,7 +340,7 @@ class PrivateRestTest(ClientTest):
         self.assertEqual(node_data['data'], '# Two Bananas')
 
         # Test setting it multiple times
-        cio.set('sv-se@page/apa.list#draft', json.dumps({
+        cio.set('sv-se@page/apa.list#draft', {
             'direction': 'col',
             'children': [
                 {
@@ -348,7 +349,7 @@ class PrivateRestTest(ClientTest):
                     'data': '# One banana',
                 }
             ]
-        }))
+        })
         cio.set('sv-se@page/apa.list?key=abc123&plugin=md', '# No bananas')
         cio.set('sv-se@page/apa.list?key=abc123&plugin=md', '# Many bananas')
         cio.set('sv-se@page/apa.list?key=abc123&plugin=md', '# Many bananas')
@@ -356,7 +357,7 @@ class PrivateRestTest(ClientTest):
         parent_node = cio.load('sv-se@page/apa.list')
         self.assertEqual(node_data['content'], '<h1>Many bananas</h1>')
         self.assertEqual(node_data['data'], '# Many bananas')
-        self.assertDictEqual(json.loads(parent_node['data']), {
+        self.assertDictEqual(parent_node['data'], {
             'direction': 'col',
             'children': [
                 {
@@ -367,8 +368,9 @@ class PrivateRestTest(ClientTest):
             ]
         })
 
+    def test_apa(self):
         # Test nested list
-        cio.set('sv-se@page/apa.list', json.dumps({
+        cio.set('sv-se@page/apa.list', {
             'direction': 'col',
             'children': [
                 {
@@ -377,8 +379,8 @@ class PrivateRestTest(ClientTest):
                     'data': '# One banana',
                 }
             ]
-        }))
-        cio.set('sv-se@page/apa.list?key=321cba&plugin=list', json.dumps({
+        })
+        cio.set('sv-se@page/apa.list?key=321cba&plugin=list', {
             'direction': 'col',
             'children': [
                 {
@@ -387,14 +389,14 @@ class PrivateRestTest(ClientTest):
                     'data': '# My banana',
                 }
             ]
-        }))
+        })
         node_data = cio.load('sv-se@page/apa.list?key=abc123&plugin=md')
         list_node = cio.load('sv-se@page/apa.list?key=321cba&plugin=list')
         parent_node = cio.load('sv-se@page/apa.list')
         child_node = cio.load('sv-se@page/apa.list?key=321cba_betterkey&plugin=md')
         self.assertEqual(node_data['content'], '<h1>One banana</h1>')
         self.assertEqual(node_data['data'], '# One banana')
-        self.assertDictEqual(json.loads(parent_node['data']), {
+        self.assertDictEqual(parent_node['data'], {
             'direction': 'col',
             'children': [
                 {
@@ -418,7 +420,7 @@ class PrivateRestTest(ClientTest):
                 }
             ]
         })
-        self.assertDictEqual(json.loads(list_node['data']), {
+        self.assertDictEqual(list_node['data'], {
             'direction': 'col',
             'children': [
                 {
@@ -436,7 +438,7 @@ class PrivateRestTest(ClientTest):
         list_node = cio.load('sv-se@page/apa.list?key=321cba&plugin=list')
         self.assertEqual(deep_node['data'], '# Not yours')
         self.assertEqual(deep_node['content'], '<h1>Not yours</h1>')
-        self.assertEqual(json.loads(list_node['data']), {
+        self.assertEqual(list_node['data'], {
             'direction': 'col',
             'children': [
                 {
@@ -447,10 +449,10 @@ class PrivateRestTest(ClientTest):
             ]
         })
 
-        cio.set('sv-se@page/render.list', json.dumps({
+        cio.set('sv-se@page/render.list', {
             'direction': 'col',
             'children': []
-        }))
+        })
         response = self.post(
             'api.render',
             'md',
@@ -459,7 +461,7 @@ class PrivateRestTest(ClientTest):
         assert response.status_code == 200
         self.assertRenderedMarkdown(smart_unicode(response.content), u'# Djedi')
 
-        data = json.dumps({
+        data = {
             'direction': 'col',
             'children': [
                 {
@@ -468,7 +470,7 @@ class PrivateRestTest(ClientTest):
                     'data': '# Not yours',
                 }
             ]
-        })
+        }
 
         response = self.post('api.render', 'list', {'data': data})
         assert response.status_code == 200
