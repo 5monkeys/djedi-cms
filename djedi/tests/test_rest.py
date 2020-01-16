@@ -315,6 +315,16 @@ class PrivateRestTest(ClientTest):
             'key': ['321cba'],
             'plugin': ['txt']
         })
+        self.assertEqual(listnode.content,
+            u'<ul class="djedi-list djedi-list--col">'
+            u'<li class="djedi-plugin--md" id="abc123">'
+            u'<h1>One banana</h1>'
+            u'</li>'
+            u'<li class="djedi-plugin--txt" id="321cba">'
+            u'Bananas'
+            u'</li>'
+            u'</ul>'
+        )
         text_node = cio.load(text_node_uri)
         self.assertEqual(text_node['data'], "Bananas")
         self.assertEqual(text_node['content'], "Bananas")
@@ -325,6 +335,12 @@ class PrivateRestTest(ClientTest):
         }))
         self.assertEqual(md_node['content'], '<h1>One banana</h1>')
         self.assertEqual(md_node['data'], '# One banana')
+
+        # TODO: Test getting default data
+        img_node_in_list = cio.load('sv-se@page/apa.list?key=idontexist&plugin=img')
+        img_node = cio.load('sv-se@page/monkeydo.img')
+        #self.assertEqual(img_node_in_list['data'], img_node['data'])
+        #self.assertEqual(img_node_in_list['content'], img_node['content'])
 
         # Test setting new subnode data
         cio.set('sv-se@page/apa.list?key=newkey&plugin=md', '# Banan')
@@ -368,7 +384,6 @@ class PrivateRestTest(ClientTest):
             ]
         })
 
-    def test_apa(self):
         # Test nested list
         cio.set('sv-se@page/apa.list', {
             'direction': 'col',
@@ -472,12 +487,12 @@ class PrivateRestTest(ClientTest):
             ]
         }
 
-        response = self.post('api.render', 'list', {'data': data})
+        response = self.post('api.render', 'list', {'data': json.dumps(data)})
         assert response.status_code == 200
         self.assertEqual(
             response.content,
             b'<ul class="djedi-list djedi-list--col">'
-            b'<li class=djedi-plugin--md id=betterkey>'
+            b'<li class="djedi-plugin--md" id="betterkey">'
             b'<h1>Not yours</h1>'
             b'</li>'
             b'</ul>'
