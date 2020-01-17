@@ -68,7 +68,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         plg = _ref[_i];
         if (plg !== 'list') {
-          $('<li class="node-add"><a href="#"><span class="' + this.getPluginColor(plg) + '">' + plg + '</span></a></li>').appendTo(this.editor.$add_list);
+          $("<li class='node-add'><a href='#'><span class='" + (this.getPluginColor(plg)) + "'>" + plg + "</span></a></li>").appendTo(this.editor.$add_list);
         }
       }
       this.editor.$add = $('.node-add');
@@ -87,7 +87,7 @@
         refreshData = true;
       }
       this.directions.find('[name="direction"]').prop('checked', false);
-      target = this.directions.find('[value="' + dir + '"]');
+      target = this.directions.find("[value='" + dir + "']");
       if (target.length === 1) {
         target.prop('checked', true);
         this.data.direction = dir;
@@ -221,7 +221,6 @@
           head = windowRef.$(node_iframe.$el[0]).contents().find("head");
           windowRef.$(head).append(_this.subnodeCss);
           windowRef.$(windowRef.document).on('editor:state-changed', function(event, oldState, newState, node) {
-            console.log(oldState, newState);
             if (oldState === 'dirty' && newState === 'draft') {
               _this.workSaveQueue();
               return _this.updateSubnode(node.uri.to_uri().query.key, node);

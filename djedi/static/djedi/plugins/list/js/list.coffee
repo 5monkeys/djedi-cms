@@ -49,7 +49,7 @@ class window.ListEditor extends window.Editor
 
     for plg in config.plugins
       if plg != 'list'
-        $('<li class="node-add"><a href="#"><span class="'+@getPluginColor(plg)+'">'+plg+'</span></a></li>').appendTo @editor.$add_list
+        $("<li class='node-add'><a href='#'><span class='#{@getPluginColor(plg)}'>#{plg}</span></a></li>").appendTo @editor.$add_list
 
     @editor.$add = $('.node-add')
     @editor.$add.on 'click', (evt) =>
@@ -58,7 +58,7 @@ class window.ListEditor extends window.Editor
 
   setDirection: (dir, refreshData = true) =>
     @directions.find('[name="direction"]').prop('checked', false);
-    target = @directions.find('[value="'+dir+'"]');
+    target = @directions.find("[value='#{dir}']");
     if target.length == 1
       target.prop('checked', true);
       @data.direction = dir
@@ -169,7 +169,6 @@ class window.ListEditor extends window.Editor
       head = windowRef.$(node_iframe.$el[0]).contents().find("head");
       windowRef.$(head).append(@subnodeCss)
       windowRef.$(windowRef.document).on 'editor:state-changed', (event, oldState, newState, node) =>
-        console.log(oldState, newState)
         if oldState == 'dirty' && newState == 'draft'
           @workSaveQueue()
           @updateSubnode(node.uri.to_uri().query.key, node)
