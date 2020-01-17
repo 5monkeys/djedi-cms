@@ -454,7 +454,11 @@
       var $revision, data, published, uri;
       console.log('Editor.loadRevision()');
       event.preventDefault();
-      $revision = $(event.target);
+      if ($(event.target).is('i')) {
+        $revision = $(event.target).parent();
+      } else {
+        $revision = $(event.target);
+      }
       uri = $revision.data('uri');
       published = $revision.data('published');
       if (uri.version) {
