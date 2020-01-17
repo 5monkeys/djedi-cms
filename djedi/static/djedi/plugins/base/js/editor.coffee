@@ -153,7 +153,7 @@ class window.Editor
 
     @$doc.ajaxStart -> $('#spinner').toggleClass('icon-spin').show()
     @$doc.ajaxStop -> $('#spinner').toggleClass('icon-spin').hide()
-    console.log(config)
+
     @api.load config.uri, @onLoad
     @callback 'initialize', config
     @initialized = yes

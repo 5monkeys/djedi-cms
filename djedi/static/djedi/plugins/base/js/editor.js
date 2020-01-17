@@ -221,7 +221,6 @@
       this.$doc.ajaxStop(function() {
         return $('#spinner').toggleClass('icon-spin').hide();
       });
-      console.log(config);
       this.api.load(config.uri, this.onLoad);
       this.callback('initialize', config);
       this.initialized = true;
