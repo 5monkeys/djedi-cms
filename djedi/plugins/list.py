@@ -3,7 +3,7 @@ from cio.plugins import plugins
 from cio.node import Node
 import cio
 import json
-import logging
+
 
 class ListPlugin(BasePlugin):
     ext = 'list'

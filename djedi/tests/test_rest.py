@@ -275,13 +275,15 @@ class PrivateRestTest(ClientTest):
             uri, content = node['uri'], node['content']
             self.assertEqual(uri, 'i18n://sv-se@header/logo.img#draft')
             self.assertEqual(meta['comment'], u'VW')
-            html = u'<img ' \
-                   u'alt="Zwitter" ' \
-                   u'class="year-53" ' \
-                   u'height="64" ' \
-                   u'id="vw" ' \
-                   u'src="/media/djedi/img/03/5e/5eba6fc2149822a8dbf76cd6978798f2ddc4ac34.png" ' \
-                   u'width="64" />'
+            html = (
+                u'<img '
+                u'alt="Zwitter" '
+                u'class="year-53" '
+                u'height="64" '
+                u'id="vw" '
+                u'src="/media/djedi/img/03/5e/5eba6fc2149822a8dbf76cd6978798f2ddc4ac34.png" '
+                u'width="64" />'
+            )
             self.assertEqual(content, html)
 
             # Post new resized version
@@ -315,7 +317,7 @@ class PrivateRestTest(ClientTest):
             'key': ['321cba'],
             'plugin': ['txt']
         })
-        self.assertEqual(listnode.content,
+        self.assertEqual(listnode.content, (
             u'<ul class="djedi-list djedi-list--col">'
             u'<li class="djedi-plugin--md" id="abc123">'
             u'<h1>One banana</h1>'
@@ -324,7 +326,7 @@ class PrivateRestTest(ClientTest):
             u'Bananas'
             u'</li>'
             u'</ul>'
-        )
+        ))
         text_node = cio.load(text_node_uri)
         self.assertEqual(text_node['data'], "Bananas")
         self.assertEqual(text_node['content'], "Bananas")
