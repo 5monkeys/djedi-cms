@@ -5,8 +5,6 @@
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  console.log = function() {};
-
   Events = $({});
 
   Events.handler = (function(_this) {

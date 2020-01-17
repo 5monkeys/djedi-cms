@@ -12,6 +12,7 @@
       this.getSubnodeUriKey = __bind(this.getSubnodeUriKey, this);
       this.resortNodes = __bind(this.resortNodes, this);
       this.moveChild = __bind(this.moveChild, this);
+      this.toggleListActions = __bind(this.toggleListActions, this);
       this.updateSubnode = __bind(this.updateSubnode, this);
       this.renderSubnode = __bind(this.renderSubnode, this);
       this.updateData = __bind(this.updateData, this);
@@ -70,6 +71,9 @@
       this.editor.$add = $('.node-add');
       this.editor.$add.on('click', (function(_this) {
         return function(evt) {
+          if (_this.subnodeDirty) {
+            return;
+          }
           return _this.spawnSubnode(_this.node.uri.clone({
             query: {
               key: _this.getSubnodeUriKey(),
@@ -111,7 +115,7 @@
       ListEditor.__super__.onLoad.call(this, node);
       this.frameBias = "node/" + encodeURIComponent(encodeURIComponent(node.uri.valueOf().replace('#' + node.uri.version, ''))) + "/editor";
       try {
-        codedData = JSON.parse(node.data);
+        codedData = node.data;
         _ref = codedData.children;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           entry = _ref[_i];
@@ -144,7 +148,7 @@
         return;
       }
       if (state === "dirty" && this.subnodeDirty) {
-        this.container.find('.subnodes__item-shift').addClass('subnodes__item-shift--disabled');
+        this.toggleListActions();
       }
       return ListEditor.__super__.setState.call(this, state);
     };
@@ -304,16 +308,16 @@
         this.loadRevision(event);
         this.setState('draft');
         this.subnodeDirty = false;
-        return this.container.find('.subnodes__item-shift').removeClass('subnodes__item-shift--disabled');
+        return this.toggleListActions(true);
       }
     };
 
     ListEditor.prototype.saveSubnode = function(plugin) {
       var windowRef;
       windowRef = plugin.$el[0].contentWindow;
-      if (windowRef.editor.state !== 'dirty') {
+      if (windowRef && windowRef.editor && windowRef.editor.state !== 'dirty') {
         return this.workSaveQueue();
-      } else {
+      } else if (windowRef && windowRef.editor) {
         return windowRef.editor.save();
       }
     };
@@ -388,7 +392,6 @@
         norender = false;
       }
       console.log("ListEditor.updateSubnode()", uuid);
-      console.log(this.data.children);
       index = 0;
       if (node['data']) {
         _ref = this.data.children;
@@ -401,6 +404,14 @@
         }
       }
       return this.renderSubnode(node['uri'], node['content']);
+    };
+
+    ListEditor.prototype.toggleListActions = function(enable) {
+      if (enable == null) {
+        enable = false;
+      }
+      this.container.find('.subnodes__item-shift').toggleClass('subnodes__item-shift--disabled', !enable);
+      return this.editor.$add.toggleClass('disabled', !enable);
     };
 
     ListEditor.prototype.array_move = function(arr, old_index, new_index) {

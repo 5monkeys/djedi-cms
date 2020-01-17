@@ -3,7 +3,7 @@ from cio.plugins import plugins
 from cio.node import Node
 import cio
 import json
-
+import logging
 
 class ListPlugin(BasePlugin):
     ext = 'list'
@@ -39,20 +39,20 @@ class ListPlugin(BasePlugin):
                 child_uri, _ = self.get_child_uri(node.uri)
                 return child_plugin.render_node(Node(uri=child_uri), data)
 
-        return ''.join(self.stream_node(node, data))
+        return u''.join(self.stream_node(node, data))
 
     def stream_node(self, node, data):
-        yield '<ul class="djedi-list djedi-list--{direction}">'.format(**data)
+        yield u'<ul class="djedi-list djedi-list--{direction}">'.format(**data)
         for child in data['children']:
             ext = child['plugin']
             child_uri = node.uri.clone(query={'plugin': [ext], 'key': [child['key']]})
             child_node = Node(uri=child_uri, content=child['data'])
             plugin = plugins.get(ext)
             content = plugin.load_node(child_node)
-            yield '<li class="djedi-plugin--{plugin}" id="{key}">'.format(**child)
-            yield plugin.render_node(child_node, content)
-            yield '</li>'
-        yield '</ul>'
+            yield u'<li class="djedi-plugin--{plugin}" id="{key}">'.format(**child)
+            yield plugin.render_node(child_node, content) or u''
+            yield u'</li>'
+        yield u'</ul>'
 
     def resolve_child_plugin(self, uri):
         if self.is_nested(uri):
@@ -113,10 +113,10 @@ class ListPlugin(BasePlugin):
 
     def save_node(self, node):
         if not self.get_query_param(node.uri, 'plugin'):
-            return super().save_node(node)
+            return node
 
         root_node = cio.load(node.uri.clone(query=None))
-        root_data = root_node['data']
+        root_data = root_node['data'] or self.load(None)
 
         node.content = self.save_child(node.content, parent_node=node, parent_data=root_data)  # TODO: deep clone data?
 
@@ -128,7 +128,7 @@ class ListPlugin(BasePlugin):
         plugin = self.resolve_child_plugin(child_node.uri)
         if plugin.ext == self.ext:
             if not self.is_nested(child_node.uri):
-                child_content = self.save(leaf_data)
+                child_content = leaf_data
             else:
                 child_data = self.load(child_node.content)
                 child_content = self.save_child(leaf_data, parent_node=child_node, parent_data=child_data)

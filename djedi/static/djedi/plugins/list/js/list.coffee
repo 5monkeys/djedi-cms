@@ -50,6 +50,8 @@ class window.ListEditor extends window.Editor
 
     @editor.$add = $('.node-add')
     @editor.$add.on 'click', (evt) =>
+      if (@subnodeDirty)
+        return
       @spawnSubnode @node.uri.clone({
         query: {
           key: @getSubnodeUriKey(),
@@ -79,7 +81,7 @@ class window.ListEditor extends window.Editor
     super node
     @frameBias = "node/" + encodeURIComponent((encodeURIComponent(node.uri.valueOf().replace('#'+node.uri.version, '')))) + "/editor"
     try
-      codedData = JSON.parse node.data
+      codedData = node.data
       for entry in codedData.children
         @spawnSubnode @node.uri.clone({
           query: {
@@ -105,7 +107,7 @@ class window.ListEditor extends window.Editor
       return
     if state == "dirty" && @subnodeDirty
       #Disable subnode re-ordering buttons
-      @container.find('.subnodes__item-shift').addClass('subnodes__item-shift--disabled')
+      @toggleListActions()
     super state
 
   spawnSubnode: (uri, refreshValue = true, data = "") =>
@@ -232,14 +234,15 @@ class window.ListEditor extends window.Editor
       @loadRevision(event)
       @setState('draft')
       @subnodeDirty = false
-      @container.find('.subnodes__item-shift').removeClass('subnodes__item-shift--disabled')
+      @toggleListActions(true)
+      # @container.find('.subnodes__item-shift').removeClass('subnodes__item-shift--disabled')
       # Load latest revision
 
   saveSubnode: (plugin) =>
     windowRef = plugin.$el[0].contentWindow
-    if windowRef.editor.state != 'dirty'
+    if windowRef and windowRef.editor and windowRef.editor.state != 'dirty'
       @workSaveQueue()
-    else
+    else if windowRef and windowRef.editor
       windowRef.editor.save()
 
 
@@ -280,7 +283,6 @@ class window.ListEditor extends window.Editor
         @node.content = contentSet
         @editor.triggerRender (@node.content)
 
-
   renderSubnode: (uri, content) =>
     console.log("ListEditor.renderSubnode()")
     key = @getSubnodeKey(decodeURIComponent(uri.to_uri().query['key']))
@@ -291,7 +293,6 @@ class window.ListEditor extends window.Editor
 
   updateSubnode: (uuid, node, norender = false) =>
     console.log("ListEditor.updateSubnode()", uuid)
-    console.log(@data.children)
     index = 0;
     if node['data']
       for child in @data.children
@@ -299,6 +300,11 @@ class window.ListEditor extends window.Editor
           @data.children[index].data = node['data']
         index++
     @renderSubnode(node['uri'], node['content'])
+
+  toggleListActions: (enable = false) =>
+    @container.find('.subnodes__item-shift').toggleClass('subnodes__item-shift--disabled', !enable)
+    @editor.$add.toggleClass('disabled', !enable)
+
 
   array_move: (arr, old_index, new_index) ->
     if new_index >= arr.length
