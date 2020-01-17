@@ -10,6 +10,26 @@
     padding: 15px;
     margin-bottom: 15px;
     border-bottom: 1px dashed #ccc;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+#editor .helpers #direction-options {
+    flex: 1;
+}
+
+#editor .helpers .direction-title {
+    margin-bottom: 0;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+#editor .helpers #direction-options .radio {
+    display: inline-block;
+    margin: 0;
+    margin-right: 10px;
+
 }
 
 .subnodes {

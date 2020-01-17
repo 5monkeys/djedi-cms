@@ -106,7 +106,6 @@ class window.ListEditor extends window.Editor
     if state == 'draft' && @preventParentReload || state == 'dirty' && @loading
       return
     if state == "dirty" && @subnodeDirty
-      #Disable subnode re-ordering buttons
       @toggleListActions()
     super state
 
@@ -235,8 +234,6 @@ class window.ListEditor extends window.Editor
       @setState('draft')
       @subnodeDirty = false
       @toggleListActions(true)
-      # @container.find('.subnodes__item-shift').removeClass('subnodes__item-shift--disabled')
-      # Load latest revision
 
   saveSubnode: (plugin) =>
     windowRef = plugin.$el[0].contentWindow
