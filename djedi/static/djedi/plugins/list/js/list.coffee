@@ -70,8 +70,8 @@ class window.ListEditor extends window.Editor
   addSubnode: (key, plugin, markDirty, defaultData = "") =>
     @spawnSubnode @node.uri.clone({
       query: {
-        key: key,
-        plugin: plugin
+        key: [key],
+        plugin: [plugin]
       },
       version: "",
     }).valueOf(), markDirty, defaultData
@@ -137,12 +137,11 @@ class window.ListEditor extends window.Editor
         @shallowSave()
 
     node = new window.Node uri, data, holder
-
-    title.append ("<span class='subnodes__item-title__text'>"+(node.uri.query['plugin'] or 'unknown')+"</span>")
-    title.find('.subnodes__item-title__text').addClass(@getPluginColor(node.uri.query['plugin'] or 'plugin-fg-unknown'))
+    title.append ("<span class='subnodes__item-title__text'>"+(node.uri.get_query_param('plugin') or 'unknown')+"</span>")
+    title.find('.subnodes__item-title__text').addClass(@getPluginColor(node.uri.get_query_param('plugin') or 'plugin-fg-unknown'))
 
     node_container.attr 'uri-ref', node.uri.valueOf()
-    node_container.attr 'data-key', node.uri.query['key']
+    node_container.attr 'data-key', node.uri.get_query_param('key')
 
     node_iframe = new window.Plugin node
 
@@ -157,8 +156,8 @@ class window.ListEditor extends window.Editor
     node_container.css('order', @data.children.length);
     @subnodeIframes.push node_iframe
     @data.children.push {
-      key: @getSubnodeKey(node.uri.query.key),
-      plugin: node.uri.query.plugin,
+      key: @getSubnodeKey(node.uri.get_query_param('key')),
+      plugin: node.uri.get_query_param('plugin'),
       data: data,
     }
     holder.append node_iframe.$el
@@ -171,14 +170,14 @@ class window.ListEditor extends window.Editor
       windowRef.$(windowRef.document).on 'editor:state-changed', (event, oldState, newState, node) =>
         if oldState == 'dirty' && newState == 'draft'
           @workSaveQueue()
-          @updateSubnode(node.uri.to_uri().query.key, node)
+          @updateSubnode(node.uri.to_uri().get_query_param('key'), node)
 
       windowRef.$(windowRef.document).on 'editor:dirty', () =>
         @subnodeDirty = true
         @setDirty()
 
       windowRef.$(windowRef.document).on 'node:update', (event, uri, node) =>
-        @updateSubnode(uri.to_uri().query.key, node)
+        @updateSubnode(node.uri.to_uri().get_query_param('key'), node)
 
       windowRef.$(windowRef.document).on 'node:render', (event, uri, content) =>
         @renderSubnode(uri, content)
@@ -231,7 +230,7 @@ class window.ListEditor extends window.Editor
   popSubnode: (uri) =>
     console.log("ListEditor.popSubnode()")
     targetUri = uri
-    targetKey = @getSubnodeKey(targetUri.to_uri().query.key)
+    targetKey = @getSubnodeKey(targetUri.to_uri().get_query_param('key'))
     @subnodeIframes = @subnodeIframes.filter (value) =>
       if value.uri.valueOf() != targetUri
         return true
@@ -270,7 +269,7 @@ class window.ListEditor extends window.Editor
 
   renderSubnode: (uri, content) =>
     console.log("ListEditor.renderSubnode()")
-    key = @getSubnodeKey(decodeURIComponent(uri.to_uri().query['key']))
+    key = @getSubnodeKey(decodeURIComponent(uri.to_uri().get_query_param('key')))
     newContent = $(@node.content).find('#'+key).html(content).end()[0];
     @updateData(false)
     @node.content = newContent
@@ -306,7 +305,7 @@ class window.ListEditor extends window.Editor
     _uri = uri.to_uri();
     step = 0;
     for child in @data.children
-      if (child.key == _uri.query['key'])
+      if (child.key == _uri.get_query_param('key'))
         if (step+steps >= 0 && step+steps < @data.children.length)
           @array_move(@data.children, step, step+steps)
           return step+steps;
@@ -323,8 +322,8 @@ class window.ListEditor extends window.Editor
   getSubnodeUriKey: (key = undefined) =>
     keys = ""
     uri = @node.uri.to_uri()
-    if uri.query && uri.query['key']
-      keys += @node.uri.to_uri().query['key'] + "_"
+    if uri.get_query_param('key')
+      keys += @node.uri.to_uri().get_query_param('key') + "_"
     return keys + (key or @generateGuid())
 
   getSubnodeKey: (composite_key) =>

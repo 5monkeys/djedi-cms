@@ -104,8 +104,8 @@
       }
       return this.spawnSubnode(this.node.uri.clone({
         query: {
-          key: key,
-          plugin: plugin
+          key: [key],
+          plugin: [plugin]
         },
         version: ""
       }).valueOf(), markDirty, defaultData);
@@ -195,10 +195,10 @@
         };
       })(this));
       node = new window.Node(uri, data, holder);
-      title.append("<span class='subnodes__item-title__text'>" + (node.uri.query['plugin'] || 'unknown') + "</span>");
-      title.find('.subnodes__item-title__text').addClass(this.getPluginColor(node.uri.query['plugin'] || 'plugin-fg-unknown'));
+      title.append("<span class='subnodes__item-title__text'>" + (node.uri.get_query_param('plugin') || 'unknown') + "</span>");
+      title.find('.subnodes__item-title__text').addClass(this.getPluginColor(node.uri.get_query_param('plugin') || 'plugin-fg-unknown'));
       node_container.attr('uri-ref', node.uri.valueOf());
-      node_container.attr('data-key', node.uri.query['key']);
+      node_container.attr('data-key', node.uri.get_query_param('key'));
       node_iframe = new window.Plugin(node);
       ref_uri = this.node.uri.clone({
         version: ""
@@ -209,8 +209,8 @@
       node_container.css('order', this.data.children.length);
       this.subnodeIframes.push(node_iframe);
       this.data.children.push({
-        key: this.getSubnodeKey(node.uri.query.key),
-        plugin: node.uri.query.plugin,
+        key: this.getSubnodeKey(node.uri.get_query_param('key')),
+        plugin: node.uri.get_query_param('plugin'),
         data: data
       });
       holder.append(node_iframe.$el);
@@ -223,7 +223,7 @@
           windowRef.$(windowRef.document).on('editor:state-changed', function(event, oldState, newState, node) {
             if (oldState === 'dirty' && newState === 'draft') {
               _this.workSaveQueue();
-              return _this.updateSubnode(node.uri.to_uri().query.key, node);
+              return _this.updateSubnode(node.uri.to_uri().get_query_param('key'), node);
             }
           });
           windowRef.$(windowRef.document).on('editor:dirty', function() {
@@ -231,7 +231,7 @@
             return _this.setDirty();
           });
           windowRef.$(windowRef.document).on('node:update', function(event, uri, node) {
-            return _this.updateSubnode(uri.to_uri().query.key, node);
+            return _this.updateSubnode(node.uri.to_uri().get_query_param('key'), node);
           });
           return windowRef.$(windowRef.document).on('node:render', function(event, uri, content) {
             return _this.renderSubnode(uri, content);
@@ -304,7 +304,7 @@
       var targetKey, targetUri;
       console.log("ListEditor.popSubnode()");
       targetUri = uri;
-      targetKey = this.getSubnodeKey(targetUri.to_uri().query.key);
+      targetKey = this.getSubnodeKey(targetUri.to_uri().get_query_param('key'));
       this.subnodeIframes = this.subnodeIframes.filter((function(_this) {
         return function(value) {
           if (value.uri.valueOf() !== targetUri) {
@@ -357,7 +357,7 @@
     ListEditor.prototype.renderSubnode = function(uri, content) {
       var key, newContent;
       console.log("ListEditor.renderSubnode()");
-      key = this.getSubnodeKey(decodeURIComponent(uri.to_uri().query['key']));
+      key = this.getSubnodeKey(decodeURIComponent(uri.to_uri().get_query_param('key')));
       newContent = $(this.node.content).find('#' + key).html(content).end()[0];
       this.updateData(false);
       this.node.content = newContent;
@@ -416,7 +416,7 @@
       _ref = this.data.children;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         child = _ref[_i];
-        if (child.key === _uri.query['key']) {
+        if (child.key === _uri.get_query_param('key')) {
           if (step + steps >= 0 && step + steps < this.data.children.length) {
             this.array_move(this.data.children, step, step + steps);
             return step + steps;
@@ -448,8 +448,8 @@
       }
       keys = "";
       uri = this.node.uri.to_uri();
-      if (uri.query && uri.query['key']) {
-        keys += this.node.uri.to_uri().query['key'] + "_";
+      if (uri.get_query_param('key')) {
+        keys += this.node.uri.to_uri().get_query_param('key') + "_";
       }
       return keys + (key || this.generateGuid());
     };

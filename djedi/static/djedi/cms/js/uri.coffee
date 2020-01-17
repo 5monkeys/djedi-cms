@@ -15,7 +15,7 @@ String::to_uri = ->
     s += @namespace + '@' if @namespace
     s += @path
     s += '.' + @ext if @ext
-    s += '?' + $.param(@query) if @query
+    s += '?' + @stringify_query(@query) if @query
     s += '#' + @version if @version
     s #@scheme + '://' + @namespace + '@' + @path + '.' + @ext + '#' + @version
 
@@ -46,7 +46,8 @@ String::to_uri = ->
       query = {}
       for pair in param_pairs
          [key, _, val] = partition(pair, '=')
-         query[key] = decodeURIComponent(val)
+         if !query[key] or query[key].length == 0
+          query[key] = [decodeURIComponent(val)]
     [scheme, _, path] = rpartition(base, '://')
     [namespace, _, path] = rpartition(path, '@')
     [path, _, ext] = partition(path, '.')
@@ -69,6 +70,18 @@ String::to_uri = ->
       parts[key] = val
     _uri.from_parts(parts)
     return _uri
+
+  @stringify_query = (query) ->
+    simplified_query = {}
+    for key, arr of @query
+      simplified_query[key] = arr[0]
+    return $.param(simplified_query)
+
+  @get_query_param = (key) ->
+    if @query and @query[key] and @query[key].length > 0
+      return @query[key][0]
+    else
+      return undefined
 
   @from_parts @parse @
   @

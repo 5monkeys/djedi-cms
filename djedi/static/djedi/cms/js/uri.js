@@ -29,7 +29,7 @@
         s += '.' + this.ext;
       }
       if (this.query) {
-        s += '?' + $.param(this.query);
+        s += '?' + this.stringify_query(this.query);
       }
       if (this.version) {
         s += '#' + this.version;
@@ -65,7 +65,9 @@
         for (_i = 0, _len = param_pairs.length; _i < _len; _i++) {
           pair = param_pairs[_i];
           _ref2 = partition(pair, '='), key = _ref2[0], _ = _ref2[1], val = _ref2[2];
-          query[key] = decodeURIComponent(val);
+          if (!query[key] || query[key].length === 0) {
+            query[key] = [decodeURIComponent(val)];
+          }
         }
       }
       _ref3 = rpartition(base, '://'), scheme = _ref3[0], _ = _ref3[1], path = _ref3[2];
@@ -93,6 +95,23 @@
       }
       _uri.from_parts(parts);
       return _uri;
+    };
+    this.stringify_query = function(query) {
+      var arr, key, simplified_query, _ref;
+      simplified_query = {};
+      _ref = this.query;
+      for (key in _ref) {
+        arr = _ref[key];
+        simplified_query[key] = arr[0];
+      }
+      return $.param(simplified_query);
+    };
+    this.get_query_param = function(key) {
+      if (this.query && this.query[key] && this.query[key].length > 0) {
+        return this.query[key][0];
+      } else {
+        return void 0;
+      }
     };
     this.from_parts(this.parse(this));
     return this;
