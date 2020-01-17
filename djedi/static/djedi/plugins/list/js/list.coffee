@@ -25,6 +25,7 @@ class window.ListEditor extends window.Editor
         }
       </style>
     ';
+
     @editor = this;
     @subPlugins = []
     @data = @initDataStructure()
@@ -42,6 +43,7 @@ class window.ListEditor extends window.Editor
     $('#form input').unbind()
     $('#form textarea').unbind()
     $('#form select').unbind()
+
     @directions.find('input').on 'change', (e) =>
       @setDirection e.target.value
     for plg in config.plugins
@@ -50,19 +52,8 @@ class window.ListEditor extends window.Editor
 
     @editor.$add = $('.node-add')
     @editor.$add.on 'click', (evt) =>
-      if (@subnodeDirty)
-        return
-      @spawnSubnode @node.uri.clone({
-        query: {
-          key: @getSubnodeUriKey(),
-          plugin: $(evt.target).text()
-        },
-        version: "",
-      }).valueOf(), true
-
-    $(window).on 'editor:state-changed', (event, oldState, newState) =>
-      console.log("ListEditor.stateChanged()")
-      console.log(oldState, newState);
+      if (!@subnodeDirty)
+        @addSubnode(@getSubnodeUriKey(), $(evt.target).text(), true)
 
   setDirection: (dir, refreshData = true) =>
     @directions.find('[name="direction"]').prop('checked', false);
@@ -71,9 +62,18 @@ class window.ListEditor extends window.Editor
       target.prop('checked', true);
       @data.direction = dir
       @updateData(refreshData)
-      @setState('dirty')
+      @setDirty()
     else
       @setDirection "col", refreshData;
+
+  addSubnode: (key, plugin, markDirty, defaultData = "") =>
+    @spawnSubnode @node.uri.clone({
+      query: {
+        key: key,
+        plugin: plugin
+      },
+      version: "",
+    }).valueOf(), markDirty, defaultData
 
   onLoad: (node) =>
     @loading = true
@@ -83,13 +83,7 @@ class window.ListEditor extends window.Editor
     try
       codedData = node.data
       for entry in codedData.children
-        @spawnSubnode @node.uri.clone({
-          query: {
-            key: @getSubnodeUriKey(entry.key),
-            plugin: entry.plugin,
-          },
-          version: "",
-        }).valueOf(), false, entry.data
+        @addSubnode(@getSubnodeUriKey(entry.key), entry.plugin, false, entry.data)
       @setDirection codedData.direction, false
     catch exception
       @clearList()
@@ -138,7 +132,7 @@ class window.ListEditor extends window.Editor
       if newOrder != false
         @resortNodes()
         @updateData true
-        @setState('dirty')
+        @setDirty()
         @shallowSave()
 
     node = new window.Node uri, data, holder
@@ -177,8 +171,7 @@ class window.ListEditor extends window.Editor
 
       windowRef.$(windowRef.document).on 'editor:dirty', () =>
         @subnodeDirty = true
-        @editor.setState('dirty')
-        @trigger 'editor:dirty'
+        @setDirty()
 
       windowRef.$(windowRef.document).on 'node:update', (event, uri, node) =>
         @updateSubnode(uri.to_uri().query.key, node)
@@ -188,8 +181,7 @@ class window.ListEditor extends window.Editor
 
     @updateData(refreshValue)
     if refreshValue
-      @trigger 'editor:dirty'
-      @editor.setState('dirty')
+      @setDirty()
 
   save: () ->
     @preventParentReload = true
@@ -242,24 +234,23 @@ class window.ListEditor extends window.Editor
     else if windowRef and windowRef.editor
       windowRef.editor.save()
 
-
   popSubnode: (uri) =>
     console.log("ListEditor.popSubnode()")
     targetUri = uri
     targetKey = @getSubnodeKey(targetUri.to_uri().query.key)
-    nodeList = @container
-    @subPlugins = @subPlugins.filter (value) ->
+    @subPlugins = @subPlugins.filter (value) =>
       if value.uri.valueOf() != targetUri
         return true
+
       value.close()
-      nodeList.find('[uri-ref="'+targetUri+'"]').remove()
+      @container.find('[uri-ref="'+targetUri+'"]').remove()
       return false
+
     @data.children = @data.children.filter (value) ->
       if value.key != targetKey
         return true
       return false
-    @setState "dirty"
-    @trigger 'editor:dirty'
+    @setDirty()
     @updateData(true)
 
   clearList: () =>
@@ -267,12 +258,15 @@ class window.ListEditor extends window.Editor
     @subPlugins = []
     @data = @initDataStructure()
 
-  updateData: (withDirty = false) =>
+  updateData: (reRender = false) =>
     collection = JSON.stringify @data
+
     @dataHolder.val collection
     @dataHolder.change()
+
     @node.data = collection
-    if (withDirty)
+
+    if (reRender)
       @api.render "list", {
         data: collection
       }, (response) =>
@@ -301,7 +295,11 @@ class window.ListEditor extends window.Editor
   toggleListActions: (enable = false) =>
     @container.find('.subnodes__item-shift').toggleClass('subnodes__item-shift--disabled', !enable)
     @editor.$add.toggleClass('disabled', !enable)
+    @directions.find('input').prop('disabled', !enable)
 
+  setDirty: () =>
+    @setState 'dirty'
+    @trigger 'editor:dirty'
 
   array_move: (arr, old_index, new_index) ->
     if new_index >= arr.length

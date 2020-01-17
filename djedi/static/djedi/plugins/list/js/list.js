@@ -12,6 +12,7 @@
       this.getSubnodeUriKey = __bind(this.getSubnodeUriKey, this);
       this.resortNodes = __bind(this.resortNodes, this);
       this.moveChild = __bind(this.moveChild, this);
+      this.setDirty = __bind(this.setDirty, this);
       this.toggleListActions = __bind(this.toggleListActions, this);
       this.updateSubnode = __bind(this.updateSubnode, this);
       this.renderSubnode = __bind(this.renderSubnode, this);
@@ -25,6 +26,7 @@
       this.setState = __bind(this.setState, this);
       this.render = __bind(this.render, this);
       this.onLoad = __bind(this.onLoad, this);
+      this.addSubnode = __bind(this.addSubnode, this);
       this.setDirection = __bind(this.setDirection, this);
       return ListEditor.__super__.constructor.apply(this, arguments);
     }
@@ -69,24 +71,11 @@
         }
       }
       this.editor.$add = $('.node-add');
-      this.editor.$add.on('click', (function(_this) {
+      return this.editor.$add.on('click', (function(_this) {
         return function(evt) {
-          if (_this.subnodeDirty) {
-            return;
+          if (!_this.subnodeDirty) {
+            return _this.addSubnode(_this.getSubnodeUriKey(), $(evt.target).text(), true);
           }
-          return _this.spawnSubnode(_this.node.uri.clone({
-            query: {
-              key: _this.getSubnodeUriKey(),
-              plugin: $(evt.target).text()
-            },
-            version: ""
-          }).valueOf(), true);
-        };
-      })(this));
-      return $(window).on('editor:state-changed', (function(_this) {
-        return function(event, oldState, newState) {
-          console.log("ListEditor.stateChanged()");
-          return console.log(oldState, newState);
         };
       })(this));
     };
@@ -102,10 +91,23 @@
         target.prop('checked', true);
         this.data.direction = dir;
         this.updateData(refreshData);
-        return this.setState('dirty');
+        return this.setDirty();
       } else {
         return this.setDirection("col", refreshData);
       }
+    };
+
+    ListEditor.prototype.addSubnode = function(key, plugin, markDirty, defaultData) {
+      if (defaultData == null) {
+        defaultData = "";
+      }
+      return this.spawnSubnode(this.node.uri.clone({
+        query: {
+          key: key,
+          plugin: plugin
+        },
+        version: ""
+      }).valueOf(), markDirty, defaultData);
     };
 
     ListEditor.prototype.onLoad = function(node) {
@@ -119,13 +121,7 @@
         _ref = codedData.children;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           entry = _ref[_i];
-          this.spawnSubnode(this.node.uri.clone({
-            query: {
-              key: this.getSubnodeUriKey(entry.key),
-              plugin: entry.plugin
-            },
-            version: ""
-          }).valueOf(), false, entry.data);
+          this.addSubnode(this.getSubnodeUriKey(entry.key), entry.plugin, false, entry.data);
         }
         this.setDirection(codedData.direction, false);
       } catch (_error) {
@@ -192,7 +188,7 @@
           if (newOrder !== false) {
             _this.resortNodes();
             _this.updateData(true);
-            _this.setState('dirty');
+            _this.setDirty();
             return _this.shallowSave();
           }
         };
@@ -232,8 +228,7 @@
           });
           windowRef.$(windowRef.document).on('editor:dirty', function() {
             _this.subnodeDirty = true;
-            _this.editor.setState('dirty');
-            return _this.trigger('editor:dirty');
+            return _this.setDirty();
           });
           windowRef.$(windowRef.document).on('node:update', function(event, uri, node) {
             return _this.updateSubnode(uri.to_uri().query.key, node);
@@ -245,8 +240,7 @@
       })(this));
       this.updateData(refreshValue);
       if (refreshValue) {
-        this.trigger('editor:dirty');
-        return this.editor.setState('dirty');
+        return this.setDirty();
       }
     };
 
@@ -323,27 +317,27 @@
     };
 
     ListEditor.prototype.popSubnode = function(uri) {
-      var nodeList, targetKey, targetUri;
+      var targetKey, targetUri;
       console.log("ListEditor.popSubnode()");
       targetUri = uri;
       targetKey = this.getSubnodeKey(targetUri.to_uri().query.key);
-      nodeList = this.container;
-      this.subPlugins = this.subPlugins.filter(function(value) {
-        if (value.uri.valueOf() !== targetUri) {
-          return true;
-        }
-        value.close();
-        nodeList.find('[uri-ref="' + targetUri + '"]').remove();
-        return false;
-      });
+      this.subPlugins = this.subPlugins.filter((function(_this) {
+        return function(value) {
+          if (value.uri.valueOf() !== targetUri) {
+            return true;
+          }
+          value.close();
+          _this.container.find('[uri-ref="' + targetUri + '"]').remove();
+          return false;
+        };
+      })(this));
       this.data.children = this.data.children.filter(function(value) {
         if (value.key !== targetKey) {
           return true;
         }
         return false;
       });
-      this.setState("dirty");
-      this.trigger('editor:dirty');
+      this.setDirty();
       return this.updateData(true);
     };
 
@@ -353,16 +347,16 @@
       return this.data = this.initDataStructure();
     };
 
-    ListEditor.prototype.updateData = function(withDirty) {
+    ListEditor.prototype.updateData = function(reRender) {
       var collection;
-      if (withDirty == null) {
-        withDirty = false;
+      if (reRender == null) {
+        reRender = false;
       }
       collection = JSON.stringify(this.data);
       this.dataHolder.val(collection);
       this.dataHolder.change();
       this.node.data = collection;
-      if (withDirty) {
+      if (reRender) {
         return this.api.render("list", {
           data: collection
         }, (function(_this) {
@@ -411,7 +405,13 @@
         enable = false;
       }
       this.container.find('.subnodes__item-shift').toggleClass('subnodes__item-shift--disabled', !enable);
-      return this.editor.$add.toggleClass('disabled', !enable);
+      this.editor.$add.toggleClass('disabled', !enable);
+      return this.directions.find('input').prop('disabled', !enable);
+    };
+
+    ListEditor.prototype.setDirty = function() {
+      this.setState('dirty');
+      return this.trigger('editor:dirty');
     };
 
     ListEditor.prototype.array_move = function(arr, old_index, new_index) {
