@@ -27,7 +27,7 @@ class window.ListEditor extends window.Editor
     ';
 
     @editor = this;
-    @subPlugins = []
+    @subnodeIframes = []
     @data = @initDataStructure()
     @saveQueue = []
     @loading = false
@@ -46,6 +46,7 @@ class window.ListEditor extends window.Editor
 
     @directions.find('input').on 'change', (e) =>
       @setDirection e.target.value
+
     for plg in config.plugins
       if plg != 'list'
         $('<li class="node-add"><a href="#"><span class="'+@getPluginColor(plg)+'">'+plg+'</span></a></li>').appendTo @editor.$add_list
@@ -107,9 +108,9 @@ class window.ListEditor extends window.Editor
     console.log("ListEditor.spawnSubNode()")
     classes = 'subnodes__item'
 
-    cont = $("<div class='"+classes+"'></div>").appendTo @container
-    title = $("<div class='subnodes__item-title'></div>").appendTo cont
-    holder = $("<div class='subnodes__item-content'></div>").appendTo cont
+    node_container = $("<div class='"+classes+"'></div>").appendTo @container
+    title = $("<div class='subnodes__item-title'></div>").appendTo node_container
+    holder = $("<div class='subnodes__item-content'></div>").appendTo node_container
 
     title.on 'click', (e) =>
       $(e.target).parent().toggleClass 'subnodes__item--closed'
@@ -139,29 +140,33 @@ class window.ListEditor extends window.Editor
 
     title.append ("<span class='subnodes__item-title__text'>"+(node.uri.query['plugin'] or 'unknown')+"</span>")
     title.find('.subnodes__item-title__text').addClass(@getPluginColor(node.uri.query['plugin'] or 'plugin-fg-unknown'))
-    cont.attr 'uri-ref', node.uri.valueOf()
-    cont.attr 'data-key', node.uri.query['key']
-    plug = new window.Plugin node
+
+    node_container.attr 'uri-ref', node.uri.valueOf()
+    node_container.attr 'data-key', node.uri.query['key']
+
+    node_iframe = new window.Plugin node
+
     ref_uri = @node.uri.clone({
       version: ""
     }).valueOf()
+
     path = document.location.pathname.replace("node/#{encodeURIComponent(encodeURIComponent ref_uri)}/editor", "")
     path = path.replace("node/#{encodeURIComponent(encodeURIComponent @node.uri)}/editor", "")
-    plug.$el.attr 'src', path + "node/#{encodeURIComponent(encodeURIComponent uri)}/editor"
+    node_iframe.$el.attr 'src', path + "node/#{encodeURIComponent(encodeURIComponent uri)}/editor"
 
-    cont.css('order', @data.children.length);
-    @subPlugins.push plug
+    node_container.css('order', @data.children.length);
+    @subnodeIframes.push node_iframe
     @data.children.push {
       key: @getSubnodeKey(node.uri.query.key),
       plugin: node.uri.query.plugin,
       data: data,
     }
-    holder.append plug.$el
+    holder.append node_iframe.$el
 
-    windowRef = plug.$el[0].contentWindow
+    windowRef = node_iframe.$el[0].contentWindow
 
-    $(plug.$el).on 'load', () =>
-      head = windowRef.$(plug.$el[0]).contents().find("head");
+    $(node_iframe.$el).on 'load', () =>
+      head = windowRef.$(node_iframe.$el[0]).contents().find("head");
       windowRef.$(head).append(@subnodeCss)
       windowRef.$(windowRef.document).on 'editor:state-changed', (event, oldState, newState, node) =>
         console.log(oldState, newState)
@@ -185,8 +190,8 @@ class window.ListEditor extends window.Editor
 
   save: () ->
     @preventParentReload = true
-    for plug in @subPlugins
-      @saveQueue.push(plug)
+    for subnode_iframe in @subnodeIframes
+      @saveQueue.push(subnode_iframe)
     super
 
   shallowSave: () ->
@@ -203,12 +208,7 @@ class window.ListEditor extends window.Editor
 
   onPublish: () =>
     super
-    event = {
-      type:'click',
-      target: $('#revisions').find('.published').find('a').get()[0],
-      preventDefault: () -> {},
-    }
-    @loadRevision(event)
+    @loadRevisionByClass('.published')
     @setState 'published'
 
   workSaveQueue: () =>
@@ -217,12 +217,7 @@ class window.ListEditor extends window.Editor
       @saveSubnode(@saveQueue.pop())
     else
       @preventParentReload = false
-      event = {
-        type:'click',
-        target: $('#revisions').find('.draft').find('a').get()[0],
-        preventDefault: () -> {},
-      }
-      @loadRevision(event)
+      @loadRevisionByClass('.draft')
       @setState('draft')
       @subnodeDirty = false
       @toggleListActions(true)
@@ -238,7 +233,7 @@ class window.ListEditor extends window.Editor
     console.log("ListEditor.popSubnode()")
     targetUri = uri
     targetKey = @getSubnodeKey(targetUri.to_uri().query.key)
-    @subPlugins = @subPlugins.filter (value) =>
+    @subnodeIframes = @subnodeIframes.filter (value) =>
       if value.uri.valueOf() != targetUri
         return true
 
@@ -255,7 +250,7 @@ class window.ListEditor extends window.Editor
 
   clearList: () =>
     @container.empty()
-    @subPlugins = []
+    @subnodeIframes = []
     @data = @initDataStructure()
 
   updateData: (reRender = false) =>
@@ -345,3 +340,10 @@ class window.ListEditor extends window.Editor
       i = Math.floor(Math.random()*16).toString(16).toUpperCase()
       result = result + i
     return result
+
+  loadRevisionByClass: (targetVersionClass) =>
+    @loadRevision({
+      type:'click',
+      target: $('#revisions').find(targetVersionClass).find('a').get()[0],
+      preventDefault: () -> {},
+    })

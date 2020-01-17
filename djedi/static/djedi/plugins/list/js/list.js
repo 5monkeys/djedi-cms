@@ -8,6 +8,7 @@
     __extends(ListEditor, _super);
 
     function ListEditor() {
+      this.loadRevisionByClass = __bind(this.loadRevisionByClass, this);
       this.getSubnodeKey = __bind(this.getSubnodeKey, this);
       this.getSubnodeUriKey = __bind(this.getSubnodeUriKey, this);
       this.resortNodes = __bind(this.resortNodes, this);
@@ -44,7 +45,7 @@
       ListEditor.__super__.initialize.call(this, config);
       this.subnodeCss = '<style> .node-title, footer { display: none; } #editor { height: auto; max-height: none; } </style>';
       this.editor = this;
-      this.subPlugins = [];
+      this.subnodeIframes = [];
       this.data = this.initDataStructure();
       this.saveQueue = [];
       this.loading = false;
@@ -150,7 +151,7 @@
     };
 
     ListEditor.prototype.spawnSubnode = function(uri, refreshValue, data) {
-      var classes, cont, handle, holder, node, path, plug, ref_uri, title, windowRef;
+      var classes, handle, holder, node, node_container, node_iframe, path, ref_uri, title, windowRef;
       if (refreshValue == null) {
         refreshValue = true;
       }
@@ -159,9 +160,9 @@
       }
       console.log("ListEditor.spawnSubNode()");
       classes = 'subnodes__item';
-      cont = $("<div class='" + classes + "'></div>").appendTo(this.container);
-      title = $("<div class='subnodes__item-title'></div>").appendTo(cont);
-      holder = $("<div class='subnodes__item-content'></div>").appendTo(cont);
+      node_container = $("<div class='" + classes + "'></div>").appendTo(this.container);
+      title = $("<div class='subnodes__item-title'></div>").appendTo(node_container);
+      holder = $("<div class='subnodes__item-content'></div>").appendTo(node_container);
       title.on('click', (function(_this) {
         return function(e) {
           return $(e.target).parent().toggleClass('subnodes__item--closed');
@@ -196,28 +197,28 @@
       node = new window.Node(uri, data, holder);
       title.append("<span class='subnodes__item-title__text'>" + (node.uri.query['plugin'] || 'unknown') + "</span>");
       title.find('.subnodes__item-title__text').addClass(this.getPluginColor(node.uri.query['plugin'] || 'plugin-fg-unknown'));
-      cont.attr('uri-ref', node.uri.valueOf());
-      cont.attr('data-key', node.uri.query['key']);
-      plug = new window.Plugin(node);
+      node_container.attr('uri-ref', node.uri.valueOf());
+      node_container.attr('data-key', node.uri.query['key']);
+      node_iframe = new window.Plugin(node);
       ref_uri = this.node.uri.clone({
         version: ""
       }).valueOf();
       path = document.location.pathname.replace("node/" + (encodeURIComponent(encodeURIComponent(ref_uri))) + "/editor", "");
       path = path.replace("node/" + (encodeURIComponent(encodeURIComponent(this.node.uri))) + "/editor", "");
-      plug.$el.attr('src', path + ("node/" + (encodeURIComponent(encodeURIComponent(uri))) + "/editor"));
-      cont.css('order', this.data.children.length);
-      this.subPlugins.push(plug);
+      node_iframe.$el.attr('src', path + ("node/" + (encodeURIComponent(encodeURIComponent(uri))) + "/editor"));
+      node_container.css('order', this.data.children.length);
+      this.subnodeIframes.push(node_iframe);
       this.data.children.push({
         key: this.getSubnodeKey(node.uri.query.key),
         plugin: node.uri.query.plugin,
         data: data
       });
-      holder.append(plug.$el);
-      windowRef = plug.$el[0].contentWindow;
-      $(plug.$el).on('load', (function(_this) {
+      holder.append(node_iframe.$el);
+      windowRef = node_iframe.$el[0].contentWindow;
+      $(node_iframe.$el).on('load', (function(_this) {
         return function() {
           var head;
-          head = windowRef.$(plug.$el[0]).contents().find("head");
+          head = windowRef.$(node_iframe.$el[0]).contents().find("head");
           windowRef.$(head).append(_this.subnodeCss);
           windowRef.$(windowRef.document).on('editor:state-changed', function(event, oldState, newState, node) {
             console.log(oldState, newState);
@@ -245,12 +246,12 @@
     };
 
     ListEditor.prototype.save = function() {
-      var plug, _i, _len, _ref;
+      var subnode_iframe, _i, _len, _ref;
       this.preventParentReload = true;
-      _ref = this.subPlugins;
+      _ref = this.subnodeIframes;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        plug = _ref[_i];
-        this.saveQueue.push(plug);
+        subnode_iframe = _ref[_i];
+        this.saveQueue.push(subnode_iframe);
       }
       return ListEditor.__super__.save.apply(this, arguments);
     };
@@ -272,34 +273,18 @@
     };
 
     ListEditor.prototype.onPublish = function() {
-      var event;
       ListEditor.__super__.onPublish.apply(this, arguments);
-      event = {
-        type: 'click',
-        target: $('#revisions').find('.published').find('a').get()[0],
-        preventDefault: function() {
-          return {};
-        }
-      };
-      this.loadRevision(event);
+      this.loadRevisionByClass('.published');
       return this.setState('published');
     };
 
     ListEditor.prototype.workSaveQueue = function() {
-      var event;
       console.log("ListEditor.workSaveQueue()", this.saveQueue.length);
       if (this.saveQueue.length > 0) {
         return this.saveSubnode(this.saveQueue.pop());
       } else {
         this.preventParentReload = false;
-        event = {
-          type: 'click',
-          target: $('#revisions').find('.draft').find('a').get()[0],
-          preventDefault: function() {
-            return {};
-          }
-        };
-        this.loadRevision(event);
+        this.loadRevisionByClass('.draft');
         this.setState('draft');
         this.subnodeDirty = false;
         return this.toggleListActions(true);
@@ -321,7 +306,7 @@
       console.log("ListEditor.popSubnode()");
       targetUri = uri;
       targetKey = this.getSubnodeKey(targetUri.to_uri().query.key);
-      this.subPlugins = this.subPlugins.filter((function(_this) {
+      this.subnodeIframes = this.subnodeIframes.filter((function(_this) {
         return function(value) {
           if (value.uri.valueOf() !== targetUri) {
             return true;
@@ -343,7 +328,7 @@
 
     ListEditor.prototype.clearList = function() {
       this.container.empty();
-      this.subPlugins = [];
+      this.subnodeIframes = [];
       return this.data = this.initDataStructure();
     };
 
@@ -487,6 +472,16 @@
         result = result + i;
       }
       return result;
+    };
+
+    ListEditor.prototype.loadRevisionByClass = function(targetVersionClass) {
+      return this.loadRevision({
+        type: 'click',
+        target: $('#revisions').find(targetVersionClass).find('a').get()[0],
+        preventDefault: function() {
+          return {};
+        }
+      });
     };
 
     return ListEditor;
