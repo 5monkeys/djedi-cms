@@ -223,7 +223,7 @@ class PrivateRestTest(ClientTest):
 
                 self.assertListEqual(
                     ["attr_id", "attr_alt", "attr_class"],
-                    response.context_data['forms']['HTML'].fields.keys()
+                    list(response.context_data['forms']['HTML'].fields.keys())
                 )
 
             else:
