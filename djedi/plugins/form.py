@@ -4,16 +4,27 @@ from cio.plugins.base import BasePlugin
 from django import forms
 
 
-class BaseEditorForm(forms.Form):
-    def __init__(self, *a, **kw):
-        super(BaseEditorForm, self).__init__(*a, **kw)
+def get_custom_render_widget(cls):
+    class CustomRenderWidget(cls):
+        def render(self, name, value, attrs=None, renderer=None):
+            return super(CustomRenderWidget, self).render(
+                name="data[%s]" % name,
+                value=value,
+                attrs=attrs,
+                renderer=renderer
+            )
 
-        # TODO: Change render method on widget
-        # to set custom name attr instead of
-        # changing fields dict keys.
+    return CustomRenderWidget
+
+
+class BaseEditorForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(BaseEditorForm, self).__init__(*args, **kwargs)
+
         for field in list(self.fields.keys()):
-            new_field = "data[%s]" % field
-            self.fields[new_field] = self.fields.pop(field)
+            self.fields[field].widget.__class__ = get_custom_render_widget(
+                self.fields[field].widget.__class__
+            )
 
 
 class FormsBasePlugin(BasePlugin):

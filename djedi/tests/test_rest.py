@@ -220,6 +220,12 @@ class PrivateRestTest(ClientTest):
                 assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri', 'forms'))
                 assert 'HTML' in response.context_data['forms']
                 assert isinstance(response.context_data['forms']['HTML'], BaseEditorForm)
+
+                self.assertListEqual(
+                    ["attr_id", "attr_alt", "attr_class"],
+                    response.context_data['forms']['HTML'].fields.keys()
+                )
+
             else:
                 assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
 
@@ -229,6 +235,16 @@ class PrivateRestTest(ClientTest):
             response = self.post('cms.editor', 'sv-se@page/title', {'data': u'Djedi'})
             self.assertEqual(response.status_code, 200)
             self.assertIn(b'document.domain = "foobar.se"', response.content)
+
+    def test_image_dataform(self):
+        from djedi.plugins.img import DataForm
+
+        data_form = DataForm()
+        html = data_form.as_table()
+
+        self.assertTrue('name="data[attr_alt]"' in html)
+        self.assertTrue('name="data[attr_class]"' in html)
+        self.assertTrue('name="data[attr_id]"' in html)
 
     def test_upload(self):
         tests_dir = os.path.dirname(os.path.abspath(__file__))
