@@ -6,12 +6,17 @@ from django import forms
 
 def get_custom_render_widget(cls):
     class CustomRenderWidget(cls):
-        def render(self, name, value, attrs=None, renderer=None):
+        def render(self, *args, **kwargs):
+            name = kwargs.pop("name", None)
+
+            if not name:
+                name = args[0]
+                args = args[1:]
+
             return super(CustomRenderWidget, self).render(
-                name="data[%s]" % name,
-                value=value,
-                attrs=attrs,
-                renderer=renderer
+                "data[%s]" % name,
+                *args,
+                **kwargs
             )
 
     return CustomRenderWidget
