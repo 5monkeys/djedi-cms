@@ -196,9 +196,11 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
             plugin = plugins.resolve(uri)
             plugin_context = self.get_context_data(uri=uri)
 
-            # TODO: Remove has_attr check when cio has default plugin context
-            if hasattr(plugin, 'get_context'):
+            # TODO: Remove try/except when cio has default plugin context
+            try:
                 plugin_context = plugin.get_context(**plugin_context)
+            except AttributeError:
+                pass
 
         except UnknownPlugin:
             raise Http404
