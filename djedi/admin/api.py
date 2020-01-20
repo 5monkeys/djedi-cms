@@ -1,4 +1,6 @@
 from collections import defaultdict
+from djedi.plugins.base import DjediPlugin
+
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.utils.http import urlunquote
@@ -196,11 +198,8 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
             plugin = plugins.resolve(uri)
             plugin_context = self.get_context_data(uri=uri)
 
-            # TODO: Remove try/except when cio has default plugin context
-            try:
-                plugin_context = plugin.get_context(**plugin_context)
-            except AttributeError:
-                pass
+            if isinstance(plugin, DjediPlugin):
+                plugin_context = plugin.get_editor_context(**plugin_context)
 
         except UnknownPlugin:
             raise Http404

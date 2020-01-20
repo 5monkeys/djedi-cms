@@ -1,6 +1,6 @@
 import json
 import cio
-from cio.plugins.base import BasePlugin
+from djedi.plugins.base import DjediPlugin
 from django import forms
 
 
@@ -32,14 +32,14 @@ class BaseEditorForm(forms.Form):
             )
 
 
-class FormsBasePlugin(BasePlugin):
+class FormsBasePlugin(DjediPlugin):
     ext = None
 
     @property
     def forms(self):
         return {}
 
-    def get_context(self, **context):
+    def get_editor_context(self, **context):
         uri = context.get('uri')
 
         loaded = cio.load(uri)
