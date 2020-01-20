@@ -10,21 +10,21 @@ from .form import FormsBasePlugin, BaseEditorForm
 
 
 class DataForm(BaseEditorForm):
-    attr_id = forms.CharField(
+    data__id = forms.CharField(
         label="ID",
         max_length=255,
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control", "name": "yoyoyo"}),
+        widget=forms.TextInput(attrs={"class": "form-control"}),
     )
 
-    attr_alt = forms.CharField(
+    data__alt = forms.CharField(
         label="Alt text",
         max_length=255,
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
 
-    attr_class = forms.CharField(
+    data__class = forms.CharField(
         label="Class",
         max_length=255,
         required=False,
@@ -164,14 +164,13 @@ class ImagePluginBase(FormsBasePlugin):
                 attrs['width'] = width
                 attrs['height'] = height
 
-            attr_alt = data.get('attr_alt') or ''
-            attrs['alt'] = attr_alt
+            attrs['alt'] = data.get('alt') or ''
 
-            attr_id = data.get('attr_id')
+            attr_id = data.get('id')
             if attr_id:
                 attrs['id'] = attr_id
 
-            attr_class = data.get('attr_class')
+            attr_class = data.get('class')
             if attr_class:
                 attrs['class'] = attr_class
 

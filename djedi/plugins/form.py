@@ -4,6 +4,11 @@ from djedi.plugins.base import DjediPlugin
 from django import forms
 
 
+def deprefix(s):
+    # Remove prefix (anything including and before __)
+    return s.rpartition('__')[-1]
+
+
 def get_custom_render_widget(cls):
     class CustomRenderWidget(cls):
         def render(self, *args, **kwargs):
@@ -12,6 +17,8 @@ def get_custom_render_widget(cls):
             if not name:
                 name = args[0]
                 args = args[1:]
+
+            name = deprefix(name)
 
             return super(CustomRenderWidget, self).render(
                 "data[%s]" % name,
@@ -66,7 +73,7 @@ class FormsBasePlugin(DjediPlugin):
 
     def collect_forms_data(self, data):
         return {
-            field: data.get(field)
+            deprefix(field): data.get(deprefix(field))
             for tab, form in self.forms.items()
             for field in form.base_fields.keys()
         }

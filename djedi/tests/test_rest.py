@@ -222,7 +222,7 @@ class PrivateRestTest(ClientTest):
                 assert isinstance(response.context_data['forms']['HTML'], BaseEditorForm)
 
                 self.assertListEqual(
-                    ["attr_id", "attr_alt", "attr_class"],
+                    ["data__id", "data__alt", "data__class"],
                     list(response.context_data['forms']['HTML'].fields.keys())
                 )
 
@@ -242,9 +242,9 @@ class PrivateRestTest(ClientTest):
         data_form = DataForm()
         html = data_form.as_table()
 
-        self.assertTrue('name="data[attr_alt]"' in html)
-        self.assertTrue('name="data[attr_class]"' in html)
-        self.assertTrue('name="data[attr_id]"' in html)
+        self.assertTrue('name="data[alt]"' in html)
+        self.assertTrue('name="data[class]"' in html)
+        self.assertTrue('name="data[id]"' in html)
 
     def test_upload(self):
         tests_dir = os.path.dirname(os.path.abspath(__file__))
@@ -254,9 +254,9 @@ class PrivateRestTest(ClientTest):
             'data[width]': u'64',
             'data[height]': u'64',
             'data[crop]': u'64,64,128,128',
-            'data[attr_id]': u'vw',
-            'data[attr_class]': u'year-53',
-            'data[attr_alt]': u'Zwitter',
+            'data[id]': u'vw',
+            'data[class]': u'year-53',
+            'data[alt]': u'Zwitter',
             'meta[comment]': u'VW'
         }
 
