@@ -1,6 +1,5 @@
 import json
 import six
-from PIL import Image
 from django.utils.html import escape
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django import forms
@@ -75,6 +74,7 @@ class ImagePluginBase(FormsBasePlugin):
             return {'filename': None, 'url': None}
 
     def save(self, data):
+        from PIL import Image
         width = int(data.get('width') or 0)
         height = int(data.get('height') or 0)
 
