@@ -1,12 +1,21 @@
-from cio.plugins.base import BasePlugin
+from .base import DjediPlugin
 from cio.plugins import plugins
 from cio.node import Node
+from cio.utils.uri import URI
 import cio
 import json
 
 
-class ListPlugin(BasePlugin):
+class ListPlugin(DjediPlugin):
     ext = 'list'
+
+    def get_editor_context(self, **kwargs):
+        uri = kwargs['uri']
+        plugin_ext = self.get_query_param(uri, 'plugin')
+        if plugin_ext:
+            kwargs['plugin'] = plugin_ext
+
+        return kwargs
 
     def load(self, content):
         if content:

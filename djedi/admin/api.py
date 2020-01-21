@@ -199,12 +199,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
     def get(self, request, uri):
         try:
             uri = self.decode_uri(uri)
-            uri = URI(uri)
-            plugin = plugins.resolve(uri)
-            plugin_context = self.get_context_data(uri=uri)
-
-            if isinstance(plugin, DjediPlugin):
-                plugin_context = plugin.get_editor_context(**plugin_context)
+            plugin_context = self.get_plugin_context(uri)
 
         except UnknownPlugin:
             raise Http404
@@ -221,18 +216,26 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
         context = cio.load(node.uri)
         context['content'] = node.content
 
+        plugin_context = self.get_plugin_context(context['uri'])
+
         if request.is_ajax():
-            return self.render_to_json(context)
+            return self.render_to_json(plugin_context)
         else:
-            return self.render_plugin(request, context)
+            return self.render_plugin(request, plugin_context)
+
+    def get_plugin_context(self, uri):
+        uri = URI(uri)
+        plugin = plugins.resolve(uri)
+
+        context = dict(uri=uri, plugin=uri.ext)
+        if isinstance(plugin, DjediPlugin):
+            context = plugin.get_editor_context(**context)
+
+        context['uri'] = mark_safe(context['uri'])
+        return context
 
     def render_plugin(self, request, context):
-        ext = context['uri'].query['plugin'][0] \
-            if context['uri'].query and 'plugin' in context['uri'].query \
-            and context['uri'].query['plugin'] \
-            else context['uri'].ext
-        context['uri'] = mark_safe(context['uri'])
         return TemplateResponse(request, [
-            'djedi/plugins/%s/editor.html' % ext,
+            'djedi/plugins/%s/editor.html' % context['plugin'],
             'djedi/plugins/base/editor.html'
         ], self.get_context_data(**context))
