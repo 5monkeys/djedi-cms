@@ -39,7 +39,6 @@ class ImagePluginBase(FormsBasePlugin):
     def forms(self):
         return {'HTML': DataForm}
 
-    def _open_file(self, filename):
     def _open(self, filename):
         raise NotImplementedError
 

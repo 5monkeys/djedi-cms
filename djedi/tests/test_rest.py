@@ -217,7 +217,7 @@ class PrivateRestTest(ClientTest):
             response = self.get('cms.editor', 'sv-se@page/title.' + ext)
             self.assertEqual(response.status_code, 200)
             if ext == 'img':
-                assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri', 'forms'))
+                assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'PLUGINS', 'uri', 'forms'))
                 assert 'HTML' in response.context_data['forms']
                 assert isinstance(response.context_data['forms']['HTML'], BaseEditorForm)
 
