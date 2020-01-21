@@ -1,7 +1,6 @@
 from .base import DjediPlugin
 from cio.plugins import plugins
 from cio.node import Node
-from cio.utils.uri import URI
 import cio
 import json
 
