@@ -428,6 +428,11 @@
       var k, v;
       $("input[name='data[filename]']").val(data.filename);
       $("input[name='data[crop]']").val('');
+      $("input[name='data[width]']").val(data.width);
+      $("input[name='data[height]']").val(data.height);
+      delete data.filename;
+      delete data.width;
+      delete data.height;
       for (k in data) {
         v = data[k];
         $("input[name='data[" + k + "]']").val(v);
