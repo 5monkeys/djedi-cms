@@ -36,11 +36,14 @@ def lazy_tag(self, func=None, takes_context=None, name=None, node_class=None):
                 self.args = args
                 self.kwargs = kwargs
 
-                resolved_args, resolved_kwargs = self.get_resolved_arguments(Context({}))
+                try:
+                    resolved_args, resolved_kwargs = self.get_resolved_arguments(Context({}))
 
-                self.resolved_args = resolved_args
-                self.resolved_kwargs = resolved_kwargs
-                self.render_func = func(*resolved_args, **resolved_kwargs)
+                    self.resolved_args = resolved_args
+                    self.resolved_kwargs = resolved_kwargs
+                    self.render_func = func(*resolved_args, **resolved_kwargs)
+                except AttributeError:
+                    pass
 
             def get_resolved_arguments(self, context):
                 resolved_args = [var.resolve(context) for var in self.args]
@@ -50,6 +53,12 @@ def lazy_tag(self, func=None, takes_context=None, name=None, node_class=None):
                 return resolved_args, resolved_kwargs
 
             def render(self, context):
+                if not hasattr(self, 'resolved_args'):
+                    resolved_args, resolved_kwargs = self.get_resolved_arguments(Context(context))
+
+                    self.resolved_args = resolved_args
+                    self.resolved_kwargs = resolved_kwargs
+                    self.render_func = func(*resolved_args, **resolved_kwargs)
                 return self.render_func(context)
 
         function_name = (name or

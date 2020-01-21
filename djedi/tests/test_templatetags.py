@@ -146,3 +146,18 @@ class TagTest(DjediTest, AssertionMixin):
         user.is_superuser = True
         html = self.render(source, context)
         assert u'<script>window.DJEDI_NODES = {};</script>' in html
+
+    def test_node_tag_with_variable(self):
+        cio.set('i18n://sv-se@foo/bar.txt', u'Djedi')
+        html = self.render(u"{% with uri='foo/bar' %}{% node uri default='bogus' %}{% endwith %}")
+        self.assertEqual(html, u'<span data-i18n="sv-se@foo/bar">Djedi</span>')
+
+    def test_blocknode_tag_with_variable(self):
+        cio.set('i18n://sv-se@foo/bar.txt', u'Djedi')
+        html = self.render(u"""
+            {% with uri='foo/bar' %}
+                {% blocknode uri default='bogus' %}
+                {% endblocknode %}
+            {% endwith %}
+        """)
+        self.assertEqual(html, u'<span data-i18n="sv-se@foo/bar">Djedi</span>')
