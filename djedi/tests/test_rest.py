@@ -529,6 +529,17 @@ class PrivateRestTest(ClientTest):
         empty_subnode = cio.set('sv-se@page/listthatdoesntexist.list?key=321cba&plugin=md', "# Hej")
         self.assertEqual(empty_subnode.content, '<h1>Hej</h1>')
 
+        response = self.get('cms.editor', 'sv-se@page/context-test.list?plugin=img')
+        self.assertEqual(response.status_code, 200)
+        assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'PLUGINS', 'uri', 'plugin', 'forms'))
+        assert 'HTML' in response.context_data['forms']
+        assert isinstance(response.context_data['forms']['HTML'], BaseEditorForm)
+
+        self.assertListEqual(
+            ["data__id", "data__alt", "data__class"],
+            list(response.context_data['forms']['HTML'].fields.keys())
+        )
+
 
 class PublicRestTest(ClientTest):
 
