@@ -11,6 +11,7 @@ from cio.backends import storage
 from cio.backends.exceptions import NodeDoesNotExist, PersistenceError
 from cio.plugins import plugins
 from cio.utils.uri import URI
+from djedi.plugins.form import BaseEditorForm
 from djedi.tests.base import ClientTest, DjediTest, UserMixin
 from djedi.utils.encoding import smart_unicode
 
@@ -201,6 +202,7 @@ class PrivateRestTest(ClientTest):
             'width': '64',
             'height': '64'
         })})
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(smart_unicode(response.content), u'<img alt="" height="64" src="/foo/bar.png" width="64" />')
 
@@ -214,13 +216,35 @@ class PrivateRestTest(ClientTest):
         for ext in plugins:
             response = self.get('cms.editor', 'sv-se@page/title.' + ext)
             self.assertEqual(response.status_code, 200)
-            assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
+            if ext == 'img':
+                assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri', 'forms'))
+                assert 'HTML' in response.context_data['forms']
+                assert isinstance(response.context_data['forms']['HTML'], BaseEditorForm)
+
+                self.assertListEqual(
+                    ["data__id", "data__alt", "data__class"],
+                    list(response.context_data['forms']['HTML'].fields.keys())
+                )
+
+            else:
+                assert set(response.context_data.keys()) == set(('THEME', 'VERSION', 'uri',))
+
             self.assertNotIn(b'document.domain', response.content)
 
         with cio.conf.settings(XSS_DOMAIN='foobar.se'):
             response = self.post('cms.editor', 'sv-se@page/title', {'data': u'Djedi'})
             self.assertEqual(response.status_code, 200)
             self.assertIn(b'document.domain = "foobar.se"', response.content)
+
+    def test_image_dataform(self):
+        from djedi.plugins.img import DataForm
+
+        data_form = DataForm()
+        html = data_form.as_table()
+
+        self.assertTrue('name="data[alt]"' in html)
+        self.assertTrue('name="data[class]"' in html)
+        self.assertTrue('name="data[id]"' in html)
 
     def test_upload(self):
         tests_dir = os.path.dirname(os.path.abspath(__file__))
@@ -235,7 +259,9 @@ class PrivateRestTest(ClientTest):
             'data[alt]': u'Zwitter',
             'meta[comment]': u'VW'
         }
+
         response = self.post('api', 'i18n://sv-se@header/logo.img', form)
+
         self.assertEqual(response.status_code, 200)
 
         with open(image_path, "rb") as image:

@@ -1,15 +1,43 @@
 import json
 import six
 from django.utils.html import escape
-from cio.plugins.base import BasePlugin
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django import forms
 from hashlib import sha1
 from os import path
 
+from .form import FormsBasePlugin, BaseEditorForm
 
-class ImagePluginBase(BasePlugin):
 
+class DataForm(BaseEditorForm):
+    data__id = forms.CharField(
+        label="ID",
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+
+    data__alt = forms.CharField(
+        label="Alt text",
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+
+    data__class = forms.CharField(
+        label="Class",
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+
+
+class ImagePluginBase(FormsBasePlugin):
     ext = 'img'
+
+    @property
+    def forms(self):
+        return {'HTML': DataForm}
 
     def _open(self, filename):
         raise NotImplementedError
@@ -101,14 +129,12 @@ class ImagePluginBase(BasePlugin):
         if file:
             file.close()
 
-        content = {
+        content = super(ImagePluginBase, self).save(data, dumps=False)
+        content.update({
             'filename': filename,
             'width': width,
             'height': height,
-            'id': data.get('id') or None,
-            'class': data.get('class') or None,
-            'alt': data.get('alt') or None
-        }
+        })
 
         return json.dumps(content)
 
@@ -126,23 +152,27 @@ class ImagePluginBase(BasePlugin):
             'width': 160,
             'height': 90
         }
+
         if data:
             url = data.get('url')
-            width = data.get('width') or 0
-            height = data.get('height') or 0
-            alt = data.get('alt') or ''
-            tag_id = data.get('id')
-            tag_class = data.get('class')
             if url:
                 attrs['src'] = url
-            attrs['alt'] = alt
+
+            width = data.get('width') or 0
+            height = data.get('height') or 0
             if width and height:
                 attrs['width'] = width
                 attrs['height'] = height
-            if tag_id:
-                attrs['id'] = tag_id
-            if tag_class:
-                attrs['class'] = tag_class
+
+            attrs['alt'] = data.get('alt') or ''
+
+            attr_id = data.get('id')
+            if attr_id:
+                attrs['id'] = attr_id
+
+            attr_class = data.get('class')
+            if attr_class:
+                attrs['class'] = attr_class
 
         html_attrs = (u'{0}="{1}"'.format(attr, escape(attrs[attr])) for attr in sorted(attrs.keys()))
         return u'<img {0} />'.format(u' '.join(html_attrs))

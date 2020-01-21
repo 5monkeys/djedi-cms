@@ -425,13 +425,18 @@
     };
 
     ImageEditor.prototype.updateForm = function(data) {
+      var k, v;
       $("input[name='data[filename]']").val(data.filename);
+      $("input[name='data[crop]']").val('');
       $("input[name='data[width]']").val(data.width);
       $("input[name='data[height]']").val(data.height);
-      $("input[name='data[crop]']").val('');
-      $("input[name='data[id]']").val(data.id);
-      $("input[name='data[class]']").val(data["class"]);
-      $("input[name='data[alt]']").val(data.alt);
+      delete data.filename;
+      delete data.width;
+      delete data.height;
+      for (k in data) {
+        v = data[k];
+        $("input[name='data[" + k + "]']").val(v);
+      }
       return this.ratioButton.removeClass('active');
     };
 

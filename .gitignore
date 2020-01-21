@@ -17,3 +17,9 @@ htmlcov/
 node_modules/
 .next/
 example/db.sqlite3
+
+# Emacs Temp/Autosaves
+*~
+\#*\#
+.#*.*
+*_flymake*

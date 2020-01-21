@@ -9,7 +9,9 @@
 {% block tabs %}
     <ul class="nav navbar-default nav-tabs">
       <li class="active"><a href="#image-pane" data-toggle="tab"><i class="icon-camera"></i> Image</a></li>
-      <li><a href="#html-pane" data-toggle="tab"><i class="icon-code"></i> Html</a></li>
+      {% for tab, form in forms.items %}
+      <li><a href="#{{tab}}-pane" data-toggle="tab"><i class="icon-code"></i> {{tab}}</a></li>
+      {% endfor %}
     </ul>
 {% endblock tabs %}
 
@@ -29,28 +31,21 @@
                 <input type="hidden" name="data[crop]" id="field-crop">
             </div>
         </div>
-        <div id="html-pane" class="tab-pane">
-            <div class="form-horizontal">
-                <div class="form-group">
-                    <label class="col-xs-2 control-label">ID:</label>
-                    <div class="col-xs-10">
-                        <input type="text" class="form-control" name="data[id]">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-xs-2 control-label">Class:</label>
-                    <div class="col-xs-10">
-                        <input type="text" class="form-control" name="data[class]">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-xs-2 control-label">Alt:</label>
-                    <div class="col-xs-10">
-                        <input type="text" class="form-control" name="data[alt]">
-                    </div>
-                </div>
-            </div>
-        </div>
+
+	{% for tab, form in forms.items %}
+        <div id="{{tab}}-pane" class="tab-pane">
+	  <div class="form-horizontal">
+	    {% for field in form %}
+	    <div class="form-group">
+	      <label class="col-xs-2 control-label">{{field.label}}:</label>
+	      <div class="col-xs-10">
+		{{ field }}
+	      </div>
+	    </div>
+	    {% endfor %}
+	  </div>
+	</div>
+	{% endfor %}
     </div>
 {% endblock editor %}
 
