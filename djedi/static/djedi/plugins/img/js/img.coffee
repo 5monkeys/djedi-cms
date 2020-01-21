@@ -375,13 +375,13 @@ class window.ImageEditor extends window.Editor
     @firstRender = false
 
   updateForm: (data) ->
+
     $("input[name='data[filename]']").val data.filename
-    $("input[name='data[width]']").val data.width
-    $("input[name='data[height]']").val data.height
     $("input[name='data[crop]']").val ''
-    $("input[name='data[id]']").val data.id
-    $("input[name='data[class]']").val data.class
-    $("input[name='data[alt]']").val data.alt
+
+    for k, v of data
+        $("input[name='data[#{k}]']").val v
+
     @ratioButton.removeClass 'active'
 
   renderThumbnail: (url) ->

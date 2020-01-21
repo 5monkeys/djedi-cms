@@ -1,5 +1,4 @@
 import json
-import cio
 from djedi.plugins.base import DjediPlugin
 from django import forms
 
@@ -47,20 +46,9 @@ class FormsBasePlugin(DjediPlugin):
         return {}
 
     def get_editor_context(self, **context):
-        uri = context.get('uri')
-
-        loaded = cio.load(uri)
-        data = {}
-
-        if loaded:
-            data = loaded.get('data') or {}
-
         context.update(
             {"forms": {
-                tab: form(initial={
-                    "data[%s]" % field: data.get(field)
-                    for field in form.base_fields.keys()
-                })
+                tab: form()
                 for tab, form in self.forms.items()
             }}
         )
