@@ -338,3 +338,30 @@ class PublicRestTest(ClientTest):
         self.assertEqual(json_content['i18n://sv-se@rest/page/body.md'], u'<h1>Foo Bar</h1>')
         self.assertIn('i18n://sv-se@rest/label/email.txt#1', json_content.keys())
         self.assertEqual(json_content['i18n://sv-se@rest/label/email.txt#1'], u'E-post')
+
+    def test_nodes_invalid_body(self):
+        url = reverse('admin:djedi:rest:nodes')
+
+        # Invalid JSON should be handled properly
+        response = self.client.post(url, '', content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        json_content = json.loads(response.content)
+        self.assertEqual(
+            json_content['error'],
+            'Not a valid JSON body.',
+        )
+
+        # Invalid structure should be handled properly
+        response = self.client.post(
+            url,
+            json.dumps({
+                'rest/page/body.md': {'foo': 'bar'},
+            }),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 400)
+        json_content = json.loads(response.content)
+        self.assertEqual(
+            json_content['error'],
+            'Invalid request body structure.',
+        )
