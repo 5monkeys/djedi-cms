@@ -215,13 +215,12 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
 
         context = cio.load(node.uri)
         context['content'] = node.content
-
-        plugin_context = self.get_plugin_context(context['uri'])
+        context.update(self.get_plugin_context(context['uri']))
 
         if request.is_ajax():
-            return self.render_to_json(plugin_context)
+            return self.render_to_json(context)
         else:
-            return self.render_plugin(request, plugin_context)
+            return self.render_plugin(request, context)
 
     def get_plugin_context(self, uri):
         uri = URI(uri)
