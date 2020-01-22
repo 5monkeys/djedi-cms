@@ -8,16 +8,16 @@ import json
 class ListPlugin(DjediPlugin):
     ext = 'list'
 
-    def get_editor_context(self, request, **kwargs):
-        uri = kwargs['uri']
+    def get_editor_context(self, request, **context):
+        uri = context['uri']
         plugin_ext = self.get_query_param(uri, 'plugin')
         if plugin_ext:
-            kwargs['plugin'] = plugin_ext
+            context['plugin'] = plugin_ext
             plugin = plugins.get(plugin_ext)
             if isinstance(plugin, DjediPlugin):
-                kwargs.update(plugin.get_editor_context(request, **kwargs))
+                context.update(plugin.get_editor_context(request, **context))
 
-        return kwargs
+        return context
 
     def load(self, content):
         if content:
