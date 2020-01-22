@@ -156,9 +156,12 @@
   window.Editor = (function() {
     function Editor(config) {
       this.config = config;
+      this.getPluginColor = __bind(this.getPluginColor, this);
+      this.save = __bind(this.save, this);
       this.discard = __bind(this.discard, this);
       this.publish = __bind(this.publish, this);
       this.loadRevision = __bind(this.loadRevision, this);
+      this.onPublish = __bind(this.onPublish, this);
       this.onSave = __bind(this.onSave, this);
       this.onFormChange = __bind(this.onFormChange, this);
       this.onLoad = __bind(this.onLoad, this);
@@ -191,8 +194,19 @@
       this.$path = $('header .uri');
       this.$version = $('header .version');
       this.$flag = $('header .flag');
-      $('#button-publish').on('click', this.publish);
-      $('#button-discard').on('click', this.discard);
+      this.$doc.on('editor:save', (function(_this) {
+        return function() {
+          return _this.$form.submit();
+        };
+      })(this));
+      this.$doc.on('editor:publish', (function(_this) {
+        return function() {
+          return _this.onPublish();
+        };
+      })(this));
+      this.actions.publish.on('click', this.publish);
+      this.actions.discard.on('click', this.discard);
+      this.actions.save.on('click', this.save);
       this.$form.ajaxForm({
         beforeSubmit: this.prepareForm,
         success: this.onSave
@@ -209,7 +223,9 @@
       });
       this.api.load(config.uri, this.onLoad);
       this.callback('initialize', config);
-      return this.initialized = true;
+      this.initialized = true;
+      window.editor = this;
+      return this.trigger('editor:initialized', this, config);
     };
 
     Editor.prototype.callback = function() {
@@ -240,7 +256,7 @@
 
     Editor.prototype.onLoad = function(node) {
       var initial;
-      console.log('Editor.onLoad()', node.uri);
+      console.log('Editor.onLoad()');
       initial = this.node === void 0;
       if (initial) {
         this.trigger('page:node:fetch', node.uri.valueOf(), (function(_this) {
@@ -267,6 +283,7 @@
 
     Editor.prototype.onFormChange = function(event) {
       console.log('Editor.onFormChange()');
+      this.trigger('editor:dirty');
       this.setState('dirty');
       return this.callback('onFormChange', event);
     };
@@ -275,7 +292,15 @@
       console.log('Editor.onSave()');
       node = this.setNode(node);
       this.render(node);
+      this.trigger('node:update', node.uri.valueOf(), node);
       return this.trigger('node:render', node.uri.valueOf(), node.content);
+    };
+
+    Editor.prototype.onPublish = function() {
+      var node;
+      node = this.api.publish(this.node.uri.valueOf());
+      this.setNode(node);
+      return this.setState('published');
     };
 
     Editor.prototype.setNode = function(node) {
@@ -305,8 +330,10 @@
     };
 
     Editor.prototype.setState = function(state) {
+      var oldState;
       console.log('Editor.setState()', state);
       if (state !== this.state) {
+        oldState = this.state;
         this.state = state;
         this.$version.removeClass('label-default label-warning label-danger label-info label-success');
         switch (state) {
@@ -314,35 +341,40 @@
             this.$version.addClass('label-default');
             this.actions.discard.disable();
             this.actions.save.enable();
-            return this.actions.publish.disable();
+            this.actions.publish.disable();
+            break;
           case 'dirty':
             this.$version.addClass('label-danger');
             this.actions.discard.enable();
             this.actions.save.enable();
-            return this.actions.publish.disable();
+            this.actions.publish.disable();
+            break;
           case 'draft':
             this.$version.addClass('label-primary');
             this.actions.discard.enable();
             this.actions.save.disable();
-            return this.actions.publish.enable();
+            this.actions.publish.enable();
+            break;
           case 'published':
             this.$version.addClass('label-success');
             this.actions.discard.disable();
             this.actions.save.disable();
-            return this.actions.publish.disable();
+            this.actions.publish.disable();
+            break;
           case 'revert':
             this.$version.addClass('label-warning');
             this.actions.discard.disable();
             this.actions.save.disable();
-            return this.actions.publish.enable();
+            this.actions.publish.enable();
         }
+        return this.trigger('editor:state-changed', oldState, state, this.node);
       }
     };
 
     Editor.prototype.renderHeader = function(node) {
       var color, lang, part, parts, path, uri, v;
       uri = node.uri;
-      color = (uri.ext[0].toUpperCase().charCodeAt() - 65) % 5 + 1;
+      color = this.getPluginColor(uri.ext);
       parts = (function() {
         var _i, _len, _ref, _results;
         _ref = uri.path.split('/');
@@ -355,11 +387,11 @@
         }
         return _results;
       })();
-      path = parts.join(" <span class=\"plugin-fg-" + color + "\">/</span> ");
+      path = parts.join(" <span class=\"" + color + "\">/</span> ");
       if (uri.scheme === 'i18n') {
         lang = uri.namespace.split('-')[0];
       }
-      this.$plugin.html(uri.ext).addClass("plugin-fg-" + color);
+      this.$plugin.html(uri.ext).addClass(color);
       this.$path.html(path);
       this.$flag.addClass("flag-" + lang);
       v = this.$version.find('var');
@@ -413,6 +445,7 @@
 
     Editor.prototype.render = function(node) {
       console.log('Editor.render()');
+      this.trigger('editor:render', node);
       return this.callback('render', node);
     };
 
@@ -420,7 +453,11 @@
       var $revision, data, published, uri;
       console.log('Editor.loadRevision()');
       event.preventDefault();
-      $revision = $(event.target);
+      if ($(event.target).is('i')) {
+        $revision = $(event.target).parent();
+      } else {
+        $revision = $(event.target);
+      }
       uri = $revision.data('uri');
       published = $revision.data('published');
       if (uri.version) {
@@ -448,7 +485,11 @@
     Editor.prototype.renderContent = function(data, doTrigger, callback) {
       var content, plugin;
       console.log('Editor.renderContent()');
-      plugin = this.node.uri.ext;
+      if (this.node.uri.query && this.node.uri.query['plugin']) {
+        plugin = this.node.uri.query['plugin'];
+      } else {
+        plugin = this.node.uri.ext;
+      }
       if (typeof data === 'string') {
         data = {
           data: data
@@ -476,10 +517,9 @@
     };
 
     Editor.prototype.publish = function() {
-      var node;
-      node = this.api.publish(this.node.uri.valueOf());
-      this.setNode(node);
-      return this.setState('published');
+      if (this.state === "draft" || this.state === "revert") {
+        return this.trigger("editor:publish", this.node.uri);
+      }
     };
 
     Editor.prototype.discard = function() {
@@ -490,7 +530,20 @@
       uri = this.node.uri;
       uri.version = null;
       this.node = null;
-      return this.api.load(uri.valueOf(), this.onLoad);
+      this.api.load(uri.valueOf(), this.onLoad);
+      return this.trigger("editor:discard", uri);
+    };
+
+    Editor.prototype.save = function() {
+      if (this.state === "dirty") {
+        return this.trigger('editor:save', this.node.uri);
+      }
+    };
+
+    Editor.prototype.getPluginColor = function(ext) {
+      var color;
+      color = (ext[0].toUpperCase().charCodeAt() - 65) % 5 + 1;
+      return "plugin-fg-" + color;
     };
 
     return Editor;

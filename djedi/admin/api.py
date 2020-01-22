@@ -4,6 +4,7 @@ from djedi.plugins.base import DjediPlugin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.utils.http import urlunquote
+from django.utils.safestring import mark_safe
 from django.views.decorators.cache import never_cache
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -12,6 +13,7 @@ from django.views.generic import View
 import cio
 from cio.plugins import plugins
 from cio.plugins.exceptions import UnknownPlugin
+from cio.node import Node
 from cio.utils.uri import URI
 
 from .exceptions import InvalidNodeData
@@ -179,11 +181,14 @@ class RenderApi(APIView):
         try:
             plugin = plugins.get(ext)
             data, meta = self.get_post_data(request)
-            data = plugin.load(data)
+            uri = URI(ext=ext)
+            node = Node(uri=uri, content=data)
+            data = plugin.load_node(node)
+            node.content = data
         except UnknownPlugin:
             raise Http404
         else:
-            content = plugin.render(data)
+            content = plugin.render_node(node, data)
             return self.render_to_response(content)
 
 
@@ -194,12 +199,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
     def get(self, request, uri):
         try:
             uri = self.decode_uri(uri)
-            uri = URI(uri)
-            plugin = plugins.resolve(uri)
-            plugin_context = self.get_context_data(uri=uri)
-
-            if isinstance(plugin, DjediPlugin):
-                plugin_context = plugin.get_editor_context(**plugin_context)
+            plugin_context = self.get_plugin_context(request, uri)
 
         except UnknownPlugin:
             raise Http404
@@ -215,14 +215,26 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
 
         context = cio.load(node.uri)
         context['content'] = node.content
+        context.update(self.get_plugin_context(request, context['uri']))
 
         if request.is_ajax():
             return self.render_to_json(context)
         else:
             return self.render_plugin(request, context)
 
+    def get_plugin_context(self, request, uri):
+        uri = URI(uri)
+        plugin = plugins.resolve(uri)
+
+        context = dict(uri=uri, plugin=uri.ext)
+        if isinstance(plugin, DjediPlugin):
+            context = plugin.get_editor_context(request, **context)
+
+        context['uri'] = mark_safe(context['uri'])
+        return context
+
     def render_plugin(self, request, context):
         return TemplateResponse(request, [
-            'djedi/plugins/%s/editor.html' % context['uri'].ext,
+            'djedi/plugins/%s/editor.html' % context['plugin'],
             'djedi/plugins/base/editor.html'
         ], self.get_context_data(**context))
