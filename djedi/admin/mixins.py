@@ -40,6 +40,6 @@ class DjediContextMixin(object):
 
         context['THEME'] = theme
         context['VERSION'] = djedi.__version__
-        context['PLUGINS'] = mark_safe(list(plugins.plugins.keys()))
+        context['PLUGINS'] = mark_safe(json.dumps(list(plugins.plugins.keys())))
 
         return context
