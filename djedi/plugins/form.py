@@ -45,13 +45,14 @@ class FormsBasePlugin(DjediPlugin):
     def forms(self):
         return {}
 
-    def get_editor_context(self, **context):
-        context.update(
-            {"forms": {
-                tab: form()
-                for tab, form in self.forms.items()
-            }}
-        )
+    def get_editor_context(self, request, **context):
+        if not request.is_ajax():
+            context.update(
+                {"forms": {
+                    tab: form()
+                    for tab, form in self.forms.items()
+                }}
+            )
 
         return context
 
