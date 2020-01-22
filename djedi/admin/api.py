@@ -199,7 +199,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
     def get(self, request, uri):
         try:
             uri = self.decode_uri(uri)
-            plugin_context = self.get_plugin_context(uri)
+            plugin_context = self.get_plugin_context(request, uri)
 
         except UnknownPlugin:
             raise Http404
@@ -215,20 +215,20 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
 
         context = cio.load(node.uri)
         context['content'] = node.content
-        context.update(self.get_plugin_context(context['uri']))
+        context.update(self.get_plugin_context(request, context['uri']))
 
         if request.is_ajax():
             return self.render_to_json(context)
         else:
             return self.render_plugin(request, context)
 
-    def get_plugin_context(self, uri):
+    def get_plugin_context(self, request, uri):
         uri = URI(uri)
         plugin = plugins.resolve(uri)
 
         context = dict(uri=uri, plugin=uri.ext)
         if isinstance(plugin, DjediPlugin):
-            context = plugin.get_editor_context(**context)
+            context = plugin.get_editor_context(request, **context)
 
         context['uri'] = mark_safe(context['uri'])
         return context
