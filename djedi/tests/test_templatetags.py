@@ -19,8 +19,8 @@ class TagTest(DjediTest, AssertionMixin):
         html = self.render(u"{% node 'page/title' edit=False %}")
         assert html == u''
 
-        cio.set('i18n://sv-se@page/title.txt', u'Djedi')
-        cio.set('i18n://sv-se@page/body.txt', u'Lightning fast!')
+        cio.set('i18n://sv@page/title.txt', u'Djedi')
+        cio.set('i18n://sv@page/body.txt', u'Lightning fast!')
 
         with self.assertCache(calls=1, misses=0):
             with self.assertDB(calls=0):
@@ -32,15 +32,15 @@ class TagTest(DjediTest, AssertionMixin):
         with self.assertCache(calls=1, misses=2):
             with self.assertDB(calls=1):
                 html = self.render(u"<h1>{% node 'page/title' edit=False %}</h1><p>{% node 'page/body' %}</p>")
-                assert html == u'<h1>Djedi</h1><p><span data-i18n="sv-se@page/body">Lightning fast!</span></p>'
+                assert html == u'<h1>Djedi</h1><p><span data-i18n="sv@page/body">Lightning fast!</span></p>'
 
         html = self.render(u"{% node 'foo/bar' default='bogus' %}")
-        assert html == u'<span data-i18n="sv-se@foo/bar">bogus</span>'
+        assert html == u'<span data-i18n="sv@foo/bar">bogus</span>'
         html = self.render(u"{% node 'l10n://foo/bar' default='bogus' %}")
         self.assertEqual(html, u'<span data-i18n="djedi@foo/bar">bogus</span>')
 
     def test_node_tag_with_default_scheme(self):
-        cio.set('i18n://sv-se@page/title.txt', u'Swedish Djedi')
+        cio.set('i18n://sv@page/title.txt', u'Swedish Djedi')
         html = self.render(u"{% node 'page/title' edit=False %}")
         assert html == u'Swedish Djedi'
 
@@ -64,20 +64,20 @@ class TagTest(DjediTest, AssertionMixin):
         """)
         self.assertRenderedMarkdown(html, u'# Djedi\nLightning *fast*!')
 
-        cio.set('i18n://sv-se@page/body.txt', u'Lightning fast!')
+        cio.set('i18n://sv@page/body.txt', u'Lightning fast!')
         html = self.render(u"""
             {% blocknode "page/body" %}
                 Lorem ipsum
             {% endblocknode %}
         """)
-        assert html == u'<span data-i18n="sv-se@page/body">Lightning fast!</span>'
+        assert html == u'<span data-i18n="sv@page/body">Lightning fast!</span>'
 
-        cio.set('i18n://sv-se@page/body.txt', u'')
+        cio.set('i18n://sv@page/body.txt', u'')
         html = self.render(u"{% blocknode 'page/body' edit=False %}Lorem ipsum{% endblocknode %}")
         assert html == u''
 
     def test_blocknode_with_context(self):
-        cio.set('i18n://sv-se@page/title.txt', u'Hej {name}!')
+        cio.set('i18n://sv@page/title.txt', u'Hej {name}!')
 
         source = u"""
             {% blocknode 'page/title' edit=False name=user.get_full_name %}

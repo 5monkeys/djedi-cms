@@ -1,8 +1,7 @@
 import django
 from django.contrib import admin
-from django.shortcuts import render_to_response
 
-from ..compat import include, patterns, url
+from ..compat import include, patterns, url, render
 
 admin.autodiscover()
 
@@ -12,7 +11,7 @@ else:
     admin_urls = admin.site.urls
 
 urlpatterns = patterns(
-    url(r'^$', lambda r: render_to_response('index.html'), name='index'),
+    url(r'^$', lambda r: render(r, 'index.html'), name='index'),
     url(r'^adm1n/', admin_urls),
     url(r'^djed1/', include('djedi.urls', namespace='admin'))
 )

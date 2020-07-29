@@ -323,7 +323,7 @@ class PublicRestTest(ClientTest):
 
     def test_nodes(self):
         with self.assertCache(sets=1):
-            cio.set('sv-se@rest/label/email', u'E-post')
+            cio.set('sv@rest/label/email', u'E-post')
 
         with self.assertDB(calls=1), self.assertCache(calls=1, misses=1, hits=1, sets=0):
             url = reverse('admin:djedi:rest:nodes')
@@ -334,7 +334,7 @@ class PublicRestTest(ClientTest):
 
         json_content = json.loads(response.content)
 
-        self.assertIn('i18n://sv-se@rest/page/body.md', json_content.keys())
-        self.assertEqual(json_content['i18n://sv-se@rest/page/body.md'], u'<h1>Foo Bar</h1>')
-        self.assertIn('i18n://sv-se@rest/label/email.txt#1', json_content.keys())
-        self.assertEqual(json_content['i18n://sv-se@rest/label/email.txt#1'], u'E-post')
+        self.assertIn('i18n://sv@rest/page/body.md', json_content.keys())
+        self.assertEqual(json_content['i18n://sv@rest/page/body.md'], u'<h1>Foo Bar</h1>')
+        self.assertIn('i18n://sv@rest/label/email.txt#1', json_content.keys())
+        self.assertEqual(json_content['i18n://sv@rest/label/email.txt#1'], u'E-post')

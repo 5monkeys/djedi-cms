@@ -40,7 +40,7 @@ DEFAULT_SETTINGS = dict(
     STATIC_URL='/static/',
     ROOT_URLCONF='djedi.tests.urls',
 
-    LANGUAGE_CODE='sv-se',
+    LANGUAGE_CODE='sv',
     SECRET_KEY="iufoj=mibkpdz*%bob9-DJEDI-52x(%49rqgv8gg45k36kjcg76&-y5=!",
 
     TEMPLATE_DEBUG=True,
