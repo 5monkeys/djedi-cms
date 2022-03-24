@@ -2,7 +2,6 @@
 
 Django content management as it should be.
 
-[![Build Status](https://travis-ci.org/5monkeys/djedi-cms.svg?branch=master)](https://travis-ci.org/5monkeys/djedi-cms)
 [![Coverage Status](https://coveralls.io/repos/5monkeys/djedi-cms/badge.svg?branch=master&service=github)](https://coveralls.io/github/5monkeys/djedi-cms?branch=master)
 [![Version](https://img.shields.io/pypi/v/djedi-cms.svg)](https://pypi.python.org/pypi/djedi-cms/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/djedi-cms.svg)](https://pypi.python.org/pypi/djedi-cms/)
