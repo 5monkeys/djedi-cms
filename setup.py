@@ -7,7 +7,7 @@ install_requires = ["six", "content-io >= 1.2.5", "simplejson >= 3.2.0"]
 
 tests_require = [
     "coverage",
-    "Markdown <= 2.4.1",
+    "Markdown <= 3.3.0",
     "Pillow <= 3.4.2",
 ]
 
