@@ -18,6 +18,11 @@ coverage:
 	coverage combine || true
 	coverage report
 
+.PHONY: coverage-xml
+coverage-xml:
+	coverage combine || true
+	coverage xml -o coverage.xml
+
 .PHONY: lint
 lint:
 	flake8 djedi
