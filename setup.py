@@ -8,7 +8,7 @@ install_requires = ["six", "content-io == 1.3b2", "simplejson >= 3.2.0"]
 tests_require = [
     "coverage",
     "Markdown <= 3.3.0",
-    "Pillow <= 8.4.0",
+    "Pillow",
 ]
 
 version = __import__("djedi").__version__
