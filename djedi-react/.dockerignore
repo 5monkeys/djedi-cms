@@ -6,7 +6,6 @@
 .gitignore
 .next/
 .stuff/
-.travis.yml
 Dockerfile
 dist/
 docker-compose.yml
