@@ -43,8 +43,8 @@ jobs:
           path: coverage.xml
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           minimum_coverage: 93
-          show_line: true
-          show_branch: true
+          only_changed_lines: true
+          fail_below_threshold: true
           show_missing: true
           link_missing_lines: true
           link_missing_lines_source_dir: "djedi"
