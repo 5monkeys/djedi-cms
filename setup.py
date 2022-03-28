@@ -21,6 +21,8 @@ setup(
         ".. image:: https://djedi-cms.org/_static/djedi-portrait.svg\n\n"
         "- Read the documentation_\n"
         "- Browse the source_\n\n"
+        ".. image:: https://github.com/5monkeys/djedi-cms/workflows/CI/badge.svg\n"
+        "    :target: https://github.com/5monkeys/djedi-cms/actions\n\n"
         ".. image:: https://coveralls.io/repos/5monkeys/djedi-cms/badge.svg?branch=master\n"
         "    :target: https://coveralls.io/r/5monkeys/djedi-cms?branch=master\n\n"
         ".. _documentation: https://djedi-cms.org/\n"
