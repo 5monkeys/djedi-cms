@@ -18,10 +18,10 @@ coverage:
 	coverage combine || true
 	coverage report
 
-.PHONY: coverage-xml
-coverage-xml:
+.PHONY: coverage-lcov
+coverage-lcov:
 	coverage combine || true
-	coverage xml -o coverage.xml
+	coverage lcov -o coverage.info
 
 .PHONY: lint
 lint:
