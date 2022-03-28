@@ -47,4 +47,4 @@ jobs:
           show_branch: true
           show_missing: true
           link_missing_lines: true
-          link_missing_lines_source_dir: "."
+          link_missing_lines_source_dir: "djedi"
