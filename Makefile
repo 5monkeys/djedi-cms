@@ -20,7 +20,6 @@ coverage:
 
 .PHONY: coverage-lcov
 coverage-lcov:
-	coverage combine || true
 	coverage lcov -o coverage.info
 
 .PHONY: lint
