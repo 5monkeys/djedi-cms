@@ -26,6 +26,7 @@ coverage-lcov:
 .PHONY: lint
 lint:
 	flake8 djedi
+	isort djedi
 
 .PHONY: install
 install:

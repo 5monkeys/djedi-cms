@@ -1,10 +1,9 @@
-import django
+from django.urls import path
 
-from .compat import include, patterns, url
+from .compat import include, patterns
 
 app_name = "djedi"
 
-from django.urls import path
 
 urlpatterns = patterns(
     path("", include("djedi.admin.urls", namespace="djedi")),

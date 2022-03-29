@@ -1,7 +1,7 @@
 import django
 
 from functools import partial
-from sys import version_info
+from inspect import getfullargspec
 
 from django.shortcuts import render
 from django.template.loader import render_to_string
