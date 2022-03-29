@@ -38,6 +38,8 @@ jobs:
           path: ./.coverage.*
 
   coverage:
+    name: Reporting Coverage
+    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize')
     needs: [tests]
     steps:
