@@ -5,10 +5,8 @@ from ..compat import include, patterns, url
 
 admin.autodiscover()
 
-admin_urls = admin.site.urls
-
-urlpatterns = patterns(
+urlpatterns = [
     url(r"^$", lambda r: render(r, "index.html"), name="index"),
-    url(r"^adm1n/", admin_urls),
+    url(r"^adm1n/", admin.site.urls),
     url(r"^djed1/", include("djedi.urls", namespace="admin")),
-)
+]

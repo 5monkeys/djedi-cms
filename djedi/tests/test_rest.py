@@ -13,7 +13,7 @@ from cio.plugins import plugins
 from cio.utils.uri import URI
 from djedi.plugins.form import BaseEditorForm
 from djedi.tests.base import ClientTest, DjediTest, UserMixin
-from djedi.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 
 from ..compat import reverse
 
@@ -172,7 +172,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.delete("api", node.uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(smart_unicode(response.content), "")
+        self.assertEqual(smart_text(response.content), u"")
 
         with self.assertRaises(NodeDoesNotExist):
             storage.get("i18n://sv-se@page/title")
@@ -221,7 +221,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.post("api.render", "md", {"data": "# Djedi"})
         assert response.status_code == 200
-        self.assertRenderedMarkdown(smart_unicode(response.content), "# Djedi")
+        self.assertRenderedMarkdown(smart_text(response.content), u"# Djedi")
 
         response = self.post(
             "api.render",
@@ -235,8 +235,8 @@ class PrivateRestTest(ClientTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            smart_unicode(response.content),
-            '<img alt="" height="64" src="/foo/bar.png" width="64" />',
+            smart_text(response.content),
+            u'<img alt="" height="64" src="/foo/bar.png" width="64" />',
         )
 
     def test_editor(self):
@@ -346,7 +346,7 @@ class PublicRestTest(ClientTest):
     def test_embed(self):
         url = reverse("admin:djedi:rest:embed")
         response = self.client.get(url)
-        html = smart_unicode(response.content)
+        html = smart_text(response.content)
 
         self.assertIn('iframe id="djedi-cms"', html)
         cms_url = "http://testserver" + reverse("admin:djedi:cms")

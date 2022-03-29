@@ -2,11 +2,8 @@ import textwrap
 
 from django import template
 from django.template import TemplateSyntaxError
-
-import cio
-
-from ..compat import parse_bits
 from .template import register
+from django.template.library import parse_bits
 
 
 def render_node(node, context=None, edit=True):
@@ -44,7 +41,16 @@ class BlockNode(template.Node):
         bits = token.split_contents()[1:]
         params = ("uri", "edit")
         args, kwargs = parse_bits(
-            parser, bits, params, None, True, (True,), None, "blocknode"
+            parser=parser,
+            bits=bits,
+            params=params,
+            varargs=None,
+            varkw=True,
+            defaults=(True,),
+            kwonly=(),
+            kwonly_defaults=(),
+            takes_context=None,
+            name="blocknode",
         )
 
         # Assert uri is the only tag arg

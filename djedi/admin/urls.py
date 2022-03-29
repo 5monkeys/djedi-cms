@@ -4,7 +4,7 @@ from .cms import DjediCMS
 
 app_name = "djedi"
 
-urlpatterns = patterns(
+urlpatterns = [
     url(r"^$", DjediCMS.as_view(), name="cms"),
     url(r"^node/(?P<uri>.+)/editor$", NodeEditor.as_view(), name="cms.editor"),
     url(r"^node/(?P<uri>.+)/load$", LoadApi.as_view(), name="api.load"),
@@ -13,4 +13,4 @@ urlpatterns = patterns(
     url(r"^node/(?P<uri>.+)$", NodeApi.as_view(), name="api"),
     url(r"^plugin/(?P<ext>\w+)$", RenderApi.as_view(), name="api.render"),
     url(r"^api/", include("djedi.rest.urls", namespace="rest")),
-)
+]

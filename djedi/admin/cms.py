@@ -14,12 +14,12 @@ class Admin(ModelAdmin):
     verbose_name_plural = verbose_name
 
     def get_urls(self):
-        return patterns(
+        return [
             url(r"^", include("djedi.admin.urls", namespace="djedi")),
             url(
                 r"", lambda: None, name="djedi_cms_changelist"
             ),  # Placeholder to show change link to CMS in admin
-        )
+        ]
 
     def has_change_permission(self, request, obj=None):
         return has_permission(request)

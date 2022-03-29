@@ -2,9 +2,9 @@ from functools import partial
 
 from django import template
 from django.template import Context
-from django.template.base import Node, TemplateSyntaxError
+from django.template.base import Node, TemplateSyntaxError, generic_tag_compiler
 
-from ..compat import generic_tag_compiler, getargspec
+from ..compat import getargspec
 
 register = template.Library()
 
