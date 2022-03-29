@@ -32,20 +32,12 @@ jobs:
         run: |
           ENV_PREFIX=$(tr -C -d "0-9" <<< "${{ matrix.python-version }}")
           TOXENV=$(tox --listenvs | grep "^py$ENV_PREFIX" | tr '\n' ',') python -m tox
-          TOXENV=lcov python -m tox
-      - name: Report coverage for ${{ matrix.python-version }}
-        if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize')
-        uses: coverallsapp/github-action@1.1.3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: "./coverage.info"
-          parallel: true
-          flag-name: python-${{ matrix.python-version }}
+      - name: Generate coverage
+        if: matrix.python-version == '3.9' && github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize')
+        run: TOXENV=lcov python -m tox
       - name: Finish coverage report
         if: matrix.python-version == '3.9' && github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize')
         uses: coverallsapp/github-action@1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: "./coverage.info"
-          parallel: true
-          parallel-finished: true
