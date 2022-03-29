@@ -2,10 +2,7 @@ from django.core.cache import InvalidCacheBackendError
 from django.utils.encoding import smart_bytes, smart_text
 from cio.backends.base import CacheBackend
 from django.core.cache.backends.locmem import LocMemCache
-
-from cio.backends.base import CacheBackend
-from djedi.compat import get_cache
-from djedi.utils.encoding import smart_str, smart_unicode
+from django.core.cache import caches
 
 
 class DjangoCacheBackend(CacheBackend):

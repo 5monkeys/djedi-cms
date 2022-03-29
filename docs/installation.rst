@@ -66,7 +66,7 @@ If the Django ``AdminSite`` already is enabled, and `included <django-admin-site
 
     # urls.py
 
-    from django.conf.urls import patterns, include
+    from django.conf.urls import include
     from django.contrib import admin
 
     admin.autodiscover()

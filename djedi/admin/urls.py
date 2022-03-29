@@ -1,4 +1,4 @@
-from ..compat import include, patterns, url
+from ..compat import include, url
 from .api import LoadApi, NodeApi, NodeEditor, PublishApi, RenderApi, RevisionsApi
 from .cms import DjediCMS
 

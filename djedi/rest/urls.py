@@ -1,6 +1,6 @@
 from django.http import Http404
 
-from ..compat import patterns, url
+from ..compat import url
 from .api import EmbedApi, NodesApi
 
 app_name = "rest"

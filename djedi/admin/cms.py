@@ -4,7 +4,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import View
 
 from ..auth import has_permission
-from ..compat import include, patterns, render, url
+from ..compat import include, render, url
 from .mixins import DjediContextMixin
 
 
