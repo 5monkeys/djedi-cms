@@ -10,10 +10,8 @@ import cio
 from cio.conf import settings as cio_settings
 from djedi import configure
 
-if django.VERSION < (1, 8):
-    DEBUG_CURSOR_ATTR = "use_debug_cursor"
-else:
-    DEBUG_CURSOR_ATTR = "force_debug_cursor"
+
+DEBUG_CURSOR_ATTR = "force_debug_cursor"
 
 
 class DjediTest(TransactionTestCase):
