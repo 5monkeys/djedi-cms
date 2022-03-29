@@ -15,14 +15,6 @@ from django.urls import reverse, NoReverseMatch
 
 
 def patterns(*urls):
-    if django.VERSION < (1, 6):
-        from django.conf.urls.defaults import patterns
-
-        return patterns("", *urls)
-    elif django.VERSION < (1, 10):
-        from django.conf.urls import patterns
-
-        return patterns("", *urls)
     return list(urls)
 
 
@@ -72,13 +64,11 @@ if django.VERSION >= (1, 8):
             super(TemplateResponse, self).__init__(*args, **kwargs)
 
 
-if django.VERSION < (1, 9):
-    from django.core.cache import get_cache
-else:
-    from django.core.cache import caches
+from django.core.cache import caches
 
-    def get_cache(name):
-        return caches[name]
+
+def get_cache(name):
+    return caches[name]
 
 
 from collections import namedtuple

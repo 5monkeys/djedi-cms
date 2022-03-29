@@ -6,10 +6,7 @@ from ..compat import include, patterns, url
 
 admin.autodiscover()
 
-if django.VERSION < (2, 0):
-    admin_urls = include(admin.site.urls)
-else:
-    admin_urls = admin.site.urls
+admin_urls = admin.site.urls
 
 urlpatterns = patterns(
     url(r"^$", lambda r: render(r, "index.html"), name="index"),
