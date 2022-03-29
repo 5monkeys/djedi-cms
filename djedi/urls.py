@@ -1,10 +1,8 @@
 from django.urls import path
 
-from .compat import include, patterns
+from .compat import include
 
 app_name = "djedi"
 
 
-urlpatterns = patterns(
-    path("", include("djedi.admin.urls", namespace="djedi")),
-)
+urlpatterns = [path("", include("djedi.admin.urls", namespace="djedi"))]
