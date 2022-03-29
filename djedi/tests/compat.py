@@ -1,12 +1,9 @@
-import django
+# Django 1.8+ has multiple template engines, we only test Django's for now.
+from django.template import engines
 
 
 def cmpt_context(context):
     return context
-
-
-# Django 1.8+ has multiple template engines, we only test Django's for now.
-from django.template import engines
 
 
 def get_template_from_string(template_code):
