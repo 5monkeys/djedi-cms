@@ -2,9 +2,7 @@ from unittest import skip
 
 import cio.conf
 from djedi.tests.base import ClientTest
-from djedi.utils.encoding import smart_unicode
-
-from ..compat import reverse
+from django.urls import reverse
 
 
 class PanelTest(ClientTest):

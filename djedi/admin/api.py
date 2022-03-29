@@ -19,6 +19,8 @@ from ..compat import TemplateResponse
 from .exceptions import InvalidNodeData
 from .mixins import DjediContextMixin, JSONResponseMixin
 
+from django.template.response import TemplateResponse
+
 
 class APIView(View):
     @csrf_exempt
@@ -223,4 +225,5 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
                 "djedi/plugins/base/editor.html",
             ],
             self.get_context_data(**context),
+            using="django",
         )

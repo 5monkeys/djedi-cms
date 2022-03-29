@@ -2,12 +2,12 @@ import logging
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import translation
+from django.urls import reverse, NoReverseMatch
 
 import cio
 from cio.conf import settings
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
-from djedi.compat import NoReverseMatch, reverse
 from djedi.utils.templates import render_embed
 
 _log = logging.getLogger(__name__)

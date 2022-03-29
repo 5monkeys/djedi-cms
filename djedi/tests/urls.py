@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.shortcuts import render
 
-from ..compat import include, url
+from django.conf.urls import include, url
 
 admin.autodiscover()
 

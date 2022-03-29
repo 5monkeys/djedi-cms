@@ -15,7 +15,7 @@ from djedi.plugins.form import BaseEditorForm
 from djedi.tests.base import ClientTest, DjediTest, UserMixin
 from django.utils.encoding import smart_text
 
-from ..compat import reverse
+from django.urls import reverse
 
 
 def json_node(response, simple=True):

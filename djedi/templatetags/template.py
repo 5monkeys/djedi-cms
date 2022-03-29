@@ -3,10 +3,50 @@ from functools import partial
 from django import template
 from django.template import Context
 from django.template.base import Node, TemplateSyntaxError
+from django.template.library import parse_bits
+from collections import namedtuple
+from inspect import getfullargspec
 
-from ..compat import getargspec, generic_tag_compiler
 
 register = template.Library()
+
+
+ArgSpec = namedtuple("ArgSpec", ["args", "varargs", "keywords", "defaults"])
+
+
+def getargspec(func):
+    spec = getfullargspec(func)
+    return ArgSpec(
+        args=spec.args,
+        varargs=spec.varargs,
+        keywords=spec.varkw,
+        defaults=spec.defaults,
+    )
+
+
+def generic_tag_compiler(
+    parser, token, params, varargs, varkw, defaults, name, takes_context, node_class
+):
+    """
+     Returns a template.Node subclass.
+     This got inlined into django.template.library since Django since 1.9, this here
+     is a copypasta replacement:
+    https://github.com/django/django/blob/stable/1.8.x/django/template/base.py#L1089
+    """
+    bits = token.split_contents()[1:]
+    args, kwargs = parse_bits(
+        parser=parser,
+        bits=bits,
+        params=params,
+        varargs=varargs,
+        varkw=varkw,
+        defaults=defaults,
+        kwonly=(),
+        kwonly_defaults=(),
+        takes_context=takes_context,
+        name=name,
+    )
+    return node_class(takes_context, args, kwargs)
 
 
 def lazy_tag(self, func=None, takes_context=None, name=None, node_class=None):

@@ -4,8 +4,9 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import View
 
 from ..auth import has_permission
-from ..compat import include, render, url
+from django.conf.urls import include, url
 from .mixins import DjediContextMixin
+from django.shortcuts import render
 
 
 class Admin(ModelAdmin):
@@ -40,6 +41,8 @@ class DjediCMS(DjediContextMixin, View):
     @xframe_options_exempt
     def get(self, request):
         if has_permission(request):
-            return render(request, "djedi/cms/cms.html", self.get_context_data())
+            return render(
+                request, "djedi/cms/cms.html", self.get_context_data(), using="django"
+            )
         else:
             raise PermissionDenied
