@@ -1,16 +1,14 @@
 from collections import namedtuple
 from functools import partial
 from inspect import getfullargspec
+from collections import namedtuple
 
 import django
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse as BaseTemplateResponse
-
-
+from django.core.cache import caches
 from django.conf.urls import include, url
-
-
 from django.urls import reverse, NoReverseMatch
 
 
