@@ -32,7 +32,7 @@ jobs:
         run: |
           ENV_PREFIX=$(tr -C -d "0-9" <<< "${{ matrix.python-version }}")
           TOXENV=$(tox --listenvs | grep "^py$ENV_PREFIX" | tr '\n' ',') python -m tox
-          make coverage-lcov
+          TOXENV=lcov python -m tox
       - name: Report coverage for ${{ matrix.python-version }}
         if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize')
         uses: coverallsapp/github-action@1.1.3
