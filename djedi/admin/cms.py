@@ -10,13 +10,15 @@ from .mixins import DjediContextMixin
 
 class Admin(ModelAdmin):
 
-    verbose_name = 'CMS'
+    verbose_name = "CMS"
     verbose_name_plural = verbose_name
 
     def get_urls(self):
         return patterns(
-            url(r'^', include('djedi.admin.urls', namespace='djedi')),
-            url(r'', lambda: None, name='djedi_cms_changelist')  # Placeholder to show change link to CMS in admin
+            url(r"^", include("djedi.admin.urls", namespace="djedi")),
+            url(
+                r"", lambda: None, name="djedi_cms_changelist"
+            ),  # Placeholder to show change link to CMS in admin
         )
 
     def has_change_permission(self, request, obj=None):
@@ -35,10 +37,9 @@ class Admin(ModelAdmin):
 
 
 class DjediCMS(DjediContextMixin, View):
-
     @xframe_options_exempt
     def get(self, request):
         if has_permission(request):
-            return render(request, 'djedi/cms/cms.html', self.get_context_data())
+            return render(request, "djedi/cms/cms.html", self.get_context_data())
         else:
             raise PermissionDenied

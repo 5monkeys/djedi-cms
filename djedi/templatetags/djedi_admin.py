@@ -8,17 +8,19 @@ from cio.pipeline import pipeline
 from djedi.auth import has_permission
 from djedi.utils.templates import render_embed
 
-
 register = template.Library()
 logger = logging.getLogger(__name__)
 
 
 @register.simple_tag(takes_context=True)
 def djedi_admin(context):
-    output = u''
+    output = ""
 
-    if has_permission(context.get('request')):
-        defaults = dict((node.uri.clone(version=None), node.initial) for node in pipeline.history.list('get'))
+    if has_permission(context.get("request")):
+        defaults = {
+            node.uri.clone(version=None): node.initial
+            for node in pipeline.history.list("get")
+        }
         output = render_embed(nodes=defaults)
 
     # Clear pipeline
@@ -29,8 +31,8 @@ def djedi_admin(context):
 
 @register.simple_tag
 def djedi_xss_domain():
-    domain = cio.conf.settings.get('XSS_DOMAIN')
+    domain = cio.conf.settings.get("XSS_DOMAIN")
     if domain:
-        return mark_safe(u'<script>document.domain = "{domain}";</script>'.format(domain=domain))
+        return mark_safe(f'<script>document.domain = "{domain}";</script>')
 
-    return u''
+    return ""

@@ -5,10 +5,10 @@ Djedi is configured in your django project's ``settings.py`` with the ``DJEDI`` 
 
 .. code-block:: python
 
-    DJEDI = dict(
-        ENVIRONMENT = {}
+    DJEDI = {
+        "ENVIRONMENT": {}
         # ...
-    )
+    }
 
 
 Environment
@@ -17,10 +17,10 @@ Environment
 .. code-block:: python
 
     ENVIRONMENT = {
-        'default': {
-            'i18n': 'en-us',  # May be tuple representing fallback chain
-            'l10n': 'local',
-            'g11n': 'global'
+        "default": {
+            "i18n": "en-us",  # May be tuple representing fallback chain
+            "l10n": "local",
+            "g11n": "global",
         }
     }
 
@@ -29,17 +29,17 @@ Backends
 ~~~~~~~~
 .. code-block:: python
 
-    CACHE = 'djedi.backends.django.cache.Backend'  # 'locmem://'
-    STORAGE = 'djedi.backends.django.db.Backend'   # 'sqlite://:memory:'
+    CACHE = "djedi.backends.django.cache.Backend"  # 'locmem://'
+    STORAGE = "djedi.backends.django.db.Backend"  # 'sqlite://:memory:'
 
 Backends may also be configured dict wise to allow additional backend specific config:
 
 .. code-block:: python
 
     CACHE = {
-        'BACKEND': 'djedi.backends.django.cache.Backend',
-        'NAME': 'djedi',
-        'FOO': 'bar',
+        "BACKEND": "djedi.backends.django.cache.Backend",
+        "NAME": "djedi",
+        "FOO": "bar",
     }
 
 Pipeline
@@ -47,11 +47,11 @@ Pipeline
 .. code-block:: python
 
     PIPELINE = (
-        'cio.pipeline.pipes.cache.CachePipe',
-        'cio.pipeline.pipes.meta.MetaPipe',
-        'cio.pipeline.pipes.plugin.PluginPipe',
-        'cio.pipeline.pipes.storage.StoragePipe',
-        'cio.pipeline.pipes.storage.NamespaceFallbackPipe',
+        "cio.pipeline.pipes.cache.CachePipe",
+        "cio.pipeline.pipes.meta.MetaPipe",
+        "cio.pipeline.pipes.plugin.PluginPipe",
+        "cio.pipeline.pipes.storage.StoragePipe",
+        "cio.pipeline.pipes.storage.NamespaceFallbackPipe",
     )
 
 
@@ -65,8 +65,7 @@ Built-in themes is enabled through their names and external themes needs their f
 .. code-block:: python
 
     # Built-in themes (darth|luke)
-    THEME = 'darth'
+    THEME = "darth"
 
     # External themes
-    THEME = '/static/path/to/theme.css'
-
+    THEME = "/static/path/to/theme.css"

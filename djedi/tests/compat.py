@@ -6,6 +6,7 @@ def cmpt_context(context):
         return context
 
     from django.template import Context
+
     return Context(context)
 
 
@@ -16,7 +17,7 @@ else:
     from django.template import engines
 
     def get_template_from_string(template_code):
-        return engines['django'].from_string(template_code)
+        return engines["django"].from_string(template_code)
 
 
-__all__ = ['cmpt_context', 'get_template_from_string']
+__all__ = ["cmpt_context", "get_template_from_string"]
