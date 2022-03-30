@@ -1,7 +1,6 @@
 import shutil
 from contextlib import contextmanager
 
-import django
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.test import Client, TransactionTestCase
@@ -9,7 +8,6 @@ from django.test import Client, TransactionTestCase
 import cio
 from cio.conf import settings as cio_settings
 from djedi import configure
-
 
 DEBUG_CURSOR_ATTR = "force_debug_cursor"
 

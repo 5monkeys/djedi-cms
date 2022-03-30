@@ -2,8 +2,11 @@ import textwrap
 
 from django import template
 from django.template import TemplateSyntaxError
-from .template import register
 from django.template.library import parse_bits
+
+import cio
+
+from .template import register
 
 
 def render_node(node, context=None, edit=True):

@@ -1,15 +1,13 @@
 from collections import namedtuple
 from functools import partial
 from inspect import getfullargspec
-from collections import namedtuple
 
-import django
+from django.conf.urls import include, url
 from django.shortcuts import render
+from django.template.library import parse_bits
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse as BaseTemplateResponse
-from django.conf.urls import include, url
-from django.urls import reverse, NoReverseMatch
-from django.template.library import parse_bits
+from django.urls import reverse
 
 
 def generic_tag_compiler(
@@ -44,7 +42,7 @@ render = partial(render, using="django")
 class TemplateResponse(BaseTemplateResponse):
     def __init__(self, *args, **kwargs):
         kwargs["using"] = "django"
-        super(TemplateResponse, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 ArgSpec = namedtuple("ArgSpec", ["args", "varargs", "keywords", "defaults"])

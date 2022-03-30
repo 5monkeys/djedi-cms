@@ -1,12 +1,11 @@
+from collections import namedtuple
 from functools import partial
+from inspect import getfullargspec
 
 from django import template
 from django.template import Context
 from django.template.base import Node, TemplateSyntaxError
 from django.template.library import parse_bits
-from collections import namedtuple
-from inspect import getfullargspec
-
 
 register = template.Library()
 

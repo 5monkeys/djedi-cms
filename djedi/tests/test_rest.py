@@ -3,6 +3,8 @@ import os
 import simplejson as json
 from django.core.files import File
 from django.test import Client
+from django.urls import reverse
+from django.utils.encoding import smart_text
 from django.utils.http import urlquote
 
 import cio
@@ -13,9 +15,6 @@ from cio.plugins import plugins
 from cio.utils.uri import URI
 from djedi.plugins.form import BaseEditorForm
 from djedi.tests.base import ClientTest, DjediTest, UserMixin
-from django.utils.encoding import smart_text
-
-from django.urls import reverse
 
 
 def json_node(response, simple=True):
@@ -172,7 +171,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.delete("api", node.uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(smart_text(response.content), u"")
+        self.assertEqual(smart_text(response.content), "")
 
         with self.assertRaises(NodeDoesNotExist):
             storage.get("i18n://sv-se@page/title")
@@ -221,7 +220,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.post("api.render", "md", {"data": "# Djedi"})
         assert response.status_code == 200
-        self.assertRenderedMarkdown(smart_text(response.content), u"# Djedi")
+        self.assertRenderedMarkdown(smart_text(response.content), "# Djedi")
 
         response = self.post(
             "api.render",
@@ -236,7 +235,7 @@ class PrivateRestTest(ClientTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             smart_text(response.content),
-            u'<img alt="" height="64" src="/foo/bar.png" width="64" />',
+            '<img alt="" height="64" src="/foo/bar.png" width="64" />',
         )
 
     def test_editor(self):

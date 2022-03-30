@@ -1,12 +1,12 @@
+from django.conf.urls import include, url
 from django.contrib.admin import ModelAdmin
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import render
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import View
 
 from ..auth import has_permission
-from django.conf.urls import include, url
 from .mixins import DjediContextMixin
-from django.shortcuts import render
 
 
 class Admin(ModelAdmin):

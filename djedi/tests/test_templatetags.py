@@ -1,15 +1,16 @@
 from django.contrib.auth.models import User
-from django.template import TemplateSyntaxError
-from django.template import engines
+from django.template import TemplateSyntaxError, engines
+
+import cio
 from cio.backends import cache
 from cio.pipeline import pipeline
 from djedi.templatetags.template import register
-from djedi.tests.base import DjediTest, AssertionMixin
+from djedi.tests.base import AssertionMixin, DjediTest
 
 
 class TagTest(DjediTest, AssertionMixin):
     def render(self, source, context=None):
-        source = u"{% load djedi_tags %}" + source.strip()
+        source = "{% load djedi_tags %}" + source.strip()
         return engines["django"].from_string(source).render(context).strip()
 
     def test_node_tag(self):

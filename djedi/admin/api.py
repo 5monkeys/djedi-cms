@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.template.response import TemplateResponse
 from django.utils.http import urlunquote
 from django.views.decorators.cache import never_cache
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -15,11 +16,8 @@ from cio.utils.uri import URI
 from djedi.plugins.base import DjediPlugin
 
 from .. import auth
-from ..compat import TemplateResponse
 from .exceptions import InvalidNodeData
 from .mixins import DjediContextMixin, JSONResponseMixin
-
-from django.template.response import TemplateResponse
 
 
 class APIView(View):

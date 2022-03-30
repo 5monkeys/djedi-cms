@@ -1,6 +1,6 @@
+from django.conf.urls import url
 from django.http import Http404
 
-from django.conf.urls import url
 from .api import EmbedApi, NodesApi
 
 app_name = "rest"

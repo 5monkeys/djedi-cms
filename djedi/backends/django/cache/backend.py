@@ -1,8 +1,8 @@
-from django.core.cache import InvalidCacheBackendError
-from django.utils.encoding import smart_bytes, smart_text
-from cio.backends.base import CacheBackend
+from django.core.cache import InvalidCacheBackendError, caches
 from django.core.cache.backends.locmem import LocMemCache
-from django.core.cache import caches
+from django.utils.encoding import smart_bytes, smart_text
+
+from cio.backends.base import CacheBackend
 
 
 class DjangoCacheBackend(CacheBackend):
@@ -51,14 +51,14 @@ class DjangoCacheBackend(CacheBackend):
         """
         if content is None:
             content = self.NONE
-        return smart_bytes("|".join([six.text_type(uri), content]))
+        return smart_bytes("|".join([str(uri), content]))
 
     def _decode_content(self, content):
         """
         Split node string to uri and content and convert back to unicode.
         """
         content = smart_text(content)
-        uri, _, content = content.partition(u"|")
+        uri, _, content = content.partition("|")
         if content == self.NONE:
             content = None
         return uri or None, content
@@ -73,9 +73,7 @@ class DebugLocMemCache(LocMemCache):
         super().__init__(*args, **kwargs)
 
     def get(self, key, default=None, version=None, **kwargs):
-        result = super(DebugLocMemCache, self).get(
-            key, default=default, version=version
-        )
+        result = super().get(key, default=default, version=version)
         if kwargs.get("count", True):
             self.calls += 1
             if result is None:

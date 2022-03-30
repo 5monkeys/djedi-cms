@@ -1,9 +1,9 @@
 import json
 
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import reverse, NoReverseMatch
-from django.template.loader import render_to_string
 from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.urls import NoReverseMatch, reverse
 
 
 def render_embed(nodes=None, request=None):

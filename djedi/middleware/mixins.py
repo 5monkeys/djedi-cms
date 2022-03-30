@@ -1,8 +1,8 @@
 import logging
 
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import NoReverseMatch, reverse
 from django.utils import translation
-from django.urls import reverse, NoReverseMatch
 
 import cio
 from cio.conf import settings

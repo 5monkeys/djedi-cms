@@ -71,9 +71,10 @@ If the Django ``AdminSite`` already is enabled, and `included <django-admin-site
 
     admin.autodiscover()
 
-    urlpatterns = ['',
-        (r'^admin/', include(admin.site.urls)),
-    )]
+    urlpatterns = [
+        "",
+        (r"^admin/", include(admin.site.urls)),
+    ]
 
 
 If you're not using, or don't want to use, Django admin you can always include ``djedi.urls`` within the `admin` namespace instead.
@@ -82,8 +83,9 @@ If you're not using, or don't want to use, Django admin you can always include `
 
     # urls.py
 
-    urlpatterns = ['',
-        (r'^djedi/', include('djedi.urls', namespace='admin')),
+    urlpatterns = [
+        "",
+        (r"^djedi/", include("djedi.urls", namespace="admin")),
     ]
 
 
