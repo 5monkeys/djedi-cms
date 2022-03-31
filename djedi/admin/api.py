@@ -15,9 +15,10 @@ from cio.plugins.exceptions import UnknownPlugin
 from cio.utils.uri import URI
 
 from .. import auth
+from ..compat import TemplateResponse
+from ..plugins.base import DjediPlugin
 from .exceptions import InvalidNodeData
 from .mixins import DjediContextMixin, JSONResponseMixin
-from .plugins.base import DjediPlugin
 
 
 class APIView(View):
