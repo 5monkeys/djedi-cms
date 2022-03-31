@@ -1,8 +1,8 @@
 from collections import defaultdict
-from djedi.plugins.base import DjediPlugin
 
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, Http404, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.template.response import TemplateResponse
 from django.utils.http import urlunquote
 from django.views.decorators.cache import never_cache
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -14,21 +14,20 @@ from cio.plugins import plugins
 from cio.plugins.exceptions import UnknownPlugin
 from cio.utils.uri import URI
 
-from .exceptions import InvalidNodeData
-from .mixins import JSONResponseMixin, DjediContextMixin
-from ..compat import TemplateResponse
 from .. import auth
+from ..plugins.base import DjediPlugin
+from .exceptions import InvalidNodeData
+from .mixins import DjediContextMixin, JSONResponseMixin
 
 
 class APIView(View):
-
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
         if not auth.has_permission(request):
             raise PermissionDenied
 
         try:
-            return super(APIView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         except Http404:
             raise
         except Exception as e:
@@ -50,17 +49,19 @@ class APIView(View):
             if isinstance(value, list) and len(value) <= 1:
                 value = value[0] if value else None
 
-            prefix, _, field = param.partition('[')
+            prefix, _, field = param.partition("[")
             if field:
                 field = field[:-1]
                 try:
                     data[prefix][field] = value
                 except TypeError:
-                    raise InvalidNodeData('Got both reserved parameter "data" and plugin specific parameters.')
+                    raise InvalidNodeData(
+                        'Got both reserved parameter "data" and plugin specific parameters.'
+                    )
             else:
                 data[prefix] = value
 
-        return data['data'], data['meta']
+        return data["data"], data["meta"]
 
     def decode_uri(self, uri):
         decoded = urlunquote(uri)
@@ -71,12 +72,11 @@ class APIView(View):
 
         return decoded
 
-    def render_to_response(self, content=u''):
+    def render_to_response(self, content=""):
         return HttpResponse(content)
 
 
 class NodeApi(JSONResponseMixin, APIView):
-
     @never_cache
     def get(self, request, uri):
         """
@@ -91,10 +91,7 @@ class NodeApi(JSONResponseMixin, APIView):
         if node.content is None:
             raise Http404
 
-        return self.render_to_json({
-            'uri': node.uri,
-            'content': node.content
-        })
+        return self.render_to_json({"uri": node.uri, "content": node.content})
 
     def post(self, request, uri):
         """
@@ -105,7 +102,7 @@ class NodeApi(JSONResponseMixin, APIView):
         """
         uri = self.decode_uri(uri)
         data, meta = self.get_post_data(request)
-        meta['author'] = auth.get_username(request)
+        meta["author"] = auth.get_username(request)
         node = cio.set(uri, data, publish=False, **meta)
         return self.render_to_json(node)
 
@@ -123,7 +120,6 @@ class NodeApi(JSONResponseMixin, APIView):
 
 
 class PublishApi(JSONResponseMixin, APIView):
-
     def put(self, request, uri):
         """
         Publish versioned uri.
@@ -141,7 +137,6 @@ class PublishApi(JSONResponseMixin, APIView):
 
 
 class RevisionsApi(JSONResponseMixin, APIView):
-
     def get(self, request, uri):
         """
         List uri revisions.
@@ -151,12 +146,12 @@ class RevisionsApi(JSONResponseMixin, APIView):
         """
         uri = self.decode_uri(uri)
         revisions = cio.revisions(uri)
-        revisions = [list(revision) for revision in revisions]  # Convert tuples to lists
+        # Convert tuples to lists
+        revisions = [list(revision) for revision in revisions]
         return self.render_to_json(revisions)
 
 
 class LoadApi(JSONResponseMixin, APIView):
-
     @never_cache
     def get(self, request, uri):
         """
@@ -171,7 +166,6 @@ class LoadApi(JSONResponseMixin, APIView):
 
 
 class RenderApi(APIView):
-
     def post(self, request, ext):
         """
         Render data for plugin and return text response.
@@ -188,7 +182,6 @@ class RenderApi(APIView):
 
 
 class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
-
     @never_cache
     @xframe_options_exempt
     def get(self, request, uri):
@@ -210,11 +203,11 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
     def post(self, request, uri):
         uri = self.decode_uri(uri)
         data, meta = self.get_post_data(request)
-        meta['author'] = auth.get_username(request)
+        meta["author"] = auth.get_username(request)
         node = cio.set(uri, data, publish=False, **meta)
 
         context = cio.load(node.uri)
-        context['content'] = node.content
+        context["content"] = node.content
 
         if request.is_ajax():
             return self.render_to_json(context)
@@ -222,7 +215,12 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
             return self.render_plugin(request, context)
 
     def render_plugin(self, request, context):
-        return TemplateResponse(request, [
-            'djedi/plugins/%s/editor.html' % context['uri'].ext,
-            'djedi/plugins/base/editor.html'
-        ], self.get_context_data(**context))
+        return TemplateResponse(
+            request,
+            [
+                "djedi/plugins/%s/editor.html" % context["uri"].ext,
+                "djedi/plugins/base/editor.html",
+            ],
+            self.get_context_data(**context),
+            using="django",
+        )

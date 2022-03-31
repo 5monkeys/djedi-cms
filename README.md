@@ -2,7 +2,7 @@
 
 Django content management as it should be.
 
-[![Build Status](https://travis-ci.org/5monkeys/djedi-cms.svg?branch=master)](https://travis-ci.org/5monkeys/djedi-cms)
+[![Build Status](https://github.com/5monkeys/djedi-cms/workflows/CI/badge.svg)](https://github.com/5monkeys/djedi-cms/actions)
 [![Coverage Status](https://coveralls.io/repos/5monkeys/djedi-cms/badge.svg?branch=master&service=github)](https://coveralls.io/github/5monkeys/djedi-cms?branch=master)
 [![Version](https://img.shields.io/pypi/v/djedi-cms.svg)](https://pypi.python.org/pypi/djedi-cms/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/djedi-cms.svg)](https://pypi.python.org/pypi/djedi-cms/)
@@ -28,11 +28,11 @@ Example settings for Django 2.0:
 
 INSTALLED_APPS = (
     # ...
-    'djedi',
+    "djedi",
 )
 
 MIDDLEWARE = [
-    'djedi.middleware.translation.DjediTranslationMiddleware',
+    "djedi.middleware.translation.DjediTranslationMiddleware",
     # ...
 ]
 ```
@@ -49,7 +49,7 @@ $ django-admin.py migrate djedi
 # urls.py
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 ]
 ```
 

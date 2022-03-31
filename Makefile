@@ -18,9 +18,14 @@ coverage:
 	coverage combine || true
 	coverage report
 
+.PHONY: coverage-lcov
+coverage-lcov:
+	coverage combine || true
+	coverage lcov -o coverage.info
+
 .PHONY: lint
 lint:
-	flake8 djedi
+	pre-commit run --all-files
 
 .PHONY: install
 install:
