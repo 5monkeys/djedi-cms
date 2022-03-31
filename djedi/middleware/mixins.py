@@ -1,26 +1,26 @@
 import logging
 
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import NoReverseMatch, reverse
 from django.utils import translation
 
 import cio
 from cio.conf import settings
 from cio.pipeline import pipeline
 from djedi.auth import has_permission
-from djedi.compat import NoReverseMatch, reverse
 from djedi.utils.templates import render_embed
 
 _log = logging.getLogger(__name__)
 
 
-class TranslationMixin(object):
+class TranslationMixin:
     def activate_language(self):
         # Activate current django translation
         language = translation.get_language()
         cio.env.push_state(i18n=language)
 
 
-class AdminPanelMixin(object):
+class AdminPanelMixin:
     def inject_admin_panel(self, request, response):
         # Do not inject admin panel on gzipped responses
         if "gzip" in response.get("Content-Encoding", ""):
@@ -82,7 +82,7 @@ class AdminPanelMixin(object):
             return uri
 
         defaults = {
-            (get_requested_uri(node), node.initial)
+            get_requested_uri(node): node.initial
             for node in pipeline.history.list("get")
         }
 

@@ -6,7 +6,6 @@
 .gitignore
 .next/
 .stuff/
-.travis.yml
 .venv/
 Dockerfile
 dist/

@@ -1,12 +1,11 @@
 import textwrap
 
-import six
 from django import template
 from django.template import TemplateSyntaxError
+from django.template.library import parse_bits
 
 import cio
 
-from ..compat import parse_bits
 from .template import register
 
 
@@ -16,9 +15,7 @@ def render_node(node, context=None, edit=True):
     """
     output = node.render(**context or {}) or ""
     if edit:
-        return '<span data-i18n="{0}">{1}</span>'.format(
-            node.uri.clone(scheme=None, ext=None, version=None), output
-        )
+        return f'<span data-i18n="{node.uri.clone(scheme=None, ext=None, version=None)}">{output}</span>'
     else:
         return output
 
@@ -47,7 +44,16 @@ class BlockNode(template.Node):
         bits = token.split_contents()[1:]
         params = ("uri", "edit")
         args, kwargs = parse_bits(
-            parser, bits, params, None, True, (True,), None, "blocknode"
+            parser=parser,
+            bits=bits,
+            params=params,
+            varargs=None,
+            varkw=True,
+            defaults=(True,),
+            kwonly=(),
+            kwonly_defaults=(),
+            takes_context=None,
+            name="blocknode",
         )
 
         # Assert uri is the only tag arg
@@ -62,7 +68,7 @@ class BlockNode(template.Node):
         parser.delete_first_token()  # Remove endblocknode tag
 
         # Render default content tokens and dedent common leading whitespace
-        default = "".join((token.render({}) for token in tokens))
+        default = "".join(token.render({}) for token in tokens)
         default = default.strip("\n\r")
         default = textwrap.dedent(default)
 
@@ -79,7 +85,7 @@ class BlockNode(template.Node):
     def render(self, context):
         # Resolve tag kwargs against context
         resolved_kwargs = {
-            (key, value.resolve(context)) for key, value in six.iteritems(self.kwargs)
+            key: value.resolve(context) for key, value in self.kwargs.items()
         }
         edit = resolved_kwargs.pop("edit", True)
 

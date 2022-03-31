@@ -21,16 +21,14 @@ def get_custom_render_widget(cls):
 
             name = deprefix(name)
 
-            return super(CustomRenderWidget, self).render(
-                "data[%s]" % name, *args, **kwargs
-            )
+            return super().render("data[%s]" % name, *args, **kwargs)
 
     return CustomRenderWidget
 
 
 class BaseEditorForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        super(BaseEditorForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         for field in list(self.fields.keys()):
             self.fields[field].widget.__class__ = get_custom_render_widget(

@@ -2,7 +2,7 @@
 *.egg
 *.egg-info
 *.eggs/
-.coverage
+.coverage*
 .idea
 .DS_Store
 .tox

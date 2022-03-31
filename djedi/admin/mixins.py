@@ -8,7 +8,7 @@ from cio.conf import settings
 # TODO: Switch simplejson to ujson or other?
 
 
-class JSONResponseMixin(object):
+class JSONResponseMixin:
     """
     A mixin that can be used to render a JSON response.
     """
@@ -29,14 +29,12 @@ class JSONResponseMixin(object):
         return json.dumps(context, indent=4, for_json=True)
 
 
-class DjediContextMixin(object):
+class DjediContextMixin:
     def get_context_data(self, **context):
         theme = settings.THEME
 
         if "/" not in theme:
-            theme = "{static}djedi/themes/{theme}/theme.css".format(
-                static=django_settings.STATIC_URL, theme=theme
-            )
+            theme = f"{django_settings.STATIC_URL}djedi/themes/{theme}/theme.css"
 
         context["THEME"] = theme
         context["VERSION"] = djedi.__version__

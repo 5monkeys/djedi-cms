@@ -1,7 +1,6 @@
 import shutil
 from contextlib import contextmanager
 
-import django
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.test import Client, TransactionTestCase
@@ -10,10 +9,7 @@ import cio
 from cio.conf import settings as cio_settings
 from djedi import configure
 
-if django.VERSION < (1, 8):
-    DEBUG_CURSOR_ATTR = "use_debug_cursor"
-else:
-    DEBUG_CURSOR_ATTR = "force_debug_cursor"
+DEBUG_CURSOR_ATTR = "force_debug_cursor"
 
 
 class DjediTest(TransactionTestCase):
@@ -33,13 +29,13 @@ class DjediTest(TransactionTestCase):
 
     @contextmanager
     def settings(self, *args, **kwargs):
-        with super(DjediTest, self).settings(*args, **kwargs):
+        with super().settings(*args, **kwargs):
             with cio_settings():
                 configure()
                 yield
 
 
-class AssertionMixin(object):
+class AssertionMixin:
     def assertKeys(self, dict, *keys):
         self.assertEqual(set(dict.keys()), set(keys))
 
@@ -57,13 +53,13 @@ class AssertionMixin(object):
         yield
 
         if calls >= 0:
-            assert _cache.calls == calls, "%s != %s" % (_cache.calls, calls)
+            assert _cache.calls == calls, f"{_cache.calls} != {calls}"
         if hits >= 0:
-            assert _cache.hits == hits, "%s != %s" % (_cache.hits, hits)
+            assert _cache.hits == hits, f"{_cache.hits} != {hits}"
         if misses >= 0:
-            assert _cache.misses == misses, "%s != %s" % (_cache.misses, misses)
+            assert _cache.misses == misses, f"{_cache.misses} != {misses}"
         if sets >= 0:
-            assert _cache.sets == sets, "%s != %s" % (_cache.sets, sets)
+            assert _cache.sets == sets, f"{_cache.sets} != {sets}"
 
     @contextmanager
     def assertDB(self, calls=-1, selects=-1, inserts=-1, updates=-1):
@@ -80,16 +76,16 @@ class AssertionMixin(object):
         setattr(connection, DEBUG_CURSOR_ATTR, pre_debug_cursor)
 
         if calls >= 0:
-            assert num_queries == calls, "%s != %s" % (num_queries, calls)
+            assert num_queries == calls, f"{num_queries} != {calls}"
         if selects >= 0:
             num_selects = len([q for q in queries if q["sql"].startswith("SELECT")])
-            assert num_selects == selects, "%s != %s" % (num_selects, selects)
+            assert num_selects == selects, f"{num_selects} != {selects}"
         if inserts >= 0:
             num_inserts = len([q for q in queries if q["sql"].startswith("INSERT")])
-            assert num_inserts == inserts, "%s != %s" % (num_inserts, inserts)
+            assert num_inserts == inserts, f"{num_inserts} != {inserts}"
         if updates >= 0:
             num_updates = len([q for q in queries if q["sql"].startswith("UPDATE")])
-            assert num_updates == updates, "%s != %s" % (num_updates, updates)
+            assert num_updates == updates, f"{num_updates} != {updates}"
 
     def assertRenderedMarkdown(self, value, source):
         if cio.PY26:
@@ -101,7 +97,7 @@ class AssertionMixin(object):
             self.assertEqual(value, rendered)
 
 
-class UserMixin(object):
+class UserMixin:
     def create_djedi_master(self):
         user = User.objects.create_superuser("master", "master@djedi.io", "test")
         return user
@@ -119,7 +115,7 @@ class UserMixin(object):
 
 class ClientTest(DjediTest, UserMixin, AssertionMixin):
     def setUp(self):
-        super(ClientTest, self).setUp()
+        super().setUp()
         master = self.create_djedi_master()
         client = Client(enforce_csrf_checks=True)
         client.login(username=master.username, password="test")

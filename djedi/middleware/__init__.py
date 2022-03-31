@@ -2,7 +2,7 @@ import cio
 from cio.pipeline import pipeline
 
 
-class DjediMiddleware(object):
+class DjediMiddleware:
     def __init__(self, get_response=None):
         self.get_response = get_response
 

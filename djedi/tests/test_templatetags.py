@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.template import TemplateSyntaxError
+from django.template import TemplateSyntaxError, engines
 
 import cio
 from cio.backends import cache
@@ -7,14 +7,11 @@ from cio.pipeline import pipeline
 from djedi.templatetags.template import register
 from djedi.tests.base import AssertionMixin, DjediTest
 
-from .compat import cmpt_context, get_template_from_string
-
 
 class TagTest(DjediTest, AssertionMixin):
     def render(self, source, context=None):
         source = "{% load djedi_tags %}" + source.strip()
-        context = cmpt_context(context or {})
-        return get_template_from_string(source).render(context).strip()
+        return engines["django"].from_string(source).render(context).strip()
 
     def test_node_tag(self):
         html = self.render("{% node 'page/title' edit=False %}")
@@ -153,7 +150,7 @@ class TagTest(DjediTest, AssertionMixin):
 
         user = User(first_name="Jonas", last_name="Lundberg")
 
-        class RequestMock(object):
+        class RequestMock:
             def __init__(self, user):
                 self.user = user
 

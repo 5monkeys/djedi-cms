@@ -3,6 +3,8 @@ import os
 import simplejson as json
 from django.core.files import File
 from django.test import Client
+from django.urls import reverse
+from django.utils.encoding import smart_text
 from django.utils.http import urlquote
 
 import cio
@@ -13,9 +15,6 @@ from cio.plugins import plugins
 from cio.utils.uri import URI
 from djedi.plugins.form import BaseEditorForm
 from djedi.tests.base import ClientTest, DjediTest, UserMixin
-from djedi.utils.encoding import smart_unicode
-
-from ..compat import reverse
 
 
 def json_node(response, simple=True):
@@ -27,7 +26,7 @@ def json_node(response, simple=True):
 
 class PermissionTest(DjediTest, UserMixin):
     def setUp(self):
-        super(PermissionTest, self).setUp()
+        super().setUp()
         self.master = self.create_djedi_master()
         self.apprentice = self.create_djedi_apprentice()
 
@@ -172,7 +171,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.delete("api", node.uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(smart_unicode(response.content), "")
+        self.assertEqual(smart_text(response.content), "")
 
         with self.assertRaises(NodeDoesNotExist):
             storage.get("i18n://sv-se@page/title")
@@ -221,7 +220,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.post("api.render", "md", {"data": "# Djedi"})
         assert response.status_code == 200
-        self.assertRenderedMarkdown(smart_unicode(response.content), "# Djedi")
+        self.assertRenderedMarkdown(smart_text(response.content), "# Djedi")
 
         response = self.post(
             "api.render",
@@ -235,7 +234,7 @@ class PrivateRestTest(ClientTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            smart_unicode(response.content),
+            smart_text(response.content),
             '<img alt="" height="64" src="/foo/bar.png" width="64" />',
         )
 
@@ -251,7 +250,10 @@ class PrivateRestTest(ClientTest):
             self.assertEqual(response.status_code, 200)
             if ext == "img":
                 assert set(response.context_data.keys()) == {
-                    ("THEME", "VERSION", "uri", "forms")
+                    "THEME",
+                    "VERSION",
+                    "uri",
+                    "forms",
                 }
                 assert "HTML" in response.context_data["forms"]
                 assert isinstance(
@@ -264,13 +266,7 @@ class PrivateRestTest(ClientTest):
                 )
 
             else:
-                assert set(response.context_data.keys()) == {
-                    (
-                        "THEME",
-                        "VERSION",
-                        "uri",
-                    )
-                }
+                assert set(response.context_data.keys()) == {"THEME", "VERSION", "uri"}
 
             self.assertNotIn(b"document.domain", response.content)
 
@@ -349,7 +345,7 @@ class PublicRestTest(ClientTest):
     def test_embed(self):
         url = reverse("admin:djedi:rest:embed")
         response = self.client.get(url)
-        html = smart_unicode(response.content)
+        html = smart_text(response.content)
 
         self.assertIn('iframe id="djedi-cms"', html)
         cms_url = "http://testserver" + reverse("admin:djedi:cms")
