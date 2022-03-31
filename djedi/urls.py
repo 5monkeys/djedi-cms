@@ -1,16 +1,7 @@
-import django
-
-from .compat import include, patterns, url
+from django.conf.urls import include
+from django.urls import path
 
 app_name = "djedi"
 
-if django.VERSION < (2, 0):
-    urlpatterns = patterns(
-        url(r"^", include("djedi.admin.urls", namespace="djedi")),
-    )
-else:
-    from django.urls import path
 
-    urlpatterns = patterns(
-        path("", include("djedi.admin.urls", namespace="djedi")),
-    )
+urlpatterns = [path("", include("djedi.admin.urls", namespace="djedi"))]

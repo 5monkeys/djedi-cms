@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Djedi CMS documentation build configuration file, created by
 # sphinx-quickstart on Wed Sep 25 15:37:10 2013.

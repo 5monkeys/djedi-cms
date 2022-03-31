@@ -1,8 +1,9 @@
 import json
 
 from django.core.exceptions import ImproperlyConfigured
-
-from ..compat import NoReverseMatch, render, render_to_string, reverse
+from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.urls import NoReverseMatch, reverse
 
 
 def render_embed(nodes=None, request=None):
@@ -17,7 +18,7 @@ def render_embed(nodes=None, request=None):
                     "exclude_json_nodes": True,
                 }
             )
-            output = render(request, "djedi/cms/embed.html", context)
+            output = render(request, "djedi/cms/embed.html", context, using="django")
         except NoReverseMatch:
             raise ImproperlyConfigured(
                 "Could not find djedi in your url conf, "
@@ -33,6 +34,6 @@ def render_embed(nodes=None, request=None):
                 "json_nodes": json.dumps(nodes).replace("</", "\\x3C/"),
             }
         )
-        output = render_to_string("djedi/cms/embed.html", context)
+        output = render_to_string("djedi/cms/embed.html", context, using="django")
 
     return output

@@ -1,10 +1,8 @@
-import six
-from django.core.cache import InvalidCacheBackendError
+from django.core.cache import InvalidCacheBackendError, caches
 from django.core.cache.backends.locmem import LocMemCache
+from django.utils.encoding import smart_bytes, smart_text
 
 from cio.backends.base import CacheBackend
-from djedi.compat import get_cache
-from djedi.utils.encoding import smart_str, smart_unicode
 
 
 class DjangoCacheBackend(CacheBackend):
@@ -12,11 +10,11 @@ class DjangoCacheBackend(CacheBackend):
         """
         Get cache backend. Look for djedi specific cache first, then fallback on default
         """
-        super(DjangoCacheBackend, self).__init__(**config)
+        super().__init__(**config)
 
         try:
             cache_name = self.config.get("NAME", "djedi")
-            cache = get_cache(cache_name)
+            cache = caches[cache_name]
         except (InvalidCacheBackendError, ValueError):
             from django.core.cache import cache
 
@@ -51,13 +49,13 @@ class DjangoCacheBackend(CacheBackend):
         """
         if content is None:
             content = self.NONE
-        return smart_str("|".join([six.text_type(uri), content]))
+        return smart_bytes("|".join([str(uri), content]))
 
     def _decode_content(self, content):
         """
         Split node string to uri and content and convert back to unicode.
         """
-        content = smart_unicode(content)
+        content = smart_text(content)
         uri, _, content = content.partition("|")
         if content == self.NONE:
             content = None
@@ -70,12 +68,10 @@ class DebugLocMemCache(LocMemCache):
         self.hits = 0
         self.misses = 0
         self.sets = 0
-        super(DebugLocMemCache, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get(self, key, default=None, version=None, **kwargs):
-        result = super(DebugLocMemCache, self).get(
-            key, default=default, version=version
-        )
+        result = super().get(key, default=default, version=version)
         if kwargs.get("count", True):
             self.calls += 1
             if result is None:
@@ -97,12 +93,12 @@ class DebugLocMemCache(LocMemCache):
         return d
 
     def set(self, *args, **kwargs):
-        super(DebugLocMemCache, self).set(*args, **kwargs)
+        super().set(*args, **kwargs)
         self.calls += 1
         self.sets += 1
 
     def set_many(self, data, *args, **kwargs):
-        result = super(DebugLocMemCache, self).set_many(data, *args, **kwargs)
+        result = super().set_many(data, *args, **kwargs)
         self.calls -= len(data)  # Remove calls from set()
         self.calls += 1
         return result

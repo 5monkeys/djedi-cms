@@ -16,10 +16,10 @@ class DjangoModelStorageBackend(DatabaseBackend):
     scheme = "db"
 
     def __init__(self, **config):
-        super(DjangoModelStorageBackend, self).__init__(**config)
+        super().__init__(**config)
 
     def get_many(self, uris):
-        storage_keys = {(self._build_key(uri), uri) for uri in uris}
+        storage_keys = {self._build_key(uri): uri for uri in uris}
         stored_nodes = Node.objects.filter(key__in=storage_keys.keys())
         stored_nodes = stored_nodes.values_list(
             "key", "content", "plugin", "version", "is_published", "meta"
@@ -103,7 +103,7 @@ class DjangoModelStorageBackend(DatabaseBackend):
                 meta=meta,
             )
         except IntegrityError as e:
-            raise PersistenceError('Failed to create node for uri "%s"; %s' % (uri, e))
+            raise PersistenceError(f'Failed to create node for uri "{uri}"; {e}')
 
     def _update(self, uri, content, **meta):
         node = self._get(uri)

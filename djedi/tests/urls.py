@@ -1,18 +1,11 @@
-import django
+from django.conf.urls import include, url
 from django.contrib import admin
-from django.shortcuts import render_to_response
-
-from ..compat import include, patterns, url
+from django.shortcuts import render
 
 admin.autodiscover()
 
-if django.VERSION < (2, 0):
-    admin_urls = include(admin.site.urls)
-else:
-    admin_urls = admin.site.urls
-
-urlpatterns = patterns(
-    url(r"^$", lambda r: render_to_response("index.html"), name="index"),
-    url(r"^adm1n/", admin_urls),
+urlpatterns = [
+    url(r"^$", lambda r: render(r, "index.html"), name="index"),
+    url(r"^adm1n/", admin.site.urls),
     url(r"^djed1/", include("djedi.urls", namespace="admin")),
-)
+]

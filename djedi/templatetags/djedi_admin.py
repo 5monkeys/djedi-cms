@@ -18,7 +18,7 @@ def djedi_admin(context):
 
     if has_permission(context.get("request")):
         defaults = {
-            (node.uri.clone(version=None), node.initial)
+            node.uri.clone(version=None): node.initial
             for node in pipeline.history.list("get")
         }
         output = render_embed(nodes=defaults)
@@ -33,8 +33,6 @@ def djedi_admin(context):
 def djedi_xss_domain():
     domain = cio.conf.settings.get("XSS_DOMAIN")
     if domain:
-        return mark_safe(
-            '<script>document.domain = "{domain}";</script>'.format(domain=domain)
-        )
+        return mark_safe(f'<script>document.domain = "{domain}";</script>')
 
     return ""

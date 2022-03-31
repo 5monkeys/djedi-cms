@@ -52,12 +52,9 @@ class ImagePluginBase(FormsBasePlugin):
     def _create_filename(self, filename, **kwargs):
         name, ext = path.splitext(filename)
         dir, name = name.rsplit(path.sep, 1)
-        name += "".join(
-            sorted(key + str(value) for key, value in six.iteritems(kwargs))
-        )
+        name += "".join(sorted(key + str(value) for key, value in kwargs.items()))
 
-        if six.PY3:
-            name = name.encode("utf-8")
+        name = name.encode("utf-8")
 
         name = sha1(name).hexdigest()
         subdir = name[:2]
@@ -133,7 +130,7 @@ class ImagePluginBase(FormsBasePlugin):
         if file:
             file.close()
 
-        content = super(ImagePluginBase, self).save(data, dumps=False)
+        content = super().save(data, dumps=False)
         content.update(
             {
                 "filename": filename,
@@ -181,10 +178,9 @@ class ImagePluginBase(FormsBasePlugin):
                 attrs["class"] = attr_class
 
         html_attrs = (
-            '{0}="{1}"'.format(attr, escape(attrs[attr]))
-            for attr in sorted(attrs.keys())
+            f'{attr}="{escape(attrs[attr])}"' for attr in sorted(attrs.keys())
         )
-        return "<img {0} />".format(" ".join(html_attrs))
+        return "<img {} />".format(" ".join(html_attrs))
 
 
 class ImagePlugin(ImagePluginBase):

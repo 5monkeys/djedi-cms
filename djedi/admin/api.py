@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.template.response import TemplateResponse
 from django.utils.http import urlunquote
 from django.views.decorators.cache import never_cache
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -14,7 +15,6 @@ from cio.plugins.exceptions import UnknownPlugin
 from cio.utils.uri import URI
 
 from .. import auth
-from ..compat import TemplateResponse
 from ..plugins.base import DjediPlugin
 from .exceptions import InvalidNodeData
 from .mixins import DjediContextMixin, JSONResponseMixin
@@ -27,7 +27,7 @@ class APIView(View):
             raise PermissionDenied
 
         try:
-            return super(APIView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         except Http404:
             raise
         except Exception as e:
@@ -222,4 +222,5 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
                 "djedi/plugins/base/editor.html",
             ],
             self.get_context_data(**context),
+            using="django",
         )

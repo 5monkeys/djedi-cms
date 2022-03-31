@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from sys import version_info
 
 from setuptools import find_packages, setup
 
@@ -11,12 +10,9 @@ install_requires = [
 
 tests_require = [
     "coverage",
-    "Markdown <= 2.4.1",
-    "Pillow <= 3.4.2",
+    "Markdown <= 3.3.0",
+    "Pillow",
 ]
-
-if version_info < (3,):
-    tests_require += ["unittest2"]
 
 version = __import__("djedi").__version__
 
@@ -28,8 +24,8 @@ setup(
         ".. image:: https://djedi-cms.org/_static/djedi-portrait.svg\n\n"
         "- Read the documentation_\n"
         "- Browse the source_\n\n"
-        ".. image:: https://travis-ci.org/5monkeys/djedi-cms.svg?branch=master\n"
-        "    :target: https://travis-ci.org/5monkeys/djedi-cms\n"
+        ".. image:: https://github.com/5monkeys/djedi-cms/workflows/CI/badge.svg\n"
+        "    :target: https://github.com/5monkeys/djedi-cms/actions\n\n"
         ".. image:: https://coveralls.io/repos/5monkeys/djedi-cms/badge.svg?branch=master\n"
         "    :target: https://coveralls.io/r/5monkeys/djedi-cms?branch=master\n\n"
         ".. _documentation: https://djedi-cms.org/\n"
@@ -61,13 +57,11 @@ setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
