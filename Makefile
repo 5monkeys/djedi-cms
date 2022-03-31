@@ -25,7 +25,7 @@ coverage-lcov:
 
 .PHONY: lint
 lint:
-	pre-commit
+	pre-commit run --all-files
 
 .PHONY: install
 install:
