@@ -40,6 +40,7 @@ class PanelTest(ClientTest):
             response = self.client.get(url)
             self.assertIn(b'document.domain = "foobar.se"', response.content)
 
+    # pragma: nocover
     @skip("Unfinished admin view is hidden")
     def test_django_admin(self):
         # Patch django admin index
