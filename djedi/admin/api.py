@@ -146,9 +146,8 @@ class RevisionsApi(JSONResponseMixin, APIView):
         """
         uri = self.decode_uri(uri)
         revisions = cio.revisions(uri)
-        revisions = [
-            list(revision) for revision in revisions
-        ]  # Convert tuples to lists
+        # Convert tuples to lists
+        revisions = [list(revision) for revision in revisions]
         return self.render_to_json(revisions)
 
 
