@@ -12,5 +12,5 @@ class Node(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        app_label = u'djedi'
-        db_table = 'djedi_node'
+        app_label = "djedi"
+        db_table = "djedi_node"

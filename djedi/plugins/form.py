@@ -1,11 +1,13 @@
 import json
-from djedi.plugins.base import DjediPlugin
+
 from django import forms
+
+from djedi.plugins.base import DjediPlugin
 
 
 def deprefix(s):
     # Remove prefix (anything including and before __)
-    return s.rpartition('__')[-1]
+    return s.rpartition("__")[-1]
 
 
 def get_custom_render_widget(cls):
@@ -20,9 +22,7 @@ def get_custom_render_widget(cls):
             name = deprefix(name)
 
             return super(CustomRenderWidget, self).render(
-                "data[%s]" % name,
-                *args,
-                **kwargs
+                "data[%s]" % name, *args, **kwargs
             )
 
     return CustomRenderWidget
@@ -46,12 +46,7 @@ class FormsBasePlugin(DjediPlugin):
         return {}
 
     def get_editor_context(self, **context):
-        context.update(
-            {"forms": {
-                tab: form()
-                for tab, form in self.forms.items()
-            }}
-        )
+        context.update({"forms": {tab: form() for tab, form in self.forms.items()}})
 
         return context
 

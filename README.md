@@ -28,11 +28,11 @@ Example settings for Django 2.0:
 
 INSTALLED_APPS = (
     # ...
-    'djedi',
+    "djedi",
 )
 
 MIDDLEWARE = [
-    'djedi.middleware.translation.DjediTranslationMiddleware',
+    "djedi.middleware.translation.DjediTranslationMiddleware",
     # ...
 ]
 ```
@@ -49,7 +49,7 @@ $ django-admin.py migrate djedi
 # urls.py
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 ]
 ```
 

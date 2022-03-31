@@ -30,11 +30,11 @@ Add ``djedi`` to ``INSTALLED_APPS`` and suitable djedi middleware to ``MIDDLEWAR
 
     INSTALLED_APPS = (
         # ...
-        'djedi',
+        "djedi",
     )
 
     MIDDLEWARE_CLASSES = (
-        'djedi.middleware.translation.DjediTranslationMiddleware',
+        "djedi.middleware.translation.DjediTranslationMiddleware",
         # ...
     )
 
@@ -71,8 +71,9 @@ If the Django ``AdminSite`` already is enabled, and `included <django-admin-site
 
     admin.autodiscover()
 
-    urlpatterns = patterns('',
-        (r'^admin/', include(admin.site.urls)),
+    urlpatterns = patterns(
+        "",
+        (r"^admin/", include(admin.site.urls)),
     )
 
 
@@ -82,8 +83,9 @@ If you're not using, or don't want to use, Django admin you can always include `
 
     # urls.py
 
-    urlpatterns = patterns('',
-        (r'^djedi/', include('djedi.urls', namespace='admin')),
+    urlpatterns = patterns(
+        "",
+        (r"^djedi/", include("djedi.urls", namespace="admin")),
     )
 
 

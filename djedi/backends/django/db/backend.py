@@ -1,6 +1,7 @@
 import logging
 
 from django.db import IntegrityError
+
 from cio.backends.base import DatabaseBackend
 from cio.backends.exceptions import NodeDoesNotExist, PersistenceError
 
@@ -12,15 +13,17 @@ logger = logging.getLogger(__name__)
 
 class DjangoModelStorageBackend(DatabaseBackend):
 
-    scheme = 'db'
+    scheme = "db"
 
     def __init__(self, **config):
         super(DjangoModelStorageBackend, self).__init__(**config)
 
     def get_many(self, uris):
-        storage_keys = dict((self._build_key(uri), uri) for uri in uris)
+        storage_keys = {(self._build_key(uri), uri) for uri in uris}
         stored_nodes = Node.objects.filter(key__in=storage_keys.keys())
-        stored_nodes = stored_nodes.values_list('key', 'content', 'plugin', 'version', 'is_published', 'meta')
+        stored_nodes = stored_nodes.values_list(
+            "key", "content", "plugin", "version", "is_published", "meta"
+        )
 
         # Filter matching nodes
         nodes = {}
@@ -34,9 +37,9 @@ class DjangoModelStorageBackend(DatabaseBackend):
                 if (uri.version == version) or (is_published and not uri.version):
                     meta = self._decode_meta(meta, is_published=is_published)
                     nodes[uri] = {
-                        'uri': uri.clone(ext=plugin, version=version),
-                        'content': content,
-                        'meta': meta
+                        "uri": uri.clone(ext=plugin, version=version),
+                        "content": content,
+                        "meta": meta,
                     }
 
         return nodes
@@ -47,7 +50,9 @@ class DjangoModelStorageBackend(DatabaseBackend):
         if not node.is_published:
             # Assign version number
             if not node.version.isdigit():
-                revisions = Node.objects.filter(key=node.key).values_list('version', flat=True)
+                revisions = Node.objects.filter(key=node.key).values_list(
+                    "version", flat=True
+                )
                 version = self._get_next_version(revisions)
                 node.version = version
 
@@ -63,9 +68,12 @@ class DjangoModelStorageBackend(DatabaseBackend):
 
     def get_revisions(self, uri):
         key = self._build_key(uri)
-        nodes = Node.objects.filter(key=key).order_by('date_created')
-        revisions = nodes.values_list('plugin', 'version', 'is_published')
-        return [(key.clone(ext=plugin, version=version), is_published) for plugin, version, is_published in revisions]
+        nodes = Node.objects.filter(key=key).order_by("date_created")
+        revisions = nodes.values_list("plugin", "version", "is_published")
+        return [
+            (key.clone(ext=plugin, version=version), is_published)
+            for plugin, version, is_published in revisions
+        ]
 
     def _get(self, uri):
         key = self._build_key(uri)
@@ -92,7 +100,7 @@ class DjangoModelStorageBackend(DatabaseBackend):
                 plugin=uri.ext,
                 version=uri.version,
                 is_published=False,
-                meta=meta
+                meta=meta,
             )
         except IntegrityError as e:
             raise PersistenceError('Failed to create node for uri "%s"; %s' % (uri, e))
@@ -115,9 +123,9 @@ class DjangoModelStorageBackend(DatabaseBackend):
     def _serialize(self, uri, node):
         meta = self._decode_meta(node.meta, is_published=node.is_published)
         return {
-            'uri': uri.clone(ext=node.plugin, version=node.version),
-            'content': node.content,
-            'meta': meta
+            "uri": uri.clone(ext=node.plugin, version=node.version),
+            "content": node.content,
+            "meta": meta,
         }
 
     def _update_meta(self, node, meta):

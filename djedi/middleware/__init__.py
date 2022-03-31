@@ -3,7 +3,6 @@ from cio.pipeline import pipeline
 
 
 class DjediMiddleware(object):
-
     def __init__(self, get_response=None):
         self.get_response = get_response
 
@@ -12,8 +11,7 @@ class DjediMiddleware(object):
         if not response:
             try:
                 response = self.get_response(request)
-                response = self.process_response(request=request,
-                                                 response=response)
+                response = self.process_response(request=request, response=response)
             except Exception as e:
                 self.process_exception(request=request, exception=e)
                 raise

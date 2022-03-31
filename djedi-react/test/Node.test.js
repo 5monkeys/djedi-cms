@@ -319,7 +319,7 @@ test("it handles nodes with null value in response", async () => {
 <span
   data-i18n="en-us@test"
 >
-  
+
 </span>
 `);
 });
@@ -773,7 +773,7 @@ Network error",
     <span
       data-i18n="en-us@5"
     >
-      
+
     </span>
   </article>
 </div>

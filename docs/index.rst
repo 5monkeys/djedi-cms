@@ -17,9 +17,7 @@ If you cannot upgrade South then you need to set SOUTH_MIGRATION_MODULES_.
 
 .. code-block:: python
 
-   SOUTH_MIGRATION_MODULES = {
-      'djedi': 'djedi.south_migrations'
-   }
+   SOUTH_MIGRATION_MODULES = {"djedi": "djedi.south_migrations"}
 
 
 User Guide

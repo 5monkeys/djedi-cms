@@ -1,19 +1,24 @@
-import cio
-import six
 import textwrap
+
+import six
 from django import template
 from django.template import TemplateSyntaxError
-from .template import register
+
+import cio
+
 from ..compat import parse_bits
+from .template import register
 
 
 def render_node(node, context=None, edit=True):
     """
     Render node as html for templates, with edit tagging.
     """
-    output = node.render(**context or {}) or u''
+    output = node.render(**context or {}) or ""
     if edit:
-        return u'<span data-i18n="{0}">{1}</span>'.format(node.uri.clone(scheme=None, ext=None, version=None), output)
+        return '<span data-i18n="{0}">{1}</span>'.format(
+            node.uri.clone(scheme=None, ext=None, version=None), output
+        )
     else:
         return output
 
@@ -24,7 +29,7 @@ def node(key, default=None, edit=True):
     Simple node tag:
     {% node 'page/title' default='Lorem ipsum' edit=True %}
     """
-    node = cio.get(key, default=default or u'')
+    node = cio.get(key, default=default or "")
     return lambda _: render_node(node, edit=edit)
 
 
@@ -35,27 +40,30 @@ class BlockNode(template.Node):
         Lorem ipsum
     {% endblocknode %}
     """
+
     @classmethod
     def tag(cls, parser, token):
         # Parse tag args and kwargs
         bits = token.split_contents()[1:]
-        params = ('uri', 'edit')
-        args, kwargs = parse_bits(parser, bits, params, None, True, (True,), None, 'blocknode')
+        params = ("uri", "edit")
+        args, kwargs = parse_bits(
+            parser, bits, params, None, True, (True,), None, "blocknode"
+        )
 
         # Assert uri is the only tag arg
         if len(args) > 1:
-            raise TemplateSyntaxError('Malformed arguments to blocknode tag')
+            raise TemplateSyntaxError("Malformed arguments to blocknode tag")
 
         # Resolve uri variable
         uri = args[0].resolve({})
 
         # Parse tag body (default content)
-        tokens = parser.parse(('endblocknode',))
+        tokens = parser.parse(("endblocknode",))
         parser.delete_first_token()  # Remove endblocknode tag
 
         # Render default content tokens and dedent common leading whitespace
-        default = u''.join((token.render({}) for token in tokens))
-        default = default.strip('\n\r')
+        default = "".join((token.render({}) for token in tokens))
+        default = default.strip("\n\r")
         default = textwrap.dedent(default)
 
         # Get node for uri, lacks context variable lookup due to lazy loading.
@@ -70,10 +78,12 @@ class BlockNode(template.Node):
 
     def render(self, context):
         # Resolve tag kwargs against context
-        resolved_kwargs = dict((key, value.resolve(context)) for key, value in six.iteritems(self.kwargs))
-        edit = resolved_kwargs.pop('edit', True)
+        resolved_kwargs = {
+            (key, value.resolve(context)) for key, value in six.iteritems(self.kwargs)
+        }
+        edit = resolved_kwargs.pop("edit", True)
 
         return render_node(self.node, context=resolved_kwargs, edit=edit)
 
 
-register.tag('blocknode', BlockNode.tag)
+register.tag("blocknode", BlockNode.tag)

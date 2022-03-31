@@ -12,9 +12,9 @@ Default settings:
 .. code-block:: python
 
     PLUGINS = (
-        'cio.plugins.txt.TextPlugin',
-        'cio.plugins.md.MarkdownPlugin',
-        'djedi.plugins.img.ImagePlugin',
+        "cio.plugins.txt.TextPlugin",
+        "cio.plugins.md.MarkdownPlugin",
+        "djedi.plugins.img.ImagePlugin",
     )
 
 
@@ -69,7 +69,4 @@ you can configure the image plugin setting ``FILE_STORAGE``.
 
 .. code-block:: python
 
-    IMG = {
-        'FILE_STORAGE': my_file_storage
-    }
-
+    IMG = {"FILE_STORAGE": my_file_storage}
