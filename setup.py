@@ -3,7 +3,11 @@ from sys import version_info
 
 from setuptools import find_packages, setup
 
-install_requires = ["six", "content-io >= 1.2.5", "simplejson >= 3.2.0"]
+install_requires = [
+    "six",
+    "content-io >= 1.2.5",
+    "simplejson >= 3.2.0",
+]
 
 tests_require = [
     "coverage",

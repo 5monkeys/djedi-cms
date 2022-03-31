@@ -32,14 +32,12 @@ class DjangoCacheBackend(CacheBackend):
         return self._cache.get_many(keys)
 
     def _set(self, key, value):
-        self._cache.set(
-            key, value, timeout=None
-        )  # TODO: Fix eternal timeout like viewlet
+        # TODO: Fix eternal timeout like viewlet
+        self._cache.set(key, value, timeout=None)
 
     def _set_many(self, data):
-        self._cache.set_many(
-            data, timeout=None
-        )  # TODO: Fix eternal timeout like viewlet
+        # TODO: Fix eternal timeout like viewlet
+        self._cache.set_many(data, timeout=None)
 
     def _delete(self, key):
         self._cache.delete(key)
