@@ -12,12 +12,12 @@ import cio
 from cio.plugins import plugins
 from cio.plugins.exceptions import UnknownPlugin
 from cio.utils.uri import URI
-from djedi.plugins.base import DjediPlugin
 
 from .. import auth
 from ..compat import TemplateResponse
 from .exceptions import InvalidNodeData
 from .mixins import DjediContextMixin, JSONResponseMixin
+from .plugins.base import DjediPlugin
 
 
 class APIView(View):
