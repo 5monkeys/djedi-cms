@@ -1147,7 +1147,7 @@ You can either install [Node.js] 10 (with npm 6) or use [docker].
 
 ```bash
 # Build:
-docker-compse build
+docker-compose build
 
 # Start containers:
 docker-compose up -d
