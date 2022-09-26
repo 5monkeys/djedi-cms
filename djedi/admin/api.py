@@ -210,7 +210,8 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
         context = cio.load(node.uri)
         context["content"] = node.content
 
-        if request.is_ajax():
+        # is_ajax call?
+        if request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest":
             return self.render_to_json(context)
         else:
             return self.render_plugin(request, context)
