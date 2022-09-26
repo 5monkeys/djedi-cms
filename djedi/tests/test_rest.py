@@ -4,8 +4,7 @@ import simplejson as json
 from django.core.files import File
 from django.test import Client
 from django.urls import reverse
-from django.utils.encoding import smart_text
-from django.utils.http import urlquote
+from django.utils.encoding import smart_str
 
 import cio
 import cio.conf
@@ -171,7 +170,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.delete("api", node.uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(smart_text(response.content), "")
+        self.assertEqual(smart_str(response.content), "")
 
         with self.assertRaises(NodeDoesNotExist):
             storage.get("i18n://sv-se@page/title")
@@ -220,7 +219,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.post("api.render", "md", {"data": "# Djedi"})
         assert response.status_code == 200
-        self.assertRenderedMarkdown(smart_text(response.content), "# Djedi")
+        self.assertRenderedMarkdown(smart_str(response.content), "# Djedi")
 
         response = self.post(
             "api.render",
@@ -234,7 +233,7 @@ class PrivateRestTest(ClientTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            smart_text(response.content),
+            smart_str(response.content),
             '<img alt="" height="64" src="/foo/bar.png" width="64" />',
         )
 
@@ -345,7 +344,7 @@ class PublicRestTest(ClientTest):
     def test_embed(self):
         url = reverse("admin:djedi:rest:embed")
         response = self.client.get(url)
-        html = smart_text(response.content)
+        html = smart_str(response.content)
 
         self.assertIn('iframe id="djedi-cms"', html)
         cms_url = "http://testserver" + reverse("admin:djedi:cms")

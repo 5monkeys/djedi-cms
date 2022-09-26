@@ -1,6 +1,6 @@
 from django.core.cache import InvalidCacheBackendError, caches
 from django.core.cache.backends.locmem import LocMemCache
-from django.utils.encoding import smart_bytes, smart_text
+from django.utils.encoding import smart_bytes, smart_str
 
 from cio.backends.base import CacheBackend
 
@@ -55,7 +55,7 @@ class DjangoCacheBackend(CacheBackend):
         """
         Split node string to uri and content and convert back to unicode.
         """
-        content = smart_text(content)
+        content = smart_str(content)
         uri, _, content = content.partition("|")
         if content == self.NONE:
             content = None
