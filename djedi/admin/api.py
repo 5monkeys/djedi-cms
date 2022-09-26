@@ -1,9 +1,9 @@
 from collections import defaultdict
+from urllib.parse import unquote
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.template.response import TemplateResponse
-from django.utils.http import urlunquote
 from django.views.decorators.cache import never_cache
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -64,7 +64,7 @@ class APIView(View):
         return data["data"], data["meta"]
 
     def decode_uri(self, uri):
-        decoded = urlunquote(uri)
+        decoded = unquote(uri)
 
         # If uri got decoded then recursive try more times until nothing more can be decoded
         if decoded != uri:

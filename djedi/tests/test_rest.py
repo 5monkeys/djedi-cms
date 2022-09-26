@@ -1,4 +1,5 @@
 import os
+from urllib.parse import quote
 
 import simplejson as json
 from django.core.files import File
@@ -50,9 +51,7 @@ class PermissionTest(DjediTest, UserMixin):
 
 class PrivateRestTest(ClientTest):
     def get_api_url(self, url_name, uri):
-        return reverse(
-            "admin:djedi:" + url_name, args=[urlquote(urlquote(uri, ""), "")]
-        )
+        return reverse("admin:djedi:" + url_name, args=[quote(quote(uri, ""), "")])
 
     def get(self, url_name, uri):
         url = self.get_api_url(url_name, uri)
