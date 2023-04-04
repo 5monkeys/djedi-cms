@@ -1,6 +1,13 @@
 include setup.py README.md MANIFEST.in LICENSE AUTHORS
+exclude runtests.py tox.ini *.yml *.yaml Makefile Dockerfile .dockerignore .gitmodules
 
 recursive-include djedi/templates *
 recursive-include djedi/static *
+recursive-include djedi *.py
+recursive-exclude djedi *.html
+recursive-exclude djedi *.png
+recursive-exclude djedi-react *
+recursive-exclude docs *
+recursive-exclude example *
 
 global-exclude *~

@@ -1,0 +1,11 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-publish:
+    uses: less-action/reusables/.github/workflows/python-publish.yaml@v6
+    secrets:
+      pypi_api_token: ${{ secrets.PYPI_API_TOKEN }}
