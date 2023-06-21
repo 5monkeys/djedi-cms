@@ -1,5 +1,6 @@
 import simplejson as json
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
@@ -36,7 +37,7 @@ class NodesApi(APIView):
         {uri: content, uri: content, ...}
     """
 
-    @never_cache
+    @method_decorator(never_cache)
     def post(self, request):
         # Disable caching gets in CachePipe, defaults through this api is not trusted
         cio.conf.settings.configure(local=True, CACHE={"PIPE": {"CACHE_ON_GET": False}})

@@ -1,10 +1,11 @@
 from collections import defaultdict
+from urllib.parse import unquote
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.template.response import TemplateResponse
-from django.utils.http import urlunquote
 from django.utils.safestring import mark_safe
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -23,7 +24,7 @@ from .mixins import DjediContextMixin, JSONResponseMixin
 
 
 class APIView(View):
-    @csrf_exempt
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         if not auth.has_permission(request):
             raise PermissionDenied
@@ -66,7 +67,7 @@ class APIView(View):
         return data["data"], data["meta"]
 
     def decode_uri(self, uri):
-        decoded = urlunquote(uri)
+        decoded = unquote(uri)
 
         # If uri got decoded then recursive try more times until nothing more can be decoded
         if decoded != uri:
@@ -79,7 +80,7 @@ class APIView(View):
 
 
 class NodeApi(JSONResponseMixin, APIView):
-    @never_cache
+    @method_decorator(never_cache)
     def get(self, request, uri):
         """
         Return published node or specified version.
@@ -154,7 +155,7 @@ class RevisionsApi(JSONResponseMixin, APIView):
 
 
 class LoadApi(JSONResponseMixin, APIView):
-    @never_cache
+    @method_decorator(never_cache)
     def get(self, request, uri):
         """
         Load raw node source from storage.
@@ -187,8 +188,8 @@ class RenderApi(APIView):
 
 
 class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
-    @never_cache
-    @xframe_options_exempt
+    @method_decorator(never_cache)
+    @method_decorator(xframe_options_exempt)
     def get(self, request, uri):
         try:
             uri = self.decode_uri(uri)
@@ -199,7 +200,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
         else:
             return self.render_plugin(request, plugin_context)
 
-    @never_cache
+    @method_decorator(never_cache)
     def post(self, request, uri):
         uri = self.decode_uri(uri)
         data, meta = self.get_post_data(request)
@@ -210,7 +211,8 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
         context["content"] = node.content
         context.update(self.get_plugin_context(request, context["uri"]))
 
-        if request.is_ajax():
+        # is_ajax call?
+        if request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest":
             return self.render_to_json(context)
         else:
             return self.render_plugin(request, context)
