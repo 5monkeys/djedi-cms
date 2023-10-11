@@ -2,8 +2,6 @@ from django.db import models
 
 
 class Node(models.Model):
-    id = models.BigAutoField(primary_key=True)
-
     key = models.CharField(max_length=255, db_index=True)
     content = models.TextField(blank=True)
     plugin = models.CharField(max_length=8)
@@ -13,5 +11,4 @@ class Node(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        app_label = "djedi"
         db_table = "djedi_node"
