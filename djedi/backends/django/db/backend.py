@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 class DjangoModelStorageBackend(DatabaseBackend):
-
     scheme = "db"
 
     def __init__(self, **config):
@@ -32,7 +31,6 @@ class DjangoModelStorageBackend(DatabaseBackend):
 
             # Assert requested plugin matches
             if uri.ext in (None, plugin):
-
                 # Assert version matches or node is published
                 if (uri.version == version) or (is_published and not uri.version):
                     meta = self._decode_meta(meta, is_published=is_published)

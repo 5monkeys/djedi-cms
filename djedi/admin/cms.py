@@ -10,7 +10,6 @@ from .mixins import DjediContextMixin
 
 
 class Admin(ModelAdmin):
-
     verbose_name = "CMS"
     verbose_name_plural = verbose_name
 
