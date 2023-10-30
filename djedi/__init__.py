@@ -49,6 +49,7 @@ def configure():
             "cio.plugins.txt.TextPlugin",
             "cio.plugins.md.MarkdownPlugin",
             "djedi.plugins.img.ImagePlugin",
+            "djedi.plugins.list.ListPlugin",
         ],
         "THEME": "darth",
     }
