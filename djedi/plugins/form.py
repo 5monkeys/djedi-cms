@@ -44,7 +44,7 @@ class FormsBasePlugin(DjediPlugin):
         return {}
 
     def get_editor_context(self, request, **context):
-        if not request.is_ajax():
+        if request.META.get("HTTP_X_REQUESTED_WITH") != "XMLHttpRequest":
             context.update({"forms": {tab: form() for tab, form in self.forms.items()}})
 
         return context
