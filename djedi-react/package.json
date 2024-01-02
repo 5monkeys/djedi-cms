@@ -32,6 +32,8 @@
   },
   "dependencies": {
     "dedent-js": "^1.0.1",
+    "dompurify": "^3.0.6",
+    "isomorphic-dompurify": "^2.0.0",
     "prop-types": "^15.5.7"
   },
   "peerDependencies": {
