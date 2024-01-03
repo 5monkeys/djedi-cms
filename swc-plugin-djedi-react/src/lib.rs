@@ -2,28 +2,27 @@
 
 use swc_core::common::{Spanned, DUMMY_SP};
 use swc_core::ecma::ast::{
-    CallExpr, Callee, Expr, ExprOrSpread, ExprStmt, ImportDecl, ImportNamedSpecifier,
+    CallExpr, Callee, Expr, ExprOrSpread, ExprStmt, Ident, ImportDecl, ImportNamedSpecifier,
     ImportSpecifier, JSXText, KeyValueProp, Lit, MemberExpr, ModuleDecl, ModuleItem, Null,
     ObjectLit, Prop, PropOrSpread, Str, TaggedTpl, Tpl,
 };
-use swc_core::ecma::utils::{private_ident, quote_ident};
-use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
-use swc_core::{
-    common::errors::HANDLER,
-    ecma::{
-        ast::{
-            JSXAttrName, JSXAttrOrSpread, JSXAttrValue, JSXElement, JSXElementChild,
-            JSXElementName, JSXExpr, JSXExprContainer, Program,
-        },
-        transforms::testing::test,
-        visit::{as_folder, FoldWith, VisitMut, VisitMutWith},
+use swc_core::ecma::utils::{prepend_stmt, prepend_stmts, private_ident, quote_ident};
+use swc_core::ecma::visit::Fold;
+use swc_core::ecma::{
+    ast::{
+        JSXAttrName, JSXAttrOrSpread, JSXAttrValue, JSXElement, JSXElementChild, JSXElementName,
+        JSXExpr, JSXExprContainer, Program,
     },
+    transforms::testing::test,
+    visit::FoldWith,
 };
+use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
 
-#[derive(Debug, Default)]
-pub struct DjediReact {
-    nodes: Vec<Node>,
-}
+#[cfg(test)]
+use swc_core::common::errors::HANDLER;
+
+#[cfg(not(test))]
+use swc_core::plugin::errors::HANDLER;
 
 const COMPONENT_NAME: &str = "Node";
 const DJEDI_REACT_PACKAGE: &str = "djedi-react";
@@ -34,6 +33,17 @@ struct Node {
     uri: Box<Expr>,
     /// The default value of the node.
     value: Option<Box<Expr>>,
+}
+
+impl TryFrom<&JSXElement> for Node {
+    type Error = ();
+
+    fn try_from(element: &JSXElement) -> Result<Self, Self::Error> {
+        let uri = uri_attr(element).ok_or(())?;
+        let value = default_value(element);
+
+        Ok(Node { uri, value })
+    }
 }
 
 fn is_djedi_node(n: &JSXElement) -> bool {
@@ -171,7 +181,7 @@ fn default_value(element: &JSXElement) -> Option<Box<Expr>> {
                 handler
                     .struct_span_err(
                         element.span,
-                        &format!("<{COMPONENT_NAME} /> must have zero or one child"),
+                        &format!("<{COMPONENT_NAME} /> cannot have more than one child"),
                     )
                     .emit();
             });
@@ -182,97 +192,113 @@ fn default_value(element: &JSXElement) -> Option<Box<Expr>> {
     }
 }
 
-impl DjediReact {
-    fn visit_mut_djedi_node(&mut self, n: &mut JSXElement) {
-        if let Some(uri) = uri_attr(n) {
-            self.nodes.push(Node {
-                uri,
-                value: default_value(n),
-            });
-        }
-    }
+#[derive(Debug, Default)]
+struct Transformer {
+    nodes: Vec<Node>,
 }
 
-impl VisitMut for DjediReact {
-    fn visit_mut_jsx_element(&mut self, n: &mut JSXElement) {
-        if is_djedi_node(n) {
-            self.visit_mut_djedi_node(n);
-        }
-
-        n.visit_mut_children_with(self);
-    }
-
-    fn visit_mut_module_items(&mut self, items: &mut Vec<swc_core::ecma::ast::ModuleItem>) {
-        items.visit_mut_children_with(self);
-
-        let mut new_items = Vec::new();
-        let local_djedi = private_ident!("djedi");
-
-        new_items.push(ModuleItem::ModuleDecl(ModuleDecl::Import(ImportDecl {
+/// Make a call to `djedi.reportPrefetchableNode`.
+///
+/// Something like:
+/// ```js
+/// djedi.reportPrefetchableNode({
+///   uri: "foo",
+///   value: "bar",
+/// });
+/// ```
+fn make_report_call(node: &Node, local_djedi: &Ident) -> ModuleItem {
+    ModuleItem::Stmt(
+        ExprStmt {
             span: DUMMY_SP,
-            specifiers: vec![ImportSpecifier::Named(ImportNamedSpecifier {
+            expr: CallExpr {
                 span: DUMMY_SP,
-                local: local_djedi.clone(),
-                imported: Some(quote_ident!("djedi").into()),
-                is_type_only: false,
-            })],
-            src: Box::new(DJEDI_REACT_PACKAGE.into()),
-            type_only: false,
-            with: None,
-        })));
-
-        for node in &self.nodes {
-            new_items.push(ModuleItem::Stmt(
-                ExprStmt {
-                    span: DUMMY_SP,
-                    expr: CallExpr {
+                callee: Callee::Expr(
+                    MemberExpr {
                         span: DUMMY_SP,
-                        callee: Callee::Expr(
-                            MemberExpr {
-                                span: DUMMY_SP,
-                                obj: local_djedi.clone().into(),
-                                prop: quote_ident!("reportPrefetchableNode").into(),
-                            }
-                            .into(),
-                        ),
-                        args: vec![ExprOrSpread {
-                            spread: None,
-                            expr: ObjectLit {
-                                span: DUMMY_SP,
-                                props: vec![
-                                    PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
-                                        key: quote_ident!("uri").into(),
-                                        value: node.uri.clone(),
-                                    }))),
-                                    PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
-                                        key: quote_ident!("value").into(),
-                                        value: match node.value {
-                                            Some(ref value) => value.clone(),
-                                            None => Null { span: DUMMY_SP }.into(),
-                                        },
-                                    }))),
-                                ],
-                            }
-                            .into(),
-                        }],
-                        type_args: None,
+                        obj: local_djedi.clone().into(),
+                        prop: quote_ident!("reportPrefetchableNode").into(),
                     }
                     .into(),
-                }
-                .into(),
-            ));
+                ),
+                args: vec![ExprOrSpread {
+                    spread: None,
+                    expr: ObjectLit {
+                        span: DUMMY_SP,
+                        props: vec![
+                            PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
+                                key: quote_ident!("uri").into(),
+                                value: node.uri.clone(),
+                            }))),
+                            PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
+                                key: quote_ident!("value").into(),
+                                value: match node.value {
+                                    Some(ref value) => value.clone(),
+                                    None => Null { span: DUMMY_SP }.into(),
+                                },
+                            }))),
+                        ],
+                    }
+                    .into(),
+                }],
+                type_args: None,
+            }
+            .into(),
+        }
+        .into(),
+    )
+}
+
+impl Fold for Transformer {
+    fn fold_jsx_element(&mut self, n: JSXElement) -> JSXElement {
+        if is_djedi_node(&n) {
+            if let Ok(node) = Node::try_from(&n) {
+                self.nodes.push(node);
+            }
+        }
+        n.fold_children_with(self)
+    }
+
+    fn fold_module_items(&mut self, items: Vec<ModuleItem>) -> Vec<ModuleItem> {
+        self.nodes = Vec::new();
+
+        let mut items = items.fold_children_with(self);
+
+        if self.nodes.is_empty() {
+            return items;
         }
 
-        new_items.extend_from_slice(items);
+        let local_djedi = private_ident!("djedi");
 
-        *items = new_items;
+        prepend_stmts(
+            &mut items,
+            self.nodes.iter().map(|n| make_report_call(n, &local_djedi)),
+        );
+
+        // import { djedi as <...> } from "djedi-react";
+        prepend_stmt(
+            &mut items,
+            ModuleItem::ModuleDecl(ModuleDecl::Import(ImportDecl {
+                span: DUMMY_SP,
+                specifiers: vec![ImportSpecifier::Named(ImportNamedSpecifier {
+                    span: DUMMY_SP,
+                    local: local_djedi.clone(),
+                    imported: Some(quote_ident!("djedi").into()),
+                    is_type_only: false,
+                })],
+                src: Box::new(DJEDI_REACT_PACKAGE.into()),
+                type_only: false,
+                with: None,
+            })),
+        );
+
+        items
     }
 }
 
 #[plugin_transform]
 #[allow(clippy::needless_pass_by_value)]
 pub fn process_transform(program: Program, _metadata: TransformPluginProgramMetadata) -> Program {
-    program.fold_with(&mut as_folder(DjediReact::default()))
+    program.fold_with(&mut Transformer::default())
 }
 
 #[cfg(test)]
@@ -285,29 +311,38 @@ fn jsx_syntax() -> swc_ecma_parser::Syntax {
 
 test!(
     jsx_syntax(),
-    |_| as_folder(DjediReact::default()),
+    |_| Transformer::default(),
     template_literal,
     r#"<Node uri="foo">{`simple template literal`}</Node>"#
 );
 
 test!(
     jsx_syntax(),
-    |_| as_folder(DjediReact::default()),
+    |_| Transformer::default(),
     tagged_template_literal,
     r#"<Node uri="foo">{tag`hello world`}</Node>"#
 );
 
 test!(
     jsx_syntax(),
-    |_| as_folder(DjediReact::default()),
+    |_| Transformer::default(),
     markdown_template_literal,
     r#"<Node uri="foo">{md`**Markdown**`}</Node>"#
 );
 
 test!(
     jsx_syntax(),
-    |_| as_folder(DjediReact::default()),
+    |_| Transformer::default(),
+    directives,
+    r#"
+        "use strict";
+        <Node uri="foo">default value</Node>
+    "#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
     nodes,
-    // Input codes
     include_str!("../tests/input.js")
 );

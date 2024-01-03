@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable no-undef, react/jsx-no-undef */
 import { Node, djedi, md } from "djedi-react";
 import React from "react";

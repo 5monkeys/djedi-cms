@@ -1,4 +1,5 @@
-/* eslint-disable no-undef, react/jsx-no-undef */ import { djedi as djedi } from "djedi-react";
+"use client";
+import { djedi as djedi } from "djedi-react";
 djedi.reportPrefetchableNode({
     uri: "intro",
     value: "\n\n    [project] is a cool CMS\n\n  "
@@ -63,7 +64,7 @@ djedi.reportPrefetchableNode({
     uri: "nope 2",
     value: null
 });
-import { Node, djedi as djedi1, md } from "djedi-react";
+/* eslint-disable no-undef, react/jsx-no-undef */ import { Node, djedi as djedi1, md } from "djedi-react";
 import React from "react";
 djedi1.options.baseUrl = "/api";
 const _djedi = "djedi";
