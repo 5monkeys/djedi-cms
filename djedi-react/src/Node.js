@@ -1,3 +1,4 @@
+import { sanitize } from "isomorphic-dompurify";
 import PropTypes from "prop-types";
 import React from "react";
 
@@ -145,7 +146,7 @@ export default class Node extends React.Component {
       render = djedi.options.defaultRender,
       // Make sure to destructure all props above (even ones unused in this
       // method) so that `variables` only contains non-props.
-      ...variables
+      ...unsafeUnsanitizedVariables
     } = this.props;
     const { node } = this.state;
     const { language } = this;
@@ -157,6 +158,14 @@ export default class Node extends React.Component {
     if (node instanceof Error) {
       return render({ type: "error", error: node }, { language });
     }
+
+    // XXX: To prevent XSS injections we need to sanitize the passed variables.
+    const variables = Object.fromEntries(
+      Object.entries(unsafeUnsanitizedVariables).map(([key, value]) => [
+        key,
+        sanitize(value),
+      ])
+    );
 
     // If there’s neither a default value nor a database value, `node.value`
     // will be `null`.
