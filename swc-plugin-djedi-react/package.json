@@ -1,0 +1,14 @@
+{
+    "name": "swc-plugin-djedi-react",
+    "version": "0.1.1",
+    "description": "",
+    "author": "",
+    "license": "ISC",
+    "keywords": ["swc-plugin"],
+    "main": "swc_plugin_djedi_react.wasm",
+    "scripts": {
+        "prepublishOnly": "cargo build-wasi --release && cp target/wasm32-wasi/release/swc_plugin_djedi_react.wasm ."
+    },
+    "files": [],
+    "preferUnplugged": true
+}
