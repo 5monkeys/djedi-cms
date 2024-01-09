@@ -6,7 +6,7 @@ on:
     branches:
       - master
     paths:
-      - 'djedi-react/package-json'
+      - 'djedi-react/package.json'
 
 jobs:
   release:
