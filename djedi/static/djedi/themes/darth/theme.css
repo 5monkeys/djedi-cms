@@ -7819,7 +7819,9 @@ a .icon-flip-vertical:before {
 .flag.flag-nl {
   background-position: -80px -110px;
 }
-.flag.flag-no {
+.flag.flag-no,
+.flag.flag-nb,
+.flag.flag-nn {
   background-position: -96px -110px;
 }
 .flag.flag-np {
