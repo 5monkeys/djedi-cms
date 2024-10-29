@@ -1,5 +1,4 @@
 import simplejson as json
-from django.conf import settings as django_settings
 from django.http import HttpResponse
 from django.templatetags.static import static
 
