@@ -1,6 +1,7 @@
 import simplejson as json
 from django.conf import settings as django_settings
 from django.http import HttpResponse
+from django.templatetags.static import static
 
 import djedi
 from cio.conf import settings
@@ -34,7 +35,7 @@ class DjediContextMixin:
         theme = settings.THEME
 
         if "/" not in theme:
-            theme = f"{django_settings.STATIC_URL}djedi/themes/{theme}/theme.css"
+            theme = static(f"djedi/themes/{theme}/theme.css")
 
         context["THEME"] = theme
         context["VERSION"] = djedi.__version__
