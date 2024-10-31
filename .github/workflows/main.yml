@@ -37,7 +37,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Upgrade packaging tools
-        run: python -m pip install --upgrade pip setuptools virtualenv
+        run: python -m pip install --upgrade pip setuptools==71.1.0 virtualenv
+        # Package setuptools >72 no longer supports 'test_suite' and 'tests_require'
       - name: Install dependencies
         run: python -m pip install --upgrade tox
       - name: Run tox targets for ${{ matrix.python-version }}
