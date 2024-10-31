@@ -44,6 +44,7 @@ jobs:
         run: |
           ENV_PREFIX=$(tr -C -d "0-9" <<< "${{ matrix.python-version }}")
           TOXENV=$(tox --listenvs | grep "^py$ENV_PREFIX" | tr '\n' ',') python -m tox
+        shell: bash
       - uses: actions/upload-artifact@v3
         with:
           name: coverage-files
