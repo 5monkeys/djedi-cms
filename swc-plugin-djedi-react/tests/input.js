@@ -15,7 +15,7 @@ const intro = (
 );
 
 export default function Home() {
-  const link = text => (
+  const link = (text) => (
     <a href={`?page=${text}`}>
       <Node uri="en-us@link.txt" text={text}>
         [text]
@@ -50,6 +50,14 @@ export default function Home() {
         # markdown
 
         example
+      `}</Node>
+      <Node uri="test/text.md">{md`
+        [Cargo.toml,](./Cargo.toml)
+        [Cargo.lock,](./Cargo.lock)
+      `}</Node>
+      <Node uri="test/search.md">{md`
+        [Google,](https://www.google.com)
+        [Bing](https://www.bing.com)
       `}</Node>
       <Node uri="ok 6">
         simple jsx text on its own line (parses differently)

@@ -1,10 +1,12 @@
 #![warn(clippy::pedantic)]
 
+use swc_core::common::pass::Repeated;
 use swc_core::common::{Spanned, DUMMY_SP};
+use swc_core::ecma::ast::Pass;
 use swc_core::ecma::ast::{
-    CallExpr, Callee, Expr, ExprOrSpread, ExprStmt, Ident, ImportDecl, ImportNamedSpecifier,
-    ImportSpecifier, JSXText, KeyValueProp, Lit, MemberExpr, ModuleDecl, ModuleItem, Null,
-    ObjectLit, Prop, PropOrSpread, Str, TaggedTpl, Tpl,
+    CallExpr, Callee, Expr, ExprOrSpread, ExprStmt, Ident, IdentName, ImportDecl,
+    ImportNamedSpecifier, ImportSpecifier, JSXText, KeyValueProp, Lit, MemberExpr, MemberProp,
+    ModuleDecl, ModuleItem, Null, ObjectLit, Prop, PropOrSpread, Str, TaggedTpl, Tpl,
 };
 use swc_core::ecma::utils::{prepend_stmt, prepend_stmts, private_ident, quote_ident};
 use swc_core::ecma::visit::Fold;
@@ -31,7 +33,6 @@ const MARKDOWN_TAG: &str = "md";
 #[derive(Debug)]
 struct Node {
     uri: Box<Expr>,
-    /// The default value of the node.
     value: Option<Box<Expr>>,
 }
 
@@ -48,17 +49,16 @@ impl TryFrom<&JSXElement> for Node {
 
 fn is_djedi_node(n: &JSXElement) -> bool {
     match n.opening.name {
-        JSXElementName::Ident(ref ident) => ident.as_ref() == COMPONENT_NAME,
+        JSXElementName::Ident(ref ident) => ident.sym.as_ref() == COMPONENT_NAME,
         JSXElementName::JSXMemberExpr(_) | JSXElementName::JSXNamespacedName(_) => false,
     }
 }
 
-/// Get the value of the `uri` attribute.
 fn uri_attr(e: &JSXElement) -> Option<Box<Expr>> {
     let value = e.opening.attrs.iter().find_map(|attr| match attr {
         JSXAttrOrSpread::JSXAttr(attr) => match attr.name {
             JSXAttrName::Ident(ref ident) => {
-                if ident.as_ref() == "uri" {
+                if ident.sym.as_ref() == "uri" {
                     attr.value.as_ref()
                 } else {
                     None
@@ -216,7 +216,10 @@ fn make_report_call(node: &Node, local_djedi: &Ident) -> ModuleItem {
                     MemberExpr {
                         span: DUMMY_SP,
                         obj: local_djedi.clone().into(),
-                        prop: quote_ident!("reportPrefetchableNode").into(),
+                        prop: MemberProp::Ident(IdentName::new(
+                            "reportPrefetchableNode".into(),
+                            DUMMY_SP,
+                        )),
                     }
                     .into(),
                 ),
@@ -240,12 +243,28 @@ fn make_report_call(node: &Node, local_djedi: &Ident) -> ModuleItem {
                     }
                     .into(),
                 }],
-                type_args: None,
+                ..Default::default()
             }
             .into(),
         }
         .into(),
     )
+}
+
+impl Repeated for Transformer {
+    fn changed(&self) -> bool {
+        false
+    }
+
+    fn reset(&mut self) {
+        self.nodes.clear();
+    }
+}
+
+impl Pass for Transformer {
+    fn process(&mut self, program: &mut Program) {
+        *program = program.clone().fold_with(self);
+    }
 }
 
 impl Fold for Transformer {
@@ -288,6 +307,7 @@ impl Fold for Transformer {
                 src: Box::new(DJEDI_REACT_PACKAGE.into()),
                 type_only: false,
                 with: None,
+                phase: Default::default(),
             })),
         );
 
@@ -303,7 +323,7 @@ pub fn process_transform(program: Program, _metadata: TransformPluginProgramMeta
 
 #[cfg(test)]
 fn jsx_syntax() -> swc_ecma_parser::Syntax {
-    swc_ecma_parser::Syntax::Es(swc_ecma_parser::EsConfig {
+    swc_ecma_parser::Syntax::Es(swc_ecma_parser::EsSyntax {
         jsx: true,
         ..Default::default()
     })
@@ -333,6 +353,23 @@ test!(
 test!(
     jsx_syntax(),
     |_| Transformer::default(),
+    markdown_with_links,
+    r#"(<div>
+      <Node uri="test/text.md">{md`
+        [Cargo.toml,](./Cargo.toml)
+       [Cargo.lock,](./Cargo.lock)
+      `}</Node>
+      <Node uri="test/search.md">{md`
+        [Google](https://www.google.com)
+        [Bing](https://www.bing.com)
+      `}</Node>
+    </div>);
+"#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
     directives,
     r#"
         "use strict";
@@ -345,4 +382,101 @@ test!(
     |_| Transformer::default(),
     nodes,
     include_str!("../tests/input.js")
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
+    simple_node_with_text,
+    r#"<Node uri="example">Hello World</Node>"#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
+    simple_node_without_default,
+    r#"<Node uri="test/uri" />"#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
+    multiple_nodes,
+    r#"
+    <div>
+        <Node uri="header">Header Text</Node>
+        <Node uri="footer">Footer Text</Node>
+    </div>
+    "#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
+    node_with_string_literal_uri,
+    r#"<Node uri={"string.literal"}>Content</Node>"#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
+    node_with_template_literal_default,
+    r#"<Node uri="test">{`template literal content`}</Node>"#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
+    node_with_markdown,
+    r#"<Node uri="content.md">{md`markdown content`}</Node>"#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
+    preserves_existing_imports,
+    r#"
+    import React from "react";
+    import { Node } from "djedi-react";
+    
+    <Node uri="test">Hello</Node>
+    "#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
+    nested_nodes_in_component,
+    r#"
+    function MyComponent() {
+        return (
+            <div>
+                <Node uri="title">Title</Node>
+                <div>
+                    <Node uri="nested">Nested Content</Node>
+                </div>
+            </div>
+        );
+    }
+    "#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
+    node_with_additional_props,
+    r#"<Node uri="test" className="custom" data-id="123">Content</Node>"#
+);
+
+test!(
+    jsx_syntax(),
+    |_| Transformer::default(),
+    ignores_non_node_components,
+    r#"
+    <div>
+        <TreeNode uri="test">Should not transform</TreeNode>
+        <node uri="lowercase">Should not transform</node>
+        <Node uri="actual">Should transform</Node>
+    </div>
+    "#
 );
