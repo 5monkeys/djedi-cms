@@ -1,5 +1,6 @@
 #![warn(clippy::pedantic)]
 
+use pulldown_cmark::{html, Options, Parser};
 use swc_core::common::pass::Repeated;
 use swc_core::common::{Spanned, DUMMY_SP};
 use swc_core::ecma::ast::Pass;
@@ -30,9 +31,61 @@ const COMPONENT_NAME: &str = "Node";
 const DJEDI_REACT_PACKAGE: &str = "djedi-react";
 const MARKDOWN_TAG: &str = "md";
 
+/// Dedent a string by removing common leading whitespace from all lines.
+/// This mimics the behavior of the dedent-js library used in the babel plugin.
+fn dedent(s: &str) -> String {
+    let lines: Vec<&str> = s.lines().collect();
+
+    if lines.is_empty() {
+        return String::new();
+    }
+
+    // Find the minimum indentation (excluding empty lines)
+    let min_indent = lines
+        .iter()
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| line.len() - line.trim_start().len())
+        .min()
+        .unwrap_or(0);
+
+    // Remove the common indentation from all lines
+    lines
+        .iter()
+        .map(|line| {
+            if line.trim().is_empty() {
+                ""
+            } else if line.len() >= min_indent {
+                &line[min_indent..]
+            } else {
+                line
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+        .trim()
+        .to_string()
+}
+
+/// Convert markdown to HTML using pulldown-cmark.
+fn markdown_to_html(markdown: &str) -> String {
+    let options = Options::empty();
+    let parser = Parser::new_ext(markdown, options);
+    let mut html_output = String::new();
+    html::push_html(&mut html_output, parser);
+
+    // Remove the wrapping <p> tags if present and trim
+    html_output = html_output.trim().to_string();
+    if html_output.starts_with("<p>") && html_output.ends_with("</p>") {
+        html_output = html_output[3..html_output.len() - 4].to_string();
+    }
+
+    html_output
+}
+
 #[derive(Debug)]
 struct Node {
     uri: Box<Expr>,
+    /// The default value of the node.
     value: Option<Box<Expr>>,
 }
 
@@ -81,7 +134,7 @@ fn uri_attr(e: &JSXElement) -> Option<Box<Expr>> {
         return None;
     };
 
-    let expr = value.as_str_expr();
+    let expr = value.as_string_content().map(|content| content.to_expr());
 
     if expr.is_none() {
         HANDLER.with(|handler| {
@@ -97,27 +150,61 @@ fn uri_attr(e: &JSXElement) -> Option<Box<Expr>> {
     expr
 }
 
-trait AsStrExpr {
-    fn as_str_expr(&self) -> Option<Box<Expr>>;
+#[derive(Debug)]
+enum StringContent {
+    /// Plain text content
+    Plain(String),
+    /// Markdown content that should be converted to HTML
+    Markdown(String),
 }
 
-impl AsStrExpr for Lit {
-    fn as_str_expr(&self) -> Option<Box<Expr>> {
+impl StringContent {
+    fn to_expr(&self) -> Box<Expr> {
+        match self {
+            StringContent::Plain(s) => Box::new(Expr::Lit(Lit::Str(Str {
+                span: DUMMY_SP,
+                value: dedent(s).into(),
+                raw: None,
+            }))),
+            StringContent::Markdown(s) => {
+                let dedented = dedent(s);
+                let html = markdown_to_html(&dedented);
+                Box::new(Expr::Lit(Lit::Str(Str {
+                    span: DUMMY_SP,
+                    value: html.into(),
+                    raw: None,
+                })))
+            }
+        }
+    }
+}
+
+trait AsStringContent {
+    fn as_string_content(&self) -> Option<StringContent>;
+}
+
+impl AsStringContent for Lit {
+    fn as_string_content(&self) -> Option<StringContent> {
         match self {
             Lit::Str(Str { value, .. }) | Lit::JSXText(JSXText { value, .. }) => {
-                Some(Box::new(Expr::Lit(value.clone().into())))
+                Some(StringContent::Plain(value.to_string()))
             }
             _ => None,
         }
     }
 }
 
-impl AsStrExpr for JSXExprContainer {
-    fn as_str_expr(&self) -> Option<Box<Expr>> {
-        fn tpl_to_expr(tpl: &Tpl) -> Option<Box<Expr>> {
+impl AsStringContent for JSXExprContainer {
+    fn as_string_content(&self) -> Option<StringContent> {
+        fn tpl_to_content(tpl: &Tpl, is_markdown: bool) -> Option<StringContent> {
             // only allow template literals without substitutions
             if tpl.exprs.is_empty() && tpl.quasis.len() == 1 {
-                Some(Box::new(Expr::Lit(tpl.quasis[0].raw.clone().into())))
+                let content = tpl.quasis[0].raw.to_string();
+                Some(if is_markdown {
+                    StringContent::Markdown(content)
+                } else {
+                    StringContent::Plain(content)
+                })
             } else {
                 None
             }
@@ -125,10 +212,12 @@ impl AsStrExpr for JSXExprContainer {
 
         match &self.expr {
             JSXExpr::Expr(e) => match e.as_ref() {
-                Expr::Lit(lit) => lit.as_str_expr(),
-                Expr::Tpl(tpl) => tpl_to_expr(tpl),
+                Expr::Lit(lit) => lit.as_string_content(),
+                Expr::Tpl(tpl) => tpl_to_content(tpl, false),
                 Expr::TaggedTpl(TaggedTpl { tag, tpl, .. }) => match tag.as_ref() {
-                    Expr::Ident(ident) if ident.sym.as_str() == MARKDOWN_TAG => tpl_to_expr(tpl),
+                    Expr::Ident(ident) if ident.sym.as_str() == MARKDOWN_TAG => {
+                        tpl_to_content(tpl, true)
+                    }
                     _ => None,
                 },
                 _ => None,
@@ -138,11 +227,11 @@ impl AsStrExpr for JSXExprContainer {
     }
 }
 
-impl AsStrExpr for JSXAttrValue {
-    fn as_str_expr(&self) -> Option<Box<Expr>> {
+impl AsStringContent for JSXAttrValue {
+    fn as_string_content(&self) -> Option<StringContent> {
         match self {
-            JSXAttrValue::JSXExprContainer(exp) => exp.as_str_expr(),
-            JSXAttrValue::Lit(lit) => lit.as_str_expr(),
+            JSXAttrValue::JSXExprContainer(exp) => exp.as_string_content(),
+            JSXAttrValue::Lit(lit) => lit.as_string_content(),
             JSXAttrValue::JSXElement(_) | JSXAttrValue::JSXFragment(_) => None,
         }
     }
@@ -160,9 +249,12 @@ fn default_value(element: &JSXElement) -> Option<Box<Expr>> {
 
     match (children.next(), children.next()) {
         (Some(JSXElementChild::JSXText(t)), None) => {
-            Some(Box::new(Expr::Lit(Lit::Str(t.value.clone().into()))))
+            let content = StringContent::Plain(t.value.to_string());
+            Some(content.to_expr())
         }
-        (Some(JSXElementChild::JSXExprContainer(container)), None) => container.as_str_expr(),
+        (Some(JSXElementChild::JSXExprContainer(container)), None) => container
+            .as_string_content()
+            .map(|content| content.to_expr()),
         (Some(c), None) => {
             HANDLER.with(|handler| {
                 handler

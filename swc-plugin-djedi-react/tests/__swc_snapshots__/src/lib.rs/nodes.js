@@ -1,117 +1,105 @@
 "use client";
 import { djedi as djedi } from "djedi-react";
 djedi.reportPrefetchableNode({
-  uri: "intro",
-  value: "\n    [project] is a cool CMS\n  ",
+    uri: "intro",
+    value: "[project] is a cool CMS"
 });
 djedi.reportPrefetchableNode({
-  uri: "en-us@link.txt",
-  value: "\n        [text]\n      ",
+    uri: "en-us@link.txt",
+    value: "[text]"
 });
 djedi.reportPrefetchableNode({
-  uri: "simple",
-  value: null,
+    uri: "simple",
+    value: null
 });
 djedi.reportPrefetchableNode({
-  uri: "string literal",
-  value: null,
+    uri: "string literal",
+    value: null
 });
 djedi.reportPrefetchableNode({
-  uri: 'single quotes "',
-  value: null,
+    uri: 'single quotes "',
+    value: null
 });
 djedi.reportPrefetchableNode({
-  uri: "simple template literal",
-  value: null,
+    uri: "simple template literal",
+    value: null
 });
 djedi.reportPrefetchableNode({
-  uri: "simple",
-  value: null,
+    uri: "simple",
+    value: null
 });
 djedi.reportPrefetchableNode({
-  uri: "ok 1",
-  value: "simple",
+    uri: "ok 1",
+    value: "simple"
 });
 djedi.reportPrefetchableNode({
-  uri: "ok 2",
-  value: "string literal",
+    uri: "ok 2",
+    value: "string literal"
 });
 djedi.reportPrefetchableNode({
-  uri: "ok 3",
-  value: 'single quotes "',
+    uri: "ok 3",
+    value: 'single quotes "'
 });
 djedi.reportPrefetchableNode({
-  uri: "ok 4",
-  value: "simple template literal",
+    uri: "ok 4",
+    value: "simple template literal"
 });
 djedi.reportPrefetchableNode({
-  uri: "ok 5",
-  value: "\n        # markdown\n\n        example\n      ",
+    uri: "ok 5",
+    value: "<h1>markdown</h1>\n<p>example</p>"
 });
 djedi.reportPrefetchableNode({
-  uri: "test/text.md",
-  value:
-    "\n        [Cargo.toml,](./Cargo.toml)\n        [Cargo.lock,](./Cargo.lock)\n      ",
+    uri: "test/text.md",
+    value: '<a href="./Cargo.toml">Cargo.toml,</a>\n<a href="./Cargo.lock">Cargo.lock,</a>'
 });
 djedi.reportPrefetchableNode({
-  uri: "test/search.md",
-  value:
-    "\n        [Google,](https://www.google.com)\n        [Bing](https://www.bing.com)\n      ",
+    uri: "test/search.md",
+    value: '<a href="https://www.google.com">Google,</a>\n<a href="https://www.bing.com">Bing</a>'
 });
 djedi.reportPrefetchableNode({
-  uri: "ok 6",
-  value:
-    "\n        simple jsx text on its own line (parses differently)\n      ",
+    uri: "ok 6",
+    value: "simple jsx text on its own line (parses differently)"
 });
 djedi.reportPrefetchableNode({
-  uri: "ok 7",
-  value: "simple template literal on its own line (parses differently)",
+    uri: "ok 7",
+    value: "simple template literal on its own line (parses differently)"
 });
 djedi.reportPrefetchableNode({
-  uri: "nope 1",
-  value: null,
+    uri: "nope 1",
+    value: null
 });
 djedi.reportPrefetchableNode({
-  uri: "nope 2",
-  value: null,
+    uri: "nope 2",
+    value: null
 });
-/* eslint-disable no-undef, react/jsx-no-undef */ import {
-  Node,
-  djedi as djedi1,
-  md,
-} from "djedi-react";
+/* eslint-disable no-undef, react/jsx-no-undef */ import { Node, djedi as djedi1, md } from "djedi-react";
 import React from "react";
 djedi1.options.baseUrl = "/api";
 const _djedi = "djedi";
-const intro = (
-  <Node uri="intro" project={_djedi}>
+const intro = <Node uri="intro" project={_djedi}>
     [project] is a cool CMS
-  </Node>
-);
+  </Node>;
 export default function Home() {
-  const link = (text) => (
-    <a href={`?page=${text}`}>
+    const link = (text)=><a href={`?page=${text}`}>
       <Node uri="en-us@link.txt" text={text}>
         [text]
       </Node>
-    </a>
-  );
-  return (
-    <div>
+    </a>;
+    return <div>
       {intro}
 
       <h2>ok uri</h2>
-      <Node uri="simple" />
-      <Node uri={"string literal"} />
-      <Node uri={'single quotes "'} />
-      <Node uri={`simple template literal`} />
-      <Node uri="simple" {...variables} />
+      <Node uri="simple"/>
+      <Node uri={"string literal"}/>
+      <Node uri={'single quotes "'}/>
+      <Node uri={`simple template literal`}/>
+      <Node uri="simple" {...variables}/>
 
       <h2>nope uri</h2>
-      <Node uri={"nope".toUpperCase()} />
-      <Node uri={`template literal with interpolation ${nope}`} />
-      <Node uri={nope`tagged template literal`} />
-      <Node uri={nope} />
+      <Node uri={"nope".toUpperCase()}/>
+      <Node uri={`template literal with interpolation ${nope}`}/>
+      <Node uri={nope`tagged template literal`}/>
+      <Node uri={nope}/>
       <Node uri={nope}>default</Node>
 
       <h2>ok children</h2>
@@ -144,13 +132,12 @@ export default function Home() {
       <Node uri="nope 2">{nope}</Node>
 
       <h2>non-Nodes</h2>
-      <node uri="simple" />
-      <TreeNode uri="simple" />
+      <node uri="simple"/>
+      <TreeNode uri="simple"/>
 
       <div>
         {link("previous")}
         {link("next")}
       </div>
-    </div>
-  );
+    </div>;
 }

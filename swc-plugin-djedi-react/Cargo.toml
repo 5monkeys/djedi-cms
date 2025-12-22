@@ -12,6 +12,7 @@ opt-level = "z"     # Optimize for size (important for WASM)
 strip = true        # Strip symbols for smaller binary
 
 [dependencies]
+pulldown-cmark = "0.12"
 serde = "1"
 swc_core = { version = "33.0", features = ["ecma_plugin_transform", "__utils"] }
 tracing = { version = "0.1.40", features = ["release_max_level_off"] }
