@@ -46,8 +46,8 @@ jobs:
           TOXENV=$(tox --listenvs | grep "^py$ENV_PREFIX" | tr '\n' ',') python -m tox
       - uses: actions/upload-artifact@v6
         with:
-          name: coverage-files
-          path: ./.coverage.*
+          name: coverage-files-${{ matrix.python-version }}
+          path: ./.coverage*
           include-hidden-files: true
 
   coverage:
@@ -62,7 +62,8 @@ jobs:
           python-version: "3.11"
       - uses: actions/download-artifact@v6
         with:
-          name: coverage-files
+          pattern: coverage-files-*
+          merge-multiple: true
           path: .
       - name: Combine coverage reports
         run: |
