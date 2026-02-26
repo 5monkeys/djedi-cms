@@ -10,7 +10,7 @@ install_requires = [
 
 tests_require = [
     "coverage",
-    "Markdown <= 3.3.0",
+    "Markdown >= 3.4, < 4",
     "Pillow",
 ]
 
