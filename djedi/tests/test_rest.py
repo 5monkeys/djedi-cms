@@ -18,11 +18,8 @@ from djedi.plugins.img import DataForm
 from djedi.tests.base import ClientTest, DjediTest, UserMixin
 
 
-def json_node(response, simple=True):
-    node = json.loads(response.content)
-    if simple and "meta" in node:
-        del node["meta"]
-    return node
+def json_node(response):
+    return json.loads(response.content)
 
 
 class PermissionTest(DjediTest, UserMixin):
@@ -102,7 +99,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.get("api.load", "sv-se@page/title")
         self.assertEqual(response.status_code, 200)
-        node = json_node(response, simple=False)
+        node = json_node(response)
         meta = node.pop("meta", {})
         content = "# Djedi" if cio.PY26 else "<h1>Djedi</h1>"
         self.assertDictEqual(
@@ -137,7 +134,7 @@ class PrivateRestTest(ClientTest):
             "api", uri, {"data": "# Djedi", "meta[message]": "lundberg"}
         )
         self.assertEqual(response.status_code, 200)
-        node = json_node(response, simple=False)
+        node = json_node(response)
         meta = node.pop("meta")
         content = "# Djedi" if cio.PY26 else "<h1>Djedi</h1>"
         self.assertDictEqual(
@@ -156,7 +153,7 @@ class PrivateRestTest(ClientTest):
         response = self.post(
             "api", node.uri, {"data": "# Djedi", "meta[message]": "Lundberg"}
         )
-        node = json_node(response, simple=False)
+        node = json_node(response)
         self.assertEqual(node["meta"]["message"], "Lundberg")
 
         with self.assertRaises(PersistenceError):
@@ -306,7 +303,7 @@ class PrivateRestTest(ClientTest):
             response = self.post("api", "i18n://sv-se@header/logo.img", form)
             self.assertEqual(response.status_code, 200)
 
-            node = json_node(response, simple=False)
+            node = json_node(response)
             meta = node.pop("meta")
             uri, content = node["uri"], node["content"]
             self.assertEqual(uri, "i18n://sv-se@header/logo.img#draft")
