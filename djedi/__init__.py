@@ -28,9 +28,9 @@ __version__ = get_version()
 
 
 def configure():
-    from django.conf import settings as django_settings
+    from django.conf import settings as django_settings  # noqa: PLC0415
 
-    from cio.conf import settings
+    from cio.conf import settings  # noqa: PLC0415
 
     # Djedi default config
     config = {
@@ -66,7 +66,7 @@ def configure():
         "THEME",
         "XSS_DOMAIN",
     ):
-        conf = getattr(django_settings, "DJEDI_%s" % setting, None)
+        conf = getattr(django_settings, f"DJEDI_{setting}", None)
         if conf is not None:
             config[setting] = conf
 

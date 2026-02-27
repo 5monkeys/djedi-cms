@@ -19,12 +19,12 @@ def render_embed(nodes=None, request=None):
                 }
             )
             output = render(request, "djedi/cms/embed.html", context, using="django")
-        except NoReverseMatch:
+        except NoReverseMatch as exc:
             raise ImproperlyConfigured(
                 "Could not find djedi in your url conf, "
                 "enable django admin or include "
                 "djedi.urls within the admin namespace."
-            )
+            ) from exc
 
     else:
         context.update(

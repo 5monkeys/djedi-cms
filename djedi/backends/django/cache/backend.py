@@ -16,7 +16,7 @@ class DjangoCacheBackend(CacheBackend):
             cache_name = self.config.get("NAME", "djedi")
             cache = caches[cache_name]
         except (InvalidCacheBackendError, ValueError):
-            from django.core.cache import cache
+            from django.core.cache import cache  # noqa: PLC0415
 
         self._cache = cache
 
@@ -45,7 +45,8 @@ class DjangoCacheBackend(CacheBackend):
 
     def _encode_content(self, uri, content):
         """
-        Join node uri and content as string and convert to bytes to ensure no pickling in memcached.
+        Join node uri and content as string and convert to bytes to ensure
+        no pickling in memcached.
         """
         if content is None:
             content = self.NONE

@@ -33,6 +33,6 @@ def djedi_admin(context):
 def djedi_xss_domain():
     domain = cio.conf.settings.get("XSS_DOMAIN")
     if domain:
-        return mark_safe(f'<script>document.domain = "{domain}";</script>')
+        return mark_safe(f'<script>document.domain = "{domain}";</script>')  # noqa: S308
 
     return ""

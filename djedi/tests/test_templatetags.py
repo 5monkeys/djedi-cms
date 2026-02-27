@@ -20,24 +20,25 @@ class TagTest(DjediTest, AssertionMixin):
         cio.set("i18n://sv-se@page/title.txt", "Djedi")
         cio.set("i18n://sv-se@page/body.txt", "Lightning fast!")
 
-        with self.assertCache(calls=1, misses=0):
-            with self.assertDB(calls=0):
-                html = self.render(
-                    "<h1>{% node 'page/title' edit=False %}</h1><p>{% node 'page/body' edit=False %}</p>"
-                )
-                assert html == "<h1>Djedi</h1><p>Lightning fast!</p>"
+        with self.assertCache(calls=1, misses=0), self.assertDB(calls=0):
+            html = self.render(
+                "<h1>{% node 'page/title' edit=False %}</h1>"
+                "<p>{% node 'page/body' edit=False %}</p>"
+            )
+            assert html == "<h1>Djedi</h1><p>Lightning fast!</p>"
 
         cache.clear()
 
-        with self.assertCache(calls=1, misses=2):
-            with self.assertDB(calls=1):
-                html = self.render(
-                    "<h1>{% node 'page/title' edit=False %}</h1><p>{% node 'page/body' %}</p>"
-                )
-                assert (
-                    html
-                    == '<h1>Djedi</h1><p><span data-i18n="sv-se@page/body">Lightning fast!</span></p>'
-                )
+        with self.assertCache(calls=1, misses=2), self.assertDB(calls=1):
+            html = self.render(
+                "<h1>{% node 'page/title' edit=False %}</h1>"
+                "<p>{% node 'page/body' %}</p>"
+            )
+            assert (
+                html == "<h1>Djedi</h1><p>"
+                '<span data-i18n="sv-se@page/body">Lightning fast!</span>'
+                "</p>"
+            )
 
         html = self.render("{% node 'foo/bar' default='bogus' %}")
         assert html == '<span data-i18n="sv-se@foo/bar">bogus</span>'

@@ -70,6 +70,7 @@ version = { attr = "djedi.__version__" }
 target-version = "py310"
 line-length = 88
 fix = true
+extend-exclude = [ "*/migrations/*.py", "*/south_migrations/*.py" ]
 
 lint.select = [
   "B",
@@ -92,8 +93,7 @@ lint.select = [
   "PGH",
   "PIE",
   "PL",
-  "PT",
-  "PTH",
+#  "PTH",
   "RET",
   "RSE",
   "RUF",
@@ -111,14 +111,16 @@ lint.select = [
 lint.ignore = [
   # We've deemed ourselves good designers of our interfaces and would only have
   # motivated ignores.
+  "PLR2004",
   "PLR0913",
   "RET505",  # Don't like this opinion
   "S101",
   "TRY003",  # Don't care about length of messages for exception classes
+  "FBT002", # We should re-enable this at some point
 ]
 lint.per-file-ignores."tests/**" = [ "PLR2004", "S105", "S106" ]
 lint.isort.combine-as-imports = true
-lint.isort.known-first-party = [ "djedi" ]
+lint.isort.known-first-party = [ "djedi", "cio" ]
 
 [tool.coverage.paths]
 source = [
