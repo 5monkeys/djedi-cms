@@ -73,13 +73,13 @@ class AssertionMixin:
 
         if calls >= 0:
             assert num_queries == calls, f"{num_queries} != {calls}"
-        if selects >= 0:
+        if selects >= 0:  # pragma: no cover
             num_selects = len([q for q in queries if q["sql"].startswith("SELECT")])
             assert num_selects == selects, f"{num_selects} != {selects}"
-        if inserts >= 0:
+        if inserts >= 0:  # pragma: no cover
             num_inserts = len([q for q in queries if q["sql"].startswith("INSERT")])
             assert num_inserts == inserts, f"{num_inserts} != {inserts}"
-        if updates >= 0:
+        if updates >= 0:  # pragma: no cover
             num_updates = len([q for q in queries if q["sql"].startswith("UPDATE")])
             assert num_updates == updates, f"{num_updates} != {updates}"
 

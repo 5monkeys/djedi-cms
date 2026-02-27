@@ -1,11 +1,17 @@
+from unittest.mock import patch
+
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateSyntaxError, engines
+from django.urls import NoReverseMatch
 
 import cio
 from cio.backends import cache
 from cio.pipeline import pipeline
+from djedi.templatetags.djedi_tags import register as djedi_register
 from djedi.templatetags.template import register
 from djedi.tests.base import AssertionMixin, DjediTest
+from djedi.utils.templates import render_embed
 
 
 class TagTest(DjediTest, AssertionMixin):
@@ -142,6 +148,29 @@ class TagTest(DjediTest, AssertionMixin):
 
         html = self.render("{% bar %}")
         assert html == "foo"
+
+    def test_lazy_tag_with_context(self):
+        @register.lazy_tag(takes_context=True)
+        def whoami(context):
+            assert "name" not in context
+            return lambda _: "Djedi"
+
+        try:
+            html = self.render("{% whoami %}", {"name": "Djedi"})
+            assert html == "Djedi"
+        finally:
+            djedi_register.tags.pop("whoami", None)
+
+    def test_render_embed_raises_for_missing_djedi_url(self):
+        class RequestMock:
+            def build_absolute_uri(self, _path):
+                return "http://testserver/"
+
+        with (
+            patch("djedi.utils.templates.reverse", side_effect=NoReverseMatch),
+            self.assertRaises(ImproperlyConfigured),
+        ):
+            render_embed(request=RequestMock())
 
     def test_djedi_admin_tag(self):
         source = """
