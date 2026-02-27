@@ -1,0 +1,150 @@
+[build-system]
+requires = [ "setuptools>=77", "wheel" ]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "djedi-cms"
+dynamic = [ "version" ]
+description = "Django content management as it should be"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [ { name = "Jonas Lundberg", email = "jonas@5monkeys.se" } ]
+license = "BSD-3-Clause"
+license-files = [ "LICENSE" ]
+keywords = [
+  "cms",
+  "django",
+  "edit",
+  "gettext",
+  "content",
+  "management",
+  "template",
+  "plugins",
+  "markdown",
+]
+classifiers = [
+  "Environment :: Web Environment",
+  "Natural Language :: English",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "six",
+  "content-io>=1.2.5",
+  "simplejson>=3.2.0",
+]
+
+[project.optional-dependencies]
+tests = [
+  "coverage[toml]",
+  "Markdown>=3.4,<4",
+  "Pillow",
+]
+
+[project.urls]
+Homepage = "https://djedi-cms.org/"
+Documentation = "https://djedi-cms.org/"
+Repository = "https://github.com/5monkeys/djedi-cms"
+Issues = "https://github.com/5monkeys/djedi-cms/issues"
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+include = [ "djedi*" ]
+
+[tool.setuptools.dynamic]
+version = { attr = "djedi.__version__" }
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+fix = true
+
+lint.select = [
+  "B",
+  "BLE",
+  "C4",
+  "C9",
+  "C90",
+  "DJ006",
+  "DJ007",
+  "DJ012",
+  "DTZ",
+  "E",
+  "EXE",
+  "F",
+  "FA",
+  "FBT",
+  "I",
+  "INP",
+  "ISC",
+  "PGH",
+  "PIE",
+  "PL",
+  "PT",
+  "PTH",
+  "RET",
+  "RSE",
+  "RUF",
+  "S",
+  "SIM",
+  "SLOT",
+  "T10",
+  "T20",
+  "TID",
+  "TRY",
+  "UP",
+  "W",
+  "YTT",
+]
+lint.ignore = [
+  # We've deemed ourselves good designers of our interfaces and would only have
+  # motivated ignores.
+  "PLR0913",
+  "RET505",  # Don't like this opinion
+  "S101",
+  "TRY003",  # Don't care about length of messages for exception classes
+]
+lint.per-file-ignores."tests/**" = [ "PLR2004", "S105", "S106" ]
+lint.isort.combine-as-imports = true
+lint.isort.known-first-party = [ "djedi" ]
+
+[tool.coverage.paths]
+source = [
+  "src/djedi",
+#  ".tox/*/lib/*/site-packages/djedi-cms",
+]
+
+[tool.coverage.report]
+skip_covered = true
+show_missing = true
+exclude_also = [
+  # ignore non-implementations
+  '^\s*\.\.\.',
+  "if TYPE_CHECKING:",
+  '^\s*(def\s)?assert_never(.*)$',
+  'pragma: no cover',
+  'if __name__ == .__main__.:',
+  'raise NotImplementedError'
+]
+fail_under = 93
+
+[tool.coverage.run]
+parallel = true
+branch = true
+source = [ "djedi" ]
+omit = [
+    '*/migrations/*',
+    '*/south_migrations/*'
+]

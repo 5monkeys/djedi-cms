@@ -6,7 +6,7 @@ help:
 
 .PHONY: test
 test:
-	coverage run setup.py test
+	python -m coverage run runtests.py
 
 .PHONY: test_all  # runs tests using detox, combines coverage and reports it
 test_all:
@@ -29,11 +29,11 @@ lint:
 
 .PHONY: install
 install:
-	python setup.py install
+	python -m pip install .
 
 .PHONY: develop
 develop:
-	python setup.py develop
+	python -m pip install -e .
 
 .PHONY: build_example
 build_example:
