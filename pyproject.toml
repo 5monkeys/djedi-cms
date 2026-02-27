@@ -140,7 +140,7 @@ exclude_also = [
   'if __name__ == .__main__.:',
   'raise NotImplementedError'
 ]
-fail_under = 93
+fail_under = 100
 
 [tool.coverage.run]
 parallel = true

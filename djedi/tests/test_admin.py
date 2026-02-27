@@ -13,6 +13,8 @@ from django.utils.encoding import smart_str
 
 import cio.conf
 from djedi.admin.cms import Admin, DjediCMS
+from djedi.admin.api import APIView
+from djedi.admin.mixins import DjediContextMixin
 from djedi.middleware.mixins import AdminPanelMixin
 from djedi.tests.base import ClientTest
 
@@ -136,6 +138,17 @@ class PanelTest(ClientTest):
             self.assertRaises(ImproperlyConfigured),
         ):
             panel.inject_admin_panel(request, response)
+
+    def test_api_view_post_data_keeps_multi_values(self):
+        request = SimpleNamespace(POST={"data[items]": ["a", "b"]}, FILES={})
+        data, meta = APIView().get_post_data(request)
+        assert data["items"] == ["a", "b"]
+        assert meta == {}
+
+    def test_context_theme_keeps_absolute_path(self):
+        with cio.conf.settings(THEME="https://cdn.example.com/theme.css"):
+            context = DjediContextMixin().get_context_data()
+            assert context["THEME"] == "https://cdn.example.com/theme.css"
 
     @skip("Unfinished admin view is hidden")
     def test_django_admin(self):  # pragma: no cover
