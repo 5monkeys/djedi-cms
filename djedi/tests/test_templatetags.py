@@ -10,8 +10,8 @@ from cio.backends import cache
 from cio.pipeline import pipeline
 from djedi.templatetags.djedi_tags import register as djedi_register
 from djedi.templatetags.template import register
-from djedi.utils.templates import render_embed
 from djedi.tests.base import AssertionMixin, DjediTest
+from djedi.utils.templates import render_embed
 
 
 class TagTest(DjediTest, AssertionMixin):

@@ -1,11 +1,11 @@
 import importlib
 from unittest.mock import patch
 
+import djedi.models
 from cio.backends import storage
 from cio.conf import settings
 from cio.plugins import plugins
 from djedi import get_version
-import djedi.models
 from djedi.tests import DjediTest
 
 

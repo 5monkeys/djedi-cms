@@ -12,8 +12,8 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import smart_str
 
 import cio.conf
-from djedi.admin.cms import Admin, DjediCMS
 from djedi.admin.api import APIView
+from djedi.admin.cms import Admin, DjediCMS
 from djedi.admin.mixins import DjediContextMixin
 from djedi.middleware.mixins import AdminPanelMixin
 from djedi.tests.base import ClientTest

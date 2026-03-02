@@ -2,8 +2,8 @@ import json
 from io import BytesIO
 from unittest.mock import patch
 
-from PIL import Image
 from django import forms
+from PIL import Image
 
 from djedi.plugins.base import DjediPlugin
 from djedi.plugins.form import FormsBasePlugin, get_custom_render_widget

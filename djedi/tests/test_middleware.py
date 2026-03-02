@@ -32,7 +32,9 @@ class MiddlewareTest(DjediTest):
                 return HttpResponse("from-process-request")
 
         request = RequestFactory().get("/")
-        response = TestMiddleware(get_response=lambda _: HttpResponse("unused"))(request)
+        response = TestMiddleware(get_response=lambda _: HttpResponse("unused"))(
+            request
+        )
         assert response.content == b"from-process-request"
 
     def test_body_append_without_body_tag_keeps_content(self):
