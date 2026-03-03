@@ -1,5 +1,6 @@
 from unittest import skip
 
+from django.contrib.admin.templatetags.log import AdminLogNode
 from django.urls import reverse
 from django.utils.encoding import smart_str
 
@@ -42,16 +43,13 @@ class PanelTest(ClientTest):
 
     @skip("Unfinished admin view is hidden")
     def test_django_admin(self):  # pragma: no cover
-        # Patch django admin index
-        from django.contrib.admin.templatetags.log import AdminLogNode
-
         _render = AdminLogNode.render
         AdminLogNode.render = lambda x, y: None
 
         url = reverse("admin:index")
         response = self.client.get(url)
         cms_url = reverse("admin:djedi:cms")
-        self.assertIn('<a href="%s">CMS</a>' % cms_url, smart_str(response.content))
+        self.assertIn(f'<a href="{cms_url}">CMS</a>', smart_str(response.content))
 
         # Rollback patch
         AdminLogNode.render = _render

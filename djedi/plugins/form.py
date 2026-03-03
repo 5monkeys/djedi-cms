@@ -21,7 +21,7 @@ def get_custom_render_widget(cls):
 
             name = deprefix(name)
 
-            return super().render("data[%s]" % name, *args, **kwargs)
+            return super().render(f"data[{name}]", *args, **kwargs)
 
     return CustomRenderWidget
 
@@ -56,5 +56,5 @@ class FormsBasePlugin(DjediPlugin):
         return {
             deprefix(field): data.get(deprefix(field))
             for tab, form in self.forms.items()
-            for field in form.base_fields.keys()
+            for field in form.base_fields
         }

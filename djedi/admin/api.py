@@ -14,9 +14,9 @@ import cio
 from cio.plugins import plugins
 from cio.plugins.exceptions import UnknownPlugin
 from cio.utils.uri import URI
+from djedi import auth
+from djedi.plugins.base import DjediPlugin
 
-from .. import auth
-from ..plugins.base import DjediPlugin
 from .exceptions import InvalidNodeData
 from .mixins import DjediContextMixin, JSONResponseMixin
 
@@ -31,7 +31,7 @@ class APIView(View):
             return super().dispatch(request, *args, **kwargs)
         except Http404:
             raise
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return HttpResponseBadRequest(e)
 
     def get_post_data(self, request):
@@ -55,10 +55,11 @@ class APIView(View):
                 field = field[:-1]
                 try:
                     data[prefix][field] = value
-                except TypeError:
+                except TypeError as exc:
                     raise InvalidNodeData(
-                        'Got both reserved parameter "data" and plugin specific parameters.'
-                    )
+                        'Got both reserved parameter "data" and '
+                        "plugin specific parameters."
+                    ) from exc
             else:
                 data[prefix] = value
 
@@ -67,7 +68,8 @@ class APIView(View):
     def decode_uri(self, uri):
         decoded = unquote(uri)
 
-        # If uri got decoded then recursive try more times until nothing more can be decoded
+        # If uri got decoded, recursively try more times until nothing else
+        # can be decoded.
         if decoded != uri:
             decoded = self.decode_uri(decoded)
 
@@ -173,10 +175,10 @@ class RenderApi(APIView):
         """
         try:
             plugin = plugins.get(ext)
-            data, meta = self.get_post_data(request)
+            data, _meta = self.get_post_data(request)
             data = plugin.load(data)
         except UnknownPlugin:
-            raise Http404
+            raise Http404 from None
         else:
             content = plugin.render(data)
             return self.render_to_response(content)
@@ -196,7 +198,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
                 plugin_context = plugin.get_editor_context(**plugin_context)
 
         except UnknownPlugin:
-            raise Http404
+            raise Http404 from None
         else:
             return self.render_plugin(request, plugin_context)
 
@@ -220,7 +222,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
         return TemplateResponse(
             request,
             [
-                "djedi/plugins/%s/editor.html" % context["uri"].ext,
+                f"djedi/plugins/{context['uri'].ext}/editor.html",
                 "djedi/plugins/base/editor.html",
             ],
             self.get_context_data(**context),

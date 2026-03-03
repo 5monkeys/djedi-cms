@@ -1,4 +1,5 @@
 import json
+import logging
 from hashlib import sha1
 from os import path
 
@@ -8,6 +9,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.html import escape
 
 from .form import BaseEditorForm, FormsBasePlugin
+
+log = logging.getLogger(__name__)
 
 
 class DataForm(BaseEditorForm):
@@ -56,7 +59,7 @@ class ImagePluginBase(FormsBasePlugin):
 
         name = name.encode("utf-8")
 
-        name = sha1(name).hexdigest()
+        name = sha1(name).hexdigest()  # noqa: S324
         subdir = name[:2]
         return path.sep.join((dir, subdir, name + ext))
 
@@ -73,8 +76,8 @@ class ImagePluginBase(FormsBasePlugin):
         else:
             return {"filename": None, "url": None}
 
-    def save(self, data):
-        from PIL import Image
+    def save(self, data):  # noqa: PLR0912, C901
+        from PIL import Image  # noqa: PLC0415
 
         width = int(data.get("width") or 0)
         height = int(data.get("height") or 0)
@@ -104,7 +107,7 @@ class ImagePluginBase(FormsBasePlugin):
                     box = tuple(int(x) for x in crop.split(","))
                     image = image.crop(box)
                 except Exception:
-                    pass  # TODO: Handle image crop error
+                    log.exception("Failed to crop image")
                 else:
                     filename = self._create_filename(filename, crop=crop)
 
@@ -114,7 +117,7 @@ class ImagePluginBase(FormsBasePlugin):
                 try:
                     image = image.resize((width, height), Image.ANTIALIAS)
                 except Exception:
-                    pass
+                    log.exception("Failed to resize image")
                 else:
                     filename = self._create_filename(filename, w=width, h=height)
             else:
@@ -149,7 +152,8 @@ class ImagePluginBase(FormsBasePlugin):
             # Use a data URI so that the image works without hassle even if the
             # Djedi backend and frontend run on different domains. The base64
             # part was made by running:
-            # $ svgo djedi/static/djedi/placeholder.svg -o - | openssl base64 | tr -d '\n'
+            # $ svgo djedi/static/djedi/placeholder.svg -o - | openssl base64 |
+            #   tr -d '\n'
             # 'src': '/static/djedi/placeholder.svg',
             "src": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTYwIDkwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIG9wYWNpdHk9Ii4yNSIgZmlsbD0iIzIwYjJhYSIgZD0iTTAgMGgxNjB2OTBIMHoiLz48L3N2Zz4K",  # noqa: E501
             "width": 160,
@@ -195,7 +199,9 @@ class ImagePlugin(ImagePluginBase):
 
         # Fallback on default file storage
         if not file_storage:
-            from django.core.files.storage import default_storage as file_storage
+            from django.core.files.storage import (  # noqa: PLC0415
+                default_storage as file_storage,
+            )
 
         return file_storage
 

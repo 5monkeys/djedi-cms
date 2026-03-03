@@ -14,6 +14,7 @@ from cio.backends.exceptions import NodeDoesNotExist, PersistenceError
 from cio.plugins import plugins
 from cio.utils.uri import URI
 from djedi.plugins.form import BaseEditorForm
+from djedi.plugins.img import DataForm
 from djedi.tests.base import ClientTest, DjediTest, UserMixin
 
 
@@ -37,13 +38,13 @@ class PermissionTest(DjediTest, UserMixin):
         response = client.get(url)
         self.assertEqual(response.status_code, 403)
 
-        logged_in = client.login(username=self.master.username, password="test")
+        logged_in = client.login(username=self.master.username, password="test")  # noqa: S106
         self.assertTrue(logged_in)
         response = client.get(url)
         self.assertEqual(response.status_code, 404)
 
         client.logout()
-        logged_in = client.login(username=self.apprentice.username, password="test")
+        logged_in = client.login(username=self.apprentice.username, password="test")  # noqa: S106
         self.assertTrue(logged_in)
         response = client.get(url)
         self.assertEqual(response.status_code, 404)
@@ -274,8 +275,6 @@ class PrivateRestTest(ClientTest):
             self.assertIn(b'document.domain = "foobar.se"', response.content)
 
     def test_image_dataform(self):
-        from djedi.plugins.img import DataForm
-
         data_form = DataForm()
         html = data_form.as_table()
 
@@ -318,7 +317,8 @@ class PrivateRestTest(ClientTest):
                 'class="year-53" '
                 'height="64" '
                 'id="vw" '
-                'src="/media/djedi/img/03/5e/5eba6fc2149822a8dbf76cd6978798f2ddc4ac34.png" '
+                'src="/media/djedi/img/03/5e/'
+                '5eba6fc2149822a8dbf76cd6978798f2ddc4ac34.png" '
                 'width="64" />'
             )
             self.assertEqual(content, html)
@@ -363,8 +363,9 @@ class PublicRestTest(ClientTest):
         with self.assertCache(sets=1):
             cio.set("sv-se@rest/label/email", "E-post")
 
-        with self.assertDB(calls=1), self.assertCache(
-            calls=1, misses=1, hits=1, sets=0
+        with (
+            self.assertDB(calls=1),
+            self.assertCache(calls=1, misses=1, hits=1, sets=0),
         ):
             url = reverse("admin:djedi:rest:nodes")
             response = self.client.post(

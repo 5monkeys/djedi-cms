@@ -15,7 +15,8 @@ def render_node(node, context=None, edit=True):
     """
     output = node.render(**context or {}) or ""
     if edit:
-        return f'<span data-i18n="{node.uri.clone(scheme=None, ext=None, version=None)}">{output}</span>'
+        editable_uri = node.uri.clone(scheme=None, ext=None, version=None)
+        return f'<span data-i18n="{editable_uri}">{output}</span>'
     else:
         return output
 

@@ -7,10 +7,9 @@ from django.views.generic import View
 
 import cio
 import cio.conf
-
-from ..admin.mixins import JSONResponseMixin
-from ..auth import has_permission
-from ..utils.templates import render_embed
+from djedi.admin.mixins import JSONResponseMixin
+from djedi.auth import has_permission
+from djedi.utils.templates import render_embed
 
 
 class APIView(JSONResponseMixin, View):

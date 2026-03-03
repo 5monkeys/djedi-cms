@@ -5,7 +5,8 @@ from django.urls import include, re_path
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import View
 
-from ..auth import has_permission
+from djedi.auth import has_permission
+
 from .mixins import DjediContextMixin
 
 
