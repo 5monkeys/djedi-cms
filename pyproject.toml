@@ -124,7 +124,7 @@ lint.isort.known-first-party = [ "djedi", "cio" ]
 
 [tool.coverage.paths]
 source = [
-  "src/djedi",
+  "djedi",
 #  ".tox/*/lib/*/site-packages/djedi-cms",
 ]
 
