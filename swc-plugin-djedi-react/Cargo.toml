@@ -1,6 +1,6 @@
 [package]
 name = "swc-plugin-djedi-react"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 
 [lib]
@@ -8,15 +8,18 @@ crate-type = ["cdylib"]
 
 [profile.release]
 lto = true
+opt-level = "z"     # Optimize for size (important for WASM)
+strip = true        # Strip symbols for smaller binary
 
 [dependencies]
+pulldown-cmark = "0.12"
 serde = "1"
-swc_core = { version = "0.86", features = ["ecma_plugin_transform", "__utils"] }
-tracing = "0.1.40"
+swc_core = { version = "33.0", features = ["ecma_plugin_transform", "__utils"] }
+tracing = { version = "0.1.40", features = ["release_max_level_off"] }
 
 [dev-dependencies]
-swc_ecma_parser = "0.141.34"
+swc_ecma_parser = "21.0"
 
 # .cargo/config defines few alias to build plugin.
-# cargo build-wasi generates wasm-wasi32 binary
+# cargo build-wasip1 generates wasm-wasip1 binary
 # cargo build-wasm32 generates wasm32-unknown-unknown binary.

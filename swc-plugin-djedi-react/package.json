@@ -1,13 +1,17 @@
 {
     "name": "swc-plugin-djedi-react",
-    "version": "0.1.1",
-    "description": "",
+    "version": "0.2.0",
+    "description": "SWC plugin for djedi-react to enable prefetching of djedi nodes",
     "author": "",
     "license": "ISC",
     "keywords": ["swc-plugin"],
     "main": "swc_plugin_djedi_react.wasm",
     "scripts": {
-        "prepublishOnly": "cargo build-wasi --release && cp target/wasm32-wasi/release/swc_plugin_djedi_react.wasm ."
+        "build": "make build",
+        "test": "make test",
+        "prepublishOnly": "make build",
+        "setup": "make setup",
+        "clean": "make clean"
     },
     "files": [],
     "preferUnplugged": true
