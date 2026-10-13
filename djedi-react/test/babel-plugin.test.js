@@ -75,6 +75,28 @@ _djedi.reportPrefetchableNode({
 `);
 });
 
+test("<Node>s passed to <NodeText> are prefetchable", () => {
+  const code = dedent`
+    <NodeText node={<Node uri="search/placeholder">Search</Node>}>
+      {text => <input placeholder={text} />}
+    </NodeText>
+  `;
+  expect(transform(code)).toMatchInlineSnapshot(`
+var _djedi_uri = "search/placeholder",
+    _djedi_default = "Search";
+import { djedi as _djedi } from "djedi-react";
+
+_djedi.reportPrefetchableNode({
+  uri: _djedi_uri,
+  value: _djedi_default
+});
+
+<NodeText node={<Node uri={_djedi_uri}>{_djedi_default}</Node>}>
+  {text => <input placeholder={text} />}
+</NodeText>;
+`);
+});
+
 test("ensure no duplicated AST nodes are found", () => {
   const code = dedent`
     <>
