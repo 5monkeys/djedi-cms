@@ -7,8 +7,8 @@ from django.contrib.admin.templatetags.log import AdminLogNode
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpResponse
-from django.test import RequestFactory
-from django.urls import NoReverseMatch, reverse
+from django.test import RequestFactory, override_settings
+from django.urls import NoReverseMatch, resolve, reverse
 from django.utils.encoding import smart_str
 
 import cio.conf
@@ -29,6 +29,20 @@ class RecordingPanel(AdminPanelMixin):
     def body_append(self, response, html):
         self.appended = True
         super().body_append(response, html)
+
+
+@override_settings(ROOT_URLCONF="djedi.tests.urls_admin")
+class CMSAdminURLTest(ClientTest):
+    def test_changelist_alias_reverses_to_cms_root(self):
+        url = reverse("admin:djedi_cms_changelist")
+        self.assertEqual(url, "/adm1n/djedi/cms/")
+        self.assertEqual(url, reverse("admin:djedi:cms"))
+        self.assertEqual(resolve(url).view_name, "admin:djedi:cms")
+
+    def test_unknown_cms_subpath_returns_404(self):
+        url = reverse("admin:djedi_cms_changelist")
+        response = self.client.get(url + "unknown/")
+        self.assertEqual(response.status_code, 404)
 
 
 class PanelTest(ClientTest):

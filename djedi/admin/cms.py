@@ -17,9 +17,8 @@ class Admin(ModelAdmin):
     def get_urls(self):
         return [
             re_path(r"^", include("djedi.admin.urls", namespace="djedi")),
-            re_path(
-                r"", lambda: None, name="djedi_cms_changelist"
-            ),  # Placeholder to show change link to CMS in admin
+            # Alias for Django admin's CMS change link.
+            re_path(r"^$", DjediCMS.as_view(), name="djedi_cms_changelist"),
         ]
 
     def has_change_permission(self, request, obj=None):
