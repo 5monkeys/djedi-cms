@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from urllib.parse import unquote
 
@@ -20,6 +21,8 @@ from djedi.plugins.base import DjediPlugin
 from .exceptions import InvalidNodeData
 from .mixins import DjediContextMixin, JSONResponseMixin
 
+logger = logging.getLogger(__name__)
+
 
 class APIView(View):
     @method_decorator(csrf_exempt)
@@ -31,8 +34,9 @@ class APIView(View):
             return super().dispatch(request, *args, **kwargs)
         except Http404:
             raise
-        except Exception as e:  # noqa: BLE001
-            return HttpResponseBadRequest(e)
+        except Exception:
+            logger.exception("Error handling Djedi API request")
+            return HttpResponseBadRequest(content_type="text/plain")
 
     def get_post_data(self, request):
         """
