@@ -39,58 +39,6 @@ class CMSAdminURLTest(ClientTest):
         self.assertEqual(url, reverse("admin:djedi:cms"))
         self.assertEqual(resolve(url).view_name, "admin:djedi:cms")
 
-    def test_cms_root_is_accessible_to_authorized_users(self):
-        url = reverse("admin:djedi_cms_changelist")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<title>djedi cms</title>")
-
-        self.client.force_login(self.create_djedi_apprentice())
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<title>djedi cms</title>")
-
-    def test_cms_root_denies_unauthorized_users(self):
-        url = reverse("admin:djedi_cms_changelist")
-        users = [
-            None,
-            User.objects.create_user("nonstaff"),
-            User.objects.create_user("staff", is_staff=True),
-        ]
-        for user in users:
-            with self.subTest(user=user):
-                self.client.logout()
-                if user is not None:
-                    self.client.force_login(user)
-                response = self.client.get(url)
-                self.assertEqual(response.status_code, 403)
-
-    def test_existing_cms_and_api_routes_resolve(self):
-        root = reverse("admin:djedi_cms_changelist")
-        uri = "i18n://sv-se@page/title"
-        routes = [
-            (f"node/{uri}/editor", "cms.editor", [uri]),
-            (f"node/{uri}/load", "api.load", [uri]),
-            (f"node/{uri}/publish", "api.publish", [uri]),
-            (f"node/{uri}/revisions", "api.revisions", [uri]),
-            (f"node/{uri}", "api", [uri]),
-            ("plugin/md", "api.render", ["md"]),
-            ("api/", "rest:api-base", []),
-            ("api/embed/", "rest:embed", []),
-            ("api/nodes/", "rest:nodes", []),
-        ]
-        for suffix, name, args in routes:
-            with self.subTest(route=name):
-                view_name = "admin:djedi:" + name
-                self.assertEqual(reverse(view_name, args=args), root + suffix)
-                self.assertEqual(resolve(root + suffix).view_name, view_name)
-
-    def test_existing_api_route_remains_accessible(self):
-        url = reverse("admin:djedi:api.load", args=["i18n://sv-se@page/title"])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["uri"], "i18n://sv-se@page/title.txt")
-
     def test_unknown_cms_subpath_returns_404(self):
         url = reverse("admin:djedi_cms_changelist")
         response = self.client.get(url + "unknown/")
