@@ -119,6 +119,24 @@ class PrivateRestTest(ClientTest):
 
         self.assertEqual(len(cio.revisions("i18n://sv-se@page/title")), 1)
 
+    def test_api_errors_are_logged_without_exposing_details(self):
+        uri = "i18n://<svg onload=alert(1)>.txt"
+
+        for debug in (True, False):
+            with self.subTest(debug=debug), self.settings(DEBUG=debug):
+                with self.assertLogs("djedi.admin.api", level="ERROR") as logs:
+                    response = self.get("api.load", uri)
+
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.content, b"")
+                self.assertEqual(response["Content-Type"], "text/plain")
+                self.assertEqual(len(logs.records), 1)
+                error = logs.records[0].exc_info
+                self.assertIsNotNone(error)
+                self.assertIsInstance(error[1], URI.Invalid)
+                self.assertIn(uri, str(error[1]))
+                self.assertIsNotNone(error[2])
+
     def test_set(self):
         response = self.post("api", "i18n://page/title", {"data": "# Djedi"})
         self.assertEqual(response.status_code, 400)
