@@ -50,11 +50,14 @@ def generic_tag_compiler(
 
 def lazy_tag(self, func=None, takes_context=None, name=None, node_class=None):
     """
-    A tag function decorator, injected on Django's template tag library, similar to simple_tag().
-    The decorated function gets called when the template node tree is built and should return
-    another function, responsible for the output, that later will be called within the rendering phase.
+    A tag function decorator, injected on Django's template tag library,
+    similar to simple_tag().
+    The decorated function gets called when the template node tree is built
+    and should return another function, responsible for the output, that later
+    will be called within the rendering phase.
 
-    Note: if decorated with takes_context=True, context will not be available in the init phase.
+    Note: if decorated with takes_context=True, context will not be available
+    in the init phase.
 
     @register.lazy_tag(takes_context=True)
     def x(context, a, b, c=True, d=False):
@@ -87,7 +90,7 @@ def lazy_tag(self, func=None, takes_context=None, name=None, node_class=None):
             def get_resolved_arguments(self, context):
                 resolved_args = [var.resolve(context) for var in self.args]
                 if self.takes_context:
-                    resolved_args = [context] + resolved_args
+                    resolved_args = [context, *resolved_args]
                 resolved_kwargs = {
                     k: v.resolve(context) for k, v in self.kwargs.items()
                 }

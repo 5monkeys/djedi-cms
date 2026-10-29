@@ -5,7 +5,8 @@ from django.urls import include, re_path
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import View
 
-from ..auth import has_permission
+from djedi.auth import has_permission
+
 from .mixins import DjediContextMixin
 
 
@@ -16,9 +17,8 @@ class Admin(ModelAdmin):
     def get_urls(self):
         return [
             re_path(r"^", include("djedi.admin.urls", namespace="djedi")),
-            re_path(
-                r"", lambda: None, name="djedi_cms_changelist"
-            ),  # Placeholder to show change link to CMS in admin
+            # Alias for Django admin's CMS change link.
+            re_path(r"^$", DjediCMS.as_view(), name="djedi_cms_changelist"),
         ]
 
     def has_change_permission(self, request, obj=None):

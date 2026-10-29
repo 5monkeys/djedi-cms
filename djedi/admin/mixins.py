@@ -40,6 +40,7 @@ class DjediContextMixin:
 
         context["THEME"] = theme
         context["VERSION"] = djedi.__version__
-        context["PLUGINS"] = mark_safe(json.dumps(list(plugins.plugins.keys())))
+        # Plugin extensions come from registered server-side plugins.
+        context["PLUGINS"] = mark_safe(json.dumps(list(plugins.plugins.keys())))  # noqa: S308
 
         return context

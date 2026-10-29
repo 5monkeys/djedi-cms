@@ -30,15 +30,16 @@ class DjangoModelStorageBackend(DatabaseBackend):
             uri = storage_keys[key]
 
             # Assert requested plugin matches
-            if uri.ext in (None, plugin):
+            if uri.ext in (None, plugin) and (
                 # Assert version matches or node is published
-                if (uri.version == version) or (is_published and not uri.version):
-                    meta = self._decode_meta(meta, is_published=is_published)
-                    nodes[uri] = {
-                        "uri": uri.clone(ext=plugin, version=version),
-                        "content": content,
-                        "meta": meta,
-                    }
+                uri.version == version or (is_published and not uri.version)
+            ):
+                meta_ = self._decode_meta(meta, is_published=is_published)
+                nodes[uri] = {
+                    "uri": uri.clone(ext=plugin, version=version),
+                    "content": content,
+                    "meta": meta_,
+                }
 
         return nodes
 
@@ -86,8 +87,8 @@ class DjangoModelStorageBackend(DatabaseBackend):
 
         try:
             return nodes.get()
-        except Node.DoesNotExist:
-            raise NodeDoesNotExist('Node for uri "%s" does not exist' % uri)
+        except Node.DoesNotExist as exc:
+            raise NodeDoesNotExist(f'Node for uri "{uri}" does not exist') from exc
 
     def _create(self, uri, content, **meta):
         try:
@@ -101,7 +102,7 @@ class DjangoModelStorageBackend(DatabaseBackend):
                 meta=meta,
             )
         except IntegrityError as e:
-            raise PersistenceError(f'Failed to create node for uri "{uri}"; {e}')
+            raise PersistenceError(f'Failed to create node for uri "{uri}"; {e}') from e
 
     def _update(self, uri, content, **meta):
         node = self._get(uri)

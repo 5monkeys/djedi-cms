@@ -13,15 +13,14 @@ from cio.backends import storage
 from cio.backends.exceptions import NodeDoesNotExist, PersistenceError
 from cio.plugins import plugins
 from cio.utils.uri import URI
+from djedi.backends.django.db.models import Node
 from djedi.plugins.form import BaseEditorForm
+from djedi.plugins.img import DataForm
 from djedi.tests.base import ClientTest, DjediTest, UserMixin
 
 
-def json_node(response, simple=True):
-    node = json.loads(response.content)
-    if simple and "meta" in node:
-        del node["meta"]
-    return node
+def json_node(response):
+    return json.loads(response.content)
 
 
 class PermissionTest(DjediTest, UserMixin):
@@ -37,13 +36,13 @@ class PermissionTest(DjediTest, UserMixin):
         response = client.get(url)
         self.assertEqual(response.status_code, 403)
 
-        logged_in = client.login(username=self.master.username, password="test")
+        logged_in = client.login(username=self.master.username, password="test")  # noqa: S106
         self.assertTrue(logged_in)
         response = client.get(url)
         self.assertEqual(response.status_code, 404)
 
         client.logout()
-        logged_in = client.login(username=self.apprentice.username, password="test")
+        logged_in = client.login(username=self.apprentice.username, password="test")  # noqa: S106
         self.assertTrue(logged_in)
         response = client.get(url)
         self.assertEqual(response.status_code, 404)
@@ -101,7 +100,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.get("api.load", "sv-se@page/title")
         self.assertEqual(response.status_code, 200)
-        node = json_node(response, simple=False)
+        node = json_node(response)
         meta = node.pop("meta", {})
         content = "# Djedi" if cio.PY26 else "<h1>Djedi</h1>"
         self.assertDictEqual(
@@ -120,6 +119,24 @@ class PrivateRestTest(ClientTest):
 
         self.assertEqual(len(cio.revisions("i18n://sv-se@page/title")), 1)
 
+    def test_api_errors_are_logged_without_exposing_details(self):
+        uri = "i18n://<svg onload=alert(1)>.txt"
+
+        for debug in (True, False):
+            with self.subTest(debug=debug), self.settings(DEBUG=debug):
+                with self.assertLogs("djedi.admin.api", level="ERROR") as logs:
+                    response = self.get("api.load", uri)
+
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.content, b"")
+                self.assertEqual(response["Content-Type"], "text/plain")
+                self.assertEqual(len(logs.records), 1)
+                error = logs.records[0].exc_info
+                self.assertIsNotNone(error)
+                self.assertIsInstance(error[1], URI.Invalid)
+                self.assertIn(uri, str(error[1]))
+                self.assertIsNotNone(error[2])
+
     def test_set(self):
         response = self.post("api", "i18n://page/title", {"data": "# Djedi"})
         self.assertEqual(response.status_code, 400)
@@ -136,7 +153,7 @@ class PrivateRestTest(ClientTest):
             "api", uri, {"data": "# Djedi", "meta[message]": "lundberg"}
         )
         self.assertEqual(response.status_code, 200)
-        node = json_node(response, simple=False)
+        node = json_node(response)
         meta = node.pop("meta")
         content = "# Djedi" if cio.PY26 else "<h1>Djedi</h1>"
         self.assertDictEqual(
@@ -155,7 +172,7 @@ class PrivateRestTest(ClientTest):
         response = self.post(
             "api", node.uri, {"data": "# Djedi", "meta[message]": "Lundberg"}
         )
-        node = json_node(response, simple=False)
+        node = json_node(response)
         self.assertEqual(node["meta"]["message"], "Lundberg")
 
         with self.assertRaises(PersistenceError):
@@ -281,9 +298,19 @@ class PrivateRestTest(ClientTest):
             self.assertEqual(response.status_code, 200)
             self.assertIn(b'document.domain = "foobar.se"', response.content)
 
-    def test_image_dataform(self):
-        from djedi.plugins.img import DataForm
+    def test_editor_ajax_returns_json(self):
+        url = self.get_api_url("cms.editor", "sv-se@page/title.md")
+        response = self.client.post(
+            url,
+            {"data": "Hello"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        content = json.loads(response.content)
+        self.assertIn("uri", content)
+        self.assertIn("content", content)
 
+    def test_image_dataform(self):
         data_form = DataForm()
         html = data_form.as_table()
 
@@ -315,7 +342,7 @@ class PrivateRestTest(ClientTest):
             response = self.post("api", "i18n://sv-se@header/logo.img", form)
             self.assertEqual(response.status_code, 200)
 
-            node = json_node(response, simple=False)
+            node = json_node(response)
             meta = node.pop("meta")
             uri, content = node["uri"], node["content"]
             self.assertEqual(uri, "i18n://sv-se@header/logo.img#draft")
@@ -326,7 +353,8 @@ class PrivateRestTest(ClientTest):
                 'class="year-53" '
                 'height="64" '
                 'id="vw" '
-                'src="/media/djedi/img/03/5e/5eba6fc2149822a8dbf76cd6978798f2ddc4ac34.png" '
+                'src="/media/djedi/img/03/5e/'
+                '5eba6fc2149822a8dbf76cd6978798f2ddc4ac34.png" '
                 'width="64" />'
             )
             self.assertEqual(content, html)
@@ -341,7 +369,7 @@ class PrivateRestTest(ClientTest):
             response = self.post("api", "i18n://sv-se@header/logo.img", form)
             self.assertEqual(response.status_code, 200)
 
-    def test_save_nested_content(self):
+    def test_save_nested_content(self):  # noqa: PLR0915
         data = {
             "direction": "col",
             "children": [
@@ -577,7 +605,7 @@ class PrivateRestTest(ClientTest):
         )
         response = self.post("api.render", "md", {"data": "# Djedi"})
         assert response.status_code == 200
-        self.assertRenderedMarkdown(smart_text(response.content), "# Djedi")
+        self.assertRenderedMarkdown(smart_str(response.content), "# Djedi")
 
         data = {
             "direction": "col",
@@ -608,6 +636,7 @@ class PrivateRestTest(ClientTest):
 
         response = self.get("cms.editor", "sv-se@page/context-test.list?plugin=img")
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "djedi/plugins/img/editor.html")
         assert set(response.context_data.keys()) == {
             "THEME",
             "VERSION",
@@ -654,8 +683,9 @@ class PublicRestTest(ClientTest):
         with self.assertCache(sets=1):
             cio.set("sv-se@rest/label/email", "E-post")
 
-        with self.assertDB(calls=1), self.assertCache(
-            calls=1, misses=1, hits=1, sets=0
+        with (
+            self.assertDB(calls=1),
+            self.assertCache(calls=1, misses=1, hits=1, sets=0),
         ):
             url = reverse("admin:djedi:rest:nodes")
             response = self.client.post(
@@ -677,3 +707,18 @@ class PublicRestTest(ClientTest):
         )
         self.assertIn("i18n://sv-se@rest/label/email.txt#1", json_content.keys())
         self.assertEqual(json_content["i18n://sv-se@rest/label/email.txt#1"], "E-post")
+
+
+class BackendPublishTest(DjediTest):
+    def test_publish_handles_digit_version_and_already_published(self):
+        uri = URI("i18n://sv-se@branch/publish.txt#2")
+        storage.backend._create(uri, "v2")
+
+        first = storage.backend.publish(uri)
+        assert first["uri"] == uri
+
+        node = Node.objects.get(key=storage.backend._build_key(uri), version="2")
+        assert node.is_published is True
+
+        second = storage.backend.publish(uri)
+        assert second["uri"] == uri

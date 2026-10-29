@@ -8,4 +8,4 @@ djedi.configure()
 if storage.backend.scheme == "db":
     from .backends.django.db.models import Node
 
-    Node
+    Node  # noqa: B018

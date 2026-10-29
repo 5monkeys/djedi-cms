@@ -37,7 +37,7 @@ class ListPlugin(DjediPlugin):
             return list_data
 
         # Child data
-        child_node, key = self.get_child_node(node.uri, list_data)
+        child_node, _key = self.get_child_node(node.uri, list_data)
         plugin = self.resolve_child_plugin(child_node.uri)
 
         return plugin.load_node(child_node)
@@ -65,10 +65,7 @@ class ListPlugin(DjediPlugin):
         yield "</ul>"
 
     def resolve_child_plugin(self, uri):
-        if self.is_nested(uri):
-            ext = self.ext
-        else:
-            ext = self.get_query_param(uri, "plugin")
+        ext = self.ext if self.is_nested(uri) else self.get_query_param(uri, "plugin")
 
         return plugins.get(ext or self.ext)
 
@@ -119,7 +116,7 @@ class ListPlugin(DjediPlugin):
 
     def is_leaf_list_node(self, uri):
         plugin = self.get_query_param(uri, "plugin")
-        return not plugin or plugin == self.ext and not self.is_nested(uri)
+        return not plugin or (plugin == self.ext and not self.is_nested(uri))
 
     def save_node(self, node):
         if not self.get_query_param(node.uri, "plugin"):

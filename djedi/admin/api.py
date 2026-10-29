@@ -1,11 +1,12 @@
+import logging
 from collections import defaultdict
 from urllib.parse import unquote
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.template.response import TemplateResponse
-from django.utils.safestring import mark_safe
 from django.utils.decorators import method_decorator
+from django.utils.safestring import mark_safe
 from django.views.decorators.cache import never_cache
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -16,11 +17,13 @@ from cio.node import Node
 from cio.plugins import plugins
 from cio.plugins.exceptions import UnknownPlugin
 from cio.utils.uri import URI
+from djedi import auth
+from djedi.plugins.base import DjediPlugin
 
-from .. import auth
-from ..plugins.base import DjediPlugin
 from .exceptions import InvalidNodeData
 from .mixins import DjediContextMixin, JSONResponseMixin
+
+logger = logging.getLogger(__name__)
 
 
 class APIView(View):
@@ -33,8 +36,9 @@ class APIView(View):
             return super().dispatch(request, *args, **kwargs)
         except Http404:
             raise
-        except Exception as e:
-            return HttpResponseBadRequest(e)
+        except Exception:
+            logger.exception("Error handling Djedi API request")
+            return HttpResponseBadRequest(content_type="text/plain")
 
     def get_post_data(self, request):
         """
@@ -57,10 +61,11 @@ class APIView(View):
                 field = field[:-1]
                 try:
                     data[prefix][field] = value
-                except TypeError:
+                except TypeError as exc:
                     raise InvalidNodeData(
-                        'Got both reserved parameter "data" and plugin specific parameters.'
-                    )
+                        'Got both reserved parameter "data" and '
+                        "plugin specific parameters."
+                    ) from exc
             else:
                 data[prefix] = value
 
@@ -69,7 +74,8 @@ class APIView(View):
     def decode_uri(self, uri):
         decoded = unquote(uri)
 
-        # If uri got decoded then recursive try more times until nothing more can be decoded
+        # If uri got decoded, recursively try more times until nothing else
+        # can be decoded.
         if decoded != uri:
             decoded = self.decode_uri(decoded)
 
@@ -175,13 +181,13 @@ class RenderApi(APIView):
         """
         try:
             plugin = plugins.get(ext)
-            data, meta = self.get_post_data(request)
+            data, _meta = self.get_post_data(request)
             uri = URI(ext=ext)
             node = Node(uri=uri, content=data)
             data = plugin.load_node(node)
             node.content = data
         except UnknownPlugin:
-            raise Http404
+            raise Http404 from None
         else:
             content = plugin.render_node(node, data)
             return self.render_to_response(content)
@@ -196,7 +202,7 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
             plugin_context = self.get_plugin_context(request, uri)
 
         except UnknownPlugin:
-            raise Http404
+            raise Http404 from None
         else:
             return self.render_plugin(request, plugin_context)
 
@@ -225,14 +231,14 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
         if isinstance(plugin, DjediPlugin):
             context = plugin.get_editor_context(request, **context)
 
-        context["uri"] = mark_safe(context["uri"])
+        context["uri"] = mark_safe(context["uri"])  # noqa: S308
         return context
 
     def render_plugin(self, request, context):
         return TemplateResponse(
             request,
             [
-                "djedi/plugins/%s/editor.html" % context["plugin"],
+                f"djedi/plugins/{context['plugin']}/editor.html",
                 "djedi/plugins/base/editor.html",
             ],
             self.get_context_data(**context),
