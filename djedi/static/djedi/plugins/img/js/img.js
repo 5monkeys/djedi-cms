@@ -331,6 +331,7 @@
       this.firstRender = true;
       this.field = $(config.field);
       this.preview = $(config.preview);
+      this.enable_crop_preview = config.enable_crop_preview;
       this.dropzone = new Dropzone({
         field: this.field,
         el: config.dropzone
@@ -461,7 +462,9 @@
               if ((_ref = _this.crop) != null) {
                 _ref.setPreviewAttributes(_this.getHtmlFields());
               }
-              return _this.triggerRender(html);
+              if (_this.enable_crop_preview) {
+                return _this.triggerRender(html);
+              }
             });
             $image.on('crop:attributes', function() {
               _this.updateImageAttributes();

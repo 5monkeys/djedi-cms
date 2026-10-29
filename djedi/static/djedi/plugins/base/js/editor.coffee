@@ -134,8 +134,12 @@ class window.Editor
     @$version = $ 'header .version'
     @$flag = $ 'header .flag'
 
-    $('#button-publish').on 'click', @publish
-    $('#button-discard').on 'click', @discard
+    @$doc.on 'editor:save', () => @$form.submit()
+    @$doc.on 'editor:publish', () => @onPublish()
+
+    @actions.publish.on 'click', @publish
+    @actions.discard.on 'click', @discard
+    @actions.save.on 'click', @save
 
     # Use ajaxForm from downloads
     @$form.ajaxForm
@@ -153,6 +157,8 @@ class window.Editor
     @api.load config.uri, @onLoad
     @callback 'initialize', config
     @initialized = yes
+    window.editor = @
+    @trigger 'editor:initialized', @, config
 
   callback: (name, args...) ->
     callback = @config[name]
@@ -171,7 +177,7 @@ class window.Editor
   prepareForm: ->
 
   onLoad: (node) =>
-    console.log 'Editor.onLoad()', node.uri
+    console.log 'Editor.onLoad()'
     initial = @node == undefined
 
     # Fetch default node data from embedder
@@ -196,6 +202,7 @@ class window.Editor
 
   onFormChange: (event) =>
     console.log 'Editor.onFormChange()'
+    @trigger 'editor:dirty'
     @setState 'dirty'
     @callback 'onFormChange', event
 
@@ -203,7 +210,13 @@ class window.Editor
     console.log 'Editor.onSave()'
     node = @setNode node
     @render node
+    @trigger 'node:update', node.uri.valueOf(), node
     @trigger 'node:render', node.uri.valueOf(), node.content
+
+  onPublish: () =>
+    node = @api.publish @node.uri.valueOf()
+    @setNode node
+    @setState 'published'
 
   setNode: (node) ->
     console.log 'Editor.setNode()'
@@ -232,6 +245,7 @@ class window.Editor
   setState: (state) ->
     console.log 'Editor.setState()', state
     if state != @state
+      oldState = @state
       @state = state
       @$version.removeClass 'label-default label-warning label-danger label-info label-success'
       switch state
@@ -260,20 +274,22 @@ class window.Editor
           @actions.discard.disable()
           @actions.save.disable()
           @actions.publish.enable()
+      @trigger 'editor:state-changed', oldState, state, @node
+
 
   renderHeader: (node) ->
     uri = node.uri
-    color = (uri.ext[0].toUpperCase().charCodeAt() - 65) % 5 + 1
+    color = @getPluginColor(uri.ext)
 
     parts = (
       for part in uri.path.split '/' when part != ''
         (part[..0].toUpperCase() + part[1..-1]).replace /[_-]/g, ' '
     )
-    path = parts.join " <span class=\"plugin-fg-#{color}\">/</span> "
+    path = parts.join " <span class=\"#{color}\">/</span> "
 
     lang = uri.namespace.split('-')[0] if uri.scheme == 'i18n'
 
-    @$plugin.html(uri.ext).addClass "plugin-fg-#{color}"
+    @$plugin.html(uri.ext).addClass color
     @$path.html path
     @$flag.addClass "flag-#{lang}"
 
@@ -329,13 +345,18 @@ class window.Editor
 
   render: (node) ->
     console.log 'Editor.render()'
+    @trigger 'editor:render', node
     @callback 'render', node
 
   loadRevision: (event) =>
     console.log 'Editor.loadRevision()'
     event.preventDefault()
 
-    $revision = $ event.target
+    if $(event.target).is('i')
+      $revision = $(event.target).parent()
+    else
+      $revision = $ event.target
+
     uri = $revision.data('uri')
     published = $revision.data 'published'
 
@@ -354,7 +375,12 @@ class window.Editor
 
   renderContent: (data, doTrigger, callback) ->
     console.log 'Editor.renderContent()'
-    plugin = @node.uri.ext
+
+    if @node.uri.query and @node.uri.query['plugin']
+      plugin = @node.uri.query['plugin']
+    else
+      plugin = @node.uri.ext
+
     data = {data: data} if typeof(data) == 'string'
     content = ''
 
@@ -372,9 +398,8 @@ class window.Editor
     content
 
   publish: =>
-    node = @api.publish @node.uri.valueOf()
-    @setNode node
-    @setState 'published'
+    if @state == "draft" || @state == "revert"
+      @trigger "editor:publish", @node.uri
 
   discard: =>
     if @node.uri.version == 'draft'
@@ -385,3 +410,12 @@ class window.Editor
     @node = null
 
     @api.load uri.valueOf(), @onLoad
+    @trigger "editor:discard", uri
+
+  save: =>
+    if @state == "dirty"
+      @trigger 'editor:save', @node.uri
+
+  getPluginColor: (ext) =>
+    color = (ext[0].toUpperCase().charCodeAt() - 65) % 5 + 1
+    return "plugin-fg-#{color}"

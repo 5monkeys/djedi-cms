@@ -1,7 +1,7 @@
 .. _plugins:
 
 Plugins
-=======
+========
 
 Djedi CMS plugins handles content serialization and rendering.
 Each plugin has its own extension which is referred to in the request URI.

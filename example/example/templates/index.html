@@ -14,6 +14,26 @@
             max-width: 100%;
             height: auto;
         }
+
+        .djedi-list {
+          list-style-type: none;
+          margin:0;
+          padding: 0;
+          display: flex;
+        }
+
+        .djedi-list--col {
+          flex-direction: column;
+        }
+        .djedi-list--ucol {
+          flex-direction: column-reverse;
+        }
+        .djedi-list--row {
+          flex-direction: row;
+        }
+        .djedi-list--urow {
+          flex-direction: row-reverse;
+        }
     </style>
 </head>
 <body>
@@ -27,6 +47,7 @@
 
 {% node 'page/image.img' %}
 {% node 'page/image2.img' %}
+{% node 'page/listnode.list' %}
 <hr>
 
 {% if not request.user.is_authenticated %}

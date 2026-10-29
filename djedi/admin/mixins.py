@@ -1,9 +1,11 @@
 import simplejson as json
 from django.conf import settings as django_settings
 from django.http import HttpResponse
+from django.utils.safestring import mark_safe
 
 import djedi
 from cio.conf import settings
+from cio.plugins import plugins
 
 # TODO: Switch simplejson to ujson or other?
 
@@ -38,5 +40,7 @@ class DjediContextMixin:
 
         context["THEME"] = theme
         context["VERSION"] = djedi.__version__
+        # Plugin extensions come from registered server-side plugins.
+        context["PLUGINS"] = mark_safe(json.dumps(list(plugins.plugins.keys())))  # noqa: S308
 
         return context

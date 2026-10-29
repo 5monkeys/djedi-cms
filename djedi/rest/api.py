@@ -1,15 +1,15 @@
 import simplejson as json
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 import cio
 import cio.conf
-
-from ..admin.mixins import JSONResponseMixin
-from ..auth import has_permission
-from ..utils.templates import render_embed
+from djedi.admin.mixins import JSONResponseMixin
+from djedi.auth import has_permission
+from djedi.utils.templates import render_embed
 
 
 class APIView(JSONResponseMixin, View):
@@ -36,7 +36,7 @@ class NodesApi(APIView):
         {uri: content, uri: content, ...}
     """
 
-    @never_cache
+    @method_decorator(never_cache)
     def post(self, request):
         # Disable caching gets in CachePipe, defaults through this api is not trusted
         cio.conf.settings.configure(local=True, CACHE={"PIPE": {"CACHE_ON_GET": False}})

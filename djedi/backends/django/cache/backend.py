@@ -1,6 +1,6 @@
 from django.core.cache import InvalidCacheBackendError, caches
 from django.core.cache.backends.locmem import LocMemCache
-from django.utils.encoding import smart_bytes, smart_text
+from django.utils.encoding import smart_bytes, smart_str
 
 from cio.backends.base import CacheBackend
 
@@ -16,7 +16,7 @@ class DjangoCacheBackend(CacheBackend):
             cache_name = self.config.get("NAME", "djedi")
             cache = caches[cache_name]
         except (InvalidCacheBackendError, ValueError):
-            from django.core.cache import cache
+            from django.core.cache import cache  # noqa: PLC0415
 
         self._cache = cache
 
@@ -45,7 +45,8 @@ class DjangoCacheBackend(CacheBackend):
 
     def _encode_content(self, uri, content):
         """
-        Join node uri and content as string and convert to bytes to ensure no pickling in memcached.
+        Join node uri and content as string and convert to bytes to ensure
+        no pickling in memcached.
         """
         if content is None:
             content = self.NONE
@@ -55,7 +56,7 @@ class DjangoCacheBackend(CacheBackend):
         """
         Split node string to uri and content and convert back to unicode.
         """
-        content = smart_text(content)
+        content = smart_str(content)
         uri, _, content = content.partition("|")
         if content == self.NONE:
             content = None

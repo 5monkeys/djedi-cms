@@ -5343,6 +5343,22 @@ body {
   -ms-font-smoothing: antialiased;
   -o-font-smoothing: antialiased;
   font-smoothing: antialiased;
+  display: block;
+  display: flex;
+  flex-direction: column;
+}
+body .tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+body .tab-content .tab-pane {
+  flex: 1;
+  height: auto;
+  max-height: none;
+}
+body .tab-content .tab-pane #editor-iframe {
+  height: 100%;
 }
 body.embedded {
   overflow: hidden;
@@ -5686,6 +5702,24 @@ body.open .navbar-brand > a > i.dc-djedi-icon {
 .node-title .version var {
   font-style: normal;
   cursor: pointer;
+}
+body.editor .dropdown-menu {
+  background-color: rgba(0, 0, 0, 0.75);
+  border-color: #666;
+  text-shadow: none;
+  font-size: 9px;
+  min-width: 80px;
+  overflow: auto;
+  max-height: 300px;
+  margin-right: 45px;
+}
+body.editor .dropdown-menu > li > a {
+  font-weight: bold;
+  color: #ffad3c;
+}
+body.editor .dropdown-menu > li > a:hover {
+  color: #fff;
+  background-color: #222;
 }
 body.editor header .navbar {
   background: #fff;

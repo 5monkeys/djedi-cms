@@ -59,6 +59,7 @@
             uri: '{{ uri }}',
             field: '#image',
             preview: '#preview',
+            enable_crop_preview: {% if disable_crop_preview %}false{% else %}true{% endif %},
             dropzone: '#dropzone'
         });
     </script>

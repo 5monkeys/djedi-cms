@@ -38,8 +38,7 @@ class AdminPanelMixin:
             admin_prefix = reverse("admin:index")
         except NoReverseMatch:
             _log.debug(
-                'No reverse match for "admin:index", can\'t detect '
-                "django-admin pages"
+                'No reverse match for "admin:index", can\'t detect django-admin pages'
             )
         else:
             if request.path.startswith(admin_prefix):
@@ -51,12 +50,12 @@ class AdminPanelMixin:
 
         try:
             djedi_cms_url = reverse("admin:djedi:cms")
-        except NoReverseMatch:
+        except NoReverseMatch as exc:
             raise ImproperlyConfigured(
                 "Could not find djedi in your url conf, "
                 "enable django admin or include "
                 "djedi.urls within the admin namespace."
-            )
+            ) from exc
         else:
             if request.path.startswith(djedi_cms_url):
                 _log.debug("djedi page detected, not injecting panel")
@@ -74,12 +73,11 @@ class AdminPanelMixin:
         def get_requested_uri(node):
             # Get first namespace URI, remove any version and ensures extension.
             # TODO: Default extension fallback should be handled in content-io
-            uri = node.namespace_uri
-            uri = uri.clone(
-                ext=uri.ext or settings.URI_DEFAULT_EXT,
+            namespace_uri = node.namespace_uri
+            return namespace_uri.clone(
+                ext=namespace_uri.ext or settings.URI_DEFAULT_EXT,
                 version=None,
             )
-            return uri
 
         defaults = {
             get_requested_uri(node): node.initial

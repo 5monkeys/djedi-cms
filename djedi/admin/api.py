@@ -1,27 +1,33 @@
+import logging
 from collections import defaultdict
+from urllib.parse import unquote
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.template.response import TemplateResponse
-from django.utils.http import urlunquote
+from django.utils.decorators import method_decorator
+from django.utils.safestring import mark_safe
 from django.views.decorators.cache import never_cache
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 import cio
+from cio.node import Node
 from cio.plugins import plugins
 from cio.plugins.exceptions import UnknownPlugin
 from cio.utils.uri import URI
+from djedi import auth
+from djedi.plugins.base import DjediPlugin
 
-from .. import auth
-from ..plugins.base import DjediPlugin
 from .exceptions import InvalidNodeData
 from .mixins import DjediContextMixin, JSONResponseMixin
 
+logger = logging.getLogger(__name__)
+
 
 class APIView(View):
-    @csrf_exempt
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         if not auth.has_permission(request):
             raise PermissionDenied
@@ -30,8 +36,9 @@ class APIView(View):
             return super().dispatch(request, *args, **kwargs)
         except Http404:
             raise
-        except Exception as e:
-            return HttpResponseBadRequest(e)
+        except Exception:
+            logger.exception("Error handling Djedi API request")
+            return HttpResponseBadRequest(content_type="text/plain")
 
     def get_post_data(self, request):
         """
@@ -54,19 +61,21 @@ class APIView(View):
                 field = field[:-1]
                 try:
                     data[prefix][field] = value
-                except TypeError:
+                except TypeError as exc:
                     raise InvalidNodeData(
-                        'Got both reserved parameter "data" and plugin specific parameters.'
-                    )
+                        'Got both reserved parameter "data" and '
+                        "plugin specific parameters."
+                    ) from exc
             else:
                 data[prefix] = value
 
         return data["data"], data["meta"]
 
     def decode_uri(self, uri):
-        decoded = urlunquote(uri)
+        decoded = unquote(uri)
 
-        # If uri got decoded then recursive try more times until nothing more can be decoded
+        # If uri got decoded, recursively try more times until nothing else
+        # can be decoded.
         if decoded != uri:
             decoded = self.decode_uri(decoded)
 
@@ -77,7 +86,7 @@ class APIView(View):
 
 
 class NodeApi(JSONResponseMixin, APIView):
-    @never_cache
+    @method_decorator(never_cache)
     def get(self, request, uri):
         """
         Return published node or specified version.
@@ -152,7 +161,7 @@ class RevisionsApi(JSONResponseMixin, APIView):
 
 
 class LoadApi(JSONResponseMixin, APIView):
-    @never_cache
+    @method_decorator(never_cache)
     def get(self, request, uri):
         """
         Load raw node source from storage.
@@ -172,34 +181,32 @@ class RenderApi(APIView):
         """
         try:
             plugin = plugins.get(ext)
-            data, meta = self.get_post_data(request)
-            data = plugin.load(data)
+            data, _meta = self.get_post_data(request)
+            uri = URI(ext=ext)
+            node = Node(uri=uri, content=data)
+            data = plugin.load_node(node)
+            node.content = data
         except UnknownPlugin:
-            raise Http404
+            raise Http404 from None
         else:
-            content = plugin.render(data)
+            content = plugin.render_node(node, data)
             return self.render_to_response(content)
 
 
 class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
-    @never_cache
-    @xframe_options_exempt
+    @method_decorator(never_cache)
+    @method_decorator(xframe_options_exempt)
     def get(self, request, uri):
         try:
             uri = self.decode_uri(uri)
-            uri = URI(uri)
-            plugin = plugins.resolve(uri)
-            plugin_context = self.get_context_data(uri=uri)
-
-            if isinstance(plugin, DjediPlugin):
-                plugin_context = plugin.get_editor_context(**plugin_context)
+            plugin_context = self.get_plugin_context(request, uri)
 
         except UnknownPlugin:
-            raise Http404
+            raise Http404 from None
         else:
             return self.render_plugin(request, plugin_context)
 
-    @never_cache
+    @method_decorator(never_cache)
     def post(self, request, uri):
         uri = self.decode_uri(uri)
         data, meta = self.get_post_data(request)
@@ -208,17 +215,30 @@ class NodeEditor(JSONResponseMixin, DjediContextMixin, APIView):
 
         context = cio.load(node.uri)
         context["content"] = node.content
+        context.update(self.get_plugin_context(request, context["uri"]))
 
-        if request.is_ajax():
+        # is_ajax call?
+        if request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest":
             return self.render_to_json(context)
         else:
             return self.render_plugin(request, context)
+
+    def get_plugin_context(self, request, uri):
+        uri = URI(uri)
+        plugin = plugins.resolve(uri)
+
+        context = {"uri": uri, "plugin": uri.ext}
+        if isinstance(plugin, DjediPlugin):
+            context = plugin.get_editor_context(request, **context)
+
+        context["uri"] = mark_safe(context["uri"])  # noqa: S308
+        return context
 
     def render_plugin(self, request, context):
         return TemplateResponse(
             request,
             [
-                "djedi/plugins/%s/editor.html" % context["uri"].ext,
+                f"djedi/plugins/{context['plugin']}/editor.html",
                 "djedi/plugins/base/editor.html",
             ],
             self.get_context_data(**context),

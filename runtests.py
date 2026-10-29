@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import logging
 import os
 import sys
@@ -83,12 +81,12 @@ def main():
     sys.path.insert(0, parent)
 
     try:
-        from django.test.runner import DiscoverRunner
+        from django.test.runner import DiscoverRunner  # noqa: PLC0415
 
         runner_class = DiscoverRunner
         test_args = ["djedi.tests"]
     except ImportError:
-        from django.test.simple import DjangoTestSuiteRunner
+        from django.test.simple import DjangoTestSuiteRunner  # noqa: PLC0415
 
         runner_class = DjangoTestSuiteRunner
         test_args = ["djedi"]

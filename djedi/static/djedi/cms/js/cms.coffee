@@ -35,7 +35,7 @@ class Settings
 
 
 ################################################[  NODE  ]##############################################################
-class Node
+class window.Node
 
   selected: no
 
@@ -253,7 +253,7 @@ class Page
 
 
 ################################################[  PLUGIN  ]############################################################
-class Plugin
+window.Plugin = class Plugin
 
   constructor: (@node) ->
     @uri = @node.uri.valueOf()
@@ -388,5 +388,5 @@ class CMS
     else
       @page.$cms.css style
 
-
-new CMS
+window.makeCms = ->
+  new CMS
