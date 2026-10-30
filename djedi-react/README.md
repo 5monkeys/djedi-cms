@@ -22,6 +22,7 @@ Requires djedi-cms version 1.2.1 or later.
   - [`Node`](#node)
   - [`NodeContext`](#nodecontext)
   - [`ForceNodes`](#forcenodes)
+  - [`NodeText`](#nodetext)
   - [`djedi`](#djedi)
   - [`md`](#md)
 - [Django settings](#django-settings)
@@ -44,7 +45,14 @@ npm install djedi-react react react-dom isomorphic-unfetch
 ```
 
 ```js
-import { Node, NodeContext, ForceNodes, djedi, md } from "djedi-react";
+import {
+  Node,
+  NodeContext,
+  ForceNodes,
+  NodeText,
+  djedi,
+  md,
+} from "djedi-react";
 ```
 
 Optional [Babel] plugin (for better errors, prefetching and [server-side
@@ -507,6 +515,33 @@ const ERRORS = {
 
 <ForceNodes>{ERRORS}</ForceNodes>;
 ```
+
+### `NodeText`
+
+`<Node>` renders an element, so it can’t be used where a plain string is needed,
+such as the `placeholder` or `title` attribute, or the value passed to a
+component that only accepts strings. (`placeholder={<Node uri="..." />}` ends up
+as `"[object Object]"`.) `NodeText` gives you the node value as a string
+instead:
+
+```js
+<NodeText node={<Node uri="search/placeholder">Search</Node>}>
+  {text => <input placeholder={text} />}
+</NodeText>
+```
+
+Props:
+
+- `node`: A `<Node>` element. Its `uri`, default value and
+  [variables](#variables) work just like usual, and the node still shows up in
+  the Djedi sidebar and is picked up by the [Babel] plugin for prefetching. Its
+  `edit` and `render` props are ignored.
+- `children`: A function called with `(text, state, { language })`:
+  - `text`: The node value as a string (never wrapped in an element, see
+    [edit](#edit)). Empty string while the node is loading or if fetching it
+    failed.
+  - `state` and `{ language }`: The same arguments as for [render](#render), in
+    case you want to handle loading and errors yourself.
 
 ### `djedi`
 
